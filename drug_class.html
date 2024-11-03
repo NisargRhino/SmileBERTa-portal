@@ -61,7 +61,7 @@
     <script>
         document.getElementById('submitButton').addEventListener('click', function() {
             const smiles = document.getElementById('smilesInput').value;
-            fetch('backend/classify_smiles', {
+            fetch('https://smileberta-portal.onrender.com/classify_smiles', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -12,7 +12,7 @@ document.getElementById('inputForm').addEventListener('submit', function(event) 
 
     async function fetch2DStructure(smiles, imgElement) {
         try {
-            const response = await fetch('backend/get_2d_structure', {
+            const response = await fetch('https://smileberta-portal.onrender.com/get_2d_structure', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -29,7 +29,7 @@ document.getElementById('inputForm').addEventListener('submit', function(event) 
 
     async function fetch3DStructure(smiles, viewerElement, downloadElement, filename) {
         try {
-            const response = await fetch('backend/get_3d_structure', {
+            const response = await fetch('https://smileberta-portal.onrender.com/get_3d_structure', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -51,7 +51,7 @@ document.getElementById('inputForm').addEventListener('submit', function(event) 
             downloadElement.style.display = 'block';
             downloadElement.onclick = async function() {
                 try {
-                    const response = await fetch('backend/download_pdb', {
+                    const response = await fetch('https://smileberta-portal.onrender.com/download_pdb', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -76,7 +76,7 @@ document.getElementById('inputForm').addEventListener('submit', function(event) 
 
     async function predictFragment(smiles, suffix) {
         try {
-            const response = await fetch('backend/predict_fragment', {
+            const response = await fetch('https://smileberta-portal.onrender.com/predict_fragment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -110,7 +110,7 @@ document.getElementById('inputForm').addEventListener('submit', function(event) 
 
     async function fetchScore(smiles) {
         try {
-            const response = await fetch('backend/score', {
+            const response = await fetch('https://smileberta-portal.onrender.com/score', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -128,7 +128,7 @@ document.getElementById('inputForm').addEventListener('submit', function(event) 
     async function combineFragments(smiles1, smiles2) {
 
         try {
-            const response = await fetch('backend/combine', {
+            const response = await fetch('https://smileberta-portal.onrender.com/combine', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
