@@ -180,9 +180,9 @@ def combine():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
-model = RobertaForMaskedLM.from_pretrained('NisargRhino/drug-classification')
-tokenizer = RobertaTokenizer.from_pretrained('NisargRhino/drug-classification')
-model.eval()
+model1 = RobertaForMaskedLM.from_pretrained('NisargRhino/drug-classification')
+tokenizer1 = RobertaTokenizer.from_pretrained('NisargRhino/drug-classification')
+model1.eval()
 # Load unique tags for similarity comparison if needed
 unique_tags_df = pd.read_csv('./drug_classification_data_df.csv')
 unique_tags_list = unique_tags_df['tags'].tolist()
@@ -194,17 +194,17 @@ def classify_smiles():
         return jsonify({'error': 'No SMILES string provided'}), 400
 
     try:
-        prediction = predict_fragment_smiles(smiles, model, tokenizer)
+        prediction = predict_fragment_smiles(smiles, model1, tokenizer1)
         return jsonify({'prediction': prediction})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-def predict_fragment_smiles(smiles, model, tokenizer, max_length=128):
-    inputs = tokenizer(smiles, max_length=max_length, padding='max_length', truncation=True, return_tensors="pt")
+def predict_fragment_smiles(smiles, model1, tokenizer1, max_length=128):
+    inputs = tokenizer1(smiles, max_length=max_length, padding='max_length', truncation=True, return_tensors="pt")
     with torch.no_grad():
-        outputs = model(input_ids=inputs['input_ids'], attention_mask=inputs['attention_mask'])
+        outputs = model1(input_ids=inputs['input_ids'], attention_mask=inputs['attention_mask'])
     predicted_ids = torch.argmax(outputs.logits, dim=-1)
-    predicted_smiles = tokenizer.decode(predicted_ids[0], skip_special_tokens=True)
+    predicted_smiles = tokenizer1.decode(predicted_ids[0], skip_special_tokens=True)
     return predicted_smiles
 
 
