@@ -2,11 +2,9 @@ from flask import Flask, request, jsonify, send_file, send_from_directory, rende
 from flask_cors import CORS
 from rdkit import Chem
 from rdkit.Chem import AllChem, Draw
-# from frag_predict import generate_best_fragment, cleanup_molecule_rdkit, calculate_properties, get_3d_structure, best_model, feature_columns
 from fragpred import predict_fragment_smiles, cleanup_molecule_rdkit, calculate_properties, get_3d_structure
 from combine_frag import combine_fragments
 from docking import run_docking
-import io
 import os
 import pandas as pd
 from flask import Flask, request, jsonify, send_file, send_from_directory, render_template
@@ -14,12 +12,7 @@ from flask_cors import CORS
 from flask import make_response
 from rdkit import Chem
 from rdkit.Chem import AllChem, Draw
-# from frag_predict import generate_best_fragment, cleanup_molecule_rdkit, calculate_properties, get_3d_structure, best_model, feature_columns
-from fragpred import predict_fragment_smiles, cleanup_molecule_rdkit, calculate_properties, get_3d_structure
-from combine_frag import combine_fragments
-from docking import run_docking
 import io
-import os
 import pandas as pd
 from transformers import RobertaTokenizer, RobertaForMaskedLM
 import torch
@@ -198,14 +191,6 @@ def classify_smiles():
         return jsonify({'prediction': prediction})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-def predict_fragment_smiles(smiles, model, tokenizer, max_length=128):
-    inputs = tokenizer(smiles, max_length=max_length, padding='max_length', truncation=True, return_tensors="pt")
-    with torch.no_grad():
-        outputs = model(input_ids=inputs['input_ids'], attention_mask=inputs['attention_mask'])
-    predicted_ids = torch.argmax(outputs.logits, dim=-1)
-    predicted_smiles = tokenizer.decode(predicted_ids[0], skip_special_tokens=True)
-    return predicted_smiles
 
 
 if __name__ == '__main__':
