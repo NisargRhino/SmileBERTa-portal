@@ -199,12 +199,12 @@ def classify_smiles():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-def predict_fragment_smiles(smiles, model1, tokenizer1, max_length=128):
-    inputs = tokenizer1(smiles, max_length=max_length, padding='max_length', truncation=True, return_tensors="pt")
+def predict_fragment_smiles(smiles, model, tokenizer, max_length=128):
+    inputs = tokenizer(smiles, max_length=max_length, padding='max_length', truncation=True, return_tensors="pt")
     with torch.no_grad():
-        outputs = model1(input_ids=inputs['input_ids'], attention_mask=inputs['attention_mask'])
+        outputs = model(input_ids=inputs['input_ids'], attention_mask=inputs['attention_mask'])
     predicted_ids = torch.argmax(outputs.logits, dim=-1)
-    predicted_smiles = tokenizer1.decode(predicted_ids[0], skip_special_tokens=True)
+    predicted_smiles = tokenizer.decode(predicted_ids[0], skip_special_tokens=True)
     return predicted_smiles
 
 
