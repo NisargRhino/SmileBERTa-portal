@@ -12,7 +12,7 @@ document.getElementById('inputForm').addEventListener('submit', function(event) 
 
     async function fetch2DStructure(smiles, imgElement) {
         try {
-            const response = await fetch('http://127.0.1:5000/get_2d_structure', {
+            const response = await fetch('backend/get_2d_structure', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -29,7 +29,7 @@ document.getElementById('inputForm').addEventListener('submit', function(event) 
 
     async function fetch3DStructure(smiles, viewerElement, downloadElement, filename) {
         try {
-            const response = await fetch('http://127.0.1:5000/get_3d_structure', {
+            const response = await fetch('backend/get_3d_structure', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -51,7 +51,7 @@ document.getElementById('inputForm').addEventListener('submit', function(event) 
             downloadElement.style.display = 'block';
             downloadElement.onclick = async function() {
                 try {
-                    const response = await fetch('http://127.0.1:5000/download_pdb', {
+                    const response = await fetch('backend/download_pdb', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -76,7 +76,7 @@ document.getElementById('inputForm').addEventListener('submit', function(event) 
 
     async function predictFragment(smiles, suffix) {
         try {
-            const response = await fetch('http://127.0.1:5000/predict_fragment', {
+            const response = await fetch('backend/predict_fragment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -110,7 +110,7 @@ document.getElementById('inputForm').addEventListener('submit', function(event) 
 
     async function fetchScore(smiles) {
         try {
-            const response = await fetch('http://127.0.1:5000/score', {
+            const response = await fetch('backend/score', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -128,7 +128,7 @@ document.getElementById('inputForm').addEventListener('submit', function(event) 
     async function combineFragments(smiles1, smiles2) {
 
         try {
-            const response = await fetch('http://127.0.1:5000/combine', {
+            const response = await fetch('backend/combine', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
