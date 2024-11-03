@@ -173,21 +173,22 @@ def combine():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
-model1 = RobertaForMaskedLM.from_pretrained('NisargRhino/drug-classification')
-tokenizer1 = RobertaTokenizer.from_pretrained('NisargRhino/drug-classification')
-model1.eval()
+
 # Load unique tags for similarity comparison if needed
-unique_tags_df = pd.read_csv('./drug_classification_data_df.csv')
-unique_tags_list = unique_tags_df['tags'].tolist()
+#unique_tags_df = pd.read_csv('./drug_classification_data_df.csv')
+#unique_tags_list = unique_tags_df['tags'].tolist()  
 @app.route('/classify_smiles', methods=['POST'])
 def classify_smiles():
     data = request.get_json()
     smiles = data.get('smiles')
     if not smiles:
         return jsonify({'error': 'No SMILES string provided'}), 400
-
+    model = RobertaForMaskedLM.from_pretrained('NisargRhino/drug-classification')
+    tokenizer = RobertaTokenizer.from_pretrained('NisargRhino/drug-classification')
+    model.eval()
+ 
     try:
-        prediction = predict_fragment_smiles(smiles, model1, tokenizer1)
+        prediction = predict_fragment_smiles(smiles, model, tokenizer)
         return jsonify({'prediction': prediction})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
