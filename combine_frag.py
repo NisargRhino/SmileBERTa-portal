@@ -90,10 +90,10 @@ def combine_fragments(frag1_smiles, frag2_smiles, num_points=10):
     return combined_molecules
 
 # Example usage
-frag1_smiles = 'CC(=O)C(C)c1ccc(CC(C)C)cc1'  # Fragment 1 SMILES
-frag2_smiles = 'CCn1cc(C(C)=O)c(=O)c2cc(F)c(C)nc21'  # Fragment 2 SMILES
+# frag1_smiles = 'CC(=O)C(C)c1ccc(CC(C)C)cc1'  # Fragment 1 SMILES
+# frag2_smiles = 'CCn1cc(C(C)=O)c(=O)c2cc(F)c(C)nc21'  # Fragment 2 SMILES
 
-combined_smiles_list = combine_fragments(frag1_smiles, frag2_smiles)
+# combined_smiles_list = combine_fragments(frag1_smiles, frag2_smiles)
 
-for idx, combined_smiles in enumerate(combined_smiles_list, 1):
-    print(f"Combined Molecule {idx}: {combined_smiles}")
+# for idx, combined_smiles in enumerate(combined_smiles_list, 1):
+#     print(f"Combined Molecule {idx}: {combined_smiles}")
