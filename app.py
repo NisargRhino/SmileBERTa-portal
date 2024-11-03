@@ -208,4 +208,5 @@ def predict_fragment_smiles(smiles, model, tokenizer, max_length=128):
     return predicted_smiles
 
 
-app.run(debug=True, port=5000)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5001)  
