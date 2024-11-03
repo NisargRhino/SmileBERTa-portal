@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fragmentation Generator</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #121212; /* Dark background */
+            color: #ffffff; /* White text */
+            padding-top: 20px;
+        }
+        .section-spacing {
+            margin-bottom: 50px;
+        }
+        .blue-title {
+            color: #1e90ff; /* Blue color */
+        }
+        .btn-blue {
+            background-color: #1e90ff; /* Blue color */
+            border-color: #1e90ff;
+            color: white;
+            margin: 10px;
+        }
+        .btn-blue:hover {
+            background-color: #1c86ee; /* Darker blue for hover */
+            border-color: #1c86ee;
+        }
+        .btn-toggle {
+            display: none; /* Hide initially */
+        }
+        #viewer, #viewer2, #viewer-fragmented, #viewer-fragmented2 {
+            width: 100%;
+            height: 400px; /* Adjust height as needed */
+            position: relative; /* Ensure positioning context */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #viewer canvas, #viewer2 canvas, #viewer-fragmented canvas, #viewer-fragmented2 canvas {
+            width: 80%; /* Set canvas width to a fraction of the viewer */
+            height: 80%; /* Set canvas height to a fraction of the viewer */
+        }
+        .img-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .title-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .subtitle-text {
+            text-align: left; /* Align subtitle text to the left */
+            margin-top: 20px;
+        }
+        .spacer {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center section-spacing title-container">
+            <div class="col-md-12 text-center">
+                <h1>
+                    <span class="blue-title">Fragmentation Generator</span>
+                </h1>
+                <a href="index.html" class="btn btn-blue">Home</a>
+            </div>
+        </div>
+
+        <div class="row justify-content-center section-spacing">
+            <div class="col-md-12">
+                <form id="inputForm">
+                    <div class="form-group">
+                        <label for="smilesInput1">SMILES String 1</label>
+                        <input class="form-control" id="smilesInput1" list="smilesList1" placeholder="Type or select a SMILES string" />
+                        <datalist id="smilesList1">
+                            <option value="C=CCCC(=O)NCC1CN(c2ccc(N3CCOCC3)c(F)c2)C(=O)O1">
+                            <option value="CC(=O)NCC1CN(c2ccc(-c3cncs3)c(F)c2)C(=O)O1">
+                            <option value="CC(C)(C)NCC(O)COc1ccc(O)c2c1CCC(=O)N2">
+                            <option value="CC(C)C(NC(=O)CCc1ccccc1)C(=O)N1CCCC1">
+                        </datalist>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="smilesInput2">SMILES String 2</label>
+                        <input class="form-control" id="smilesInput2" list="smilesList2" placeholder="Type or select a SMILES string" />
+                        <datalist id="smilesList2">
+                            <option value="C=CCCC(=O)NCC1CN(c2ccc(N3CCOCC3)c(F)c2)C(=O)O1">
+                            <option value="CC(=O)NCC1CN(c2ccc(-c3cncs3)c(F)c2)C(=O)O1">
+                            <option value="CC(C)(C)NCC(O)COc1ccc(O)c2c1CCC(=O)N2">
+                            <option value="CC(C)C(NC(=O)CCc1ccccc1)C(=O)N1CCCC1">
+                        </datalist>
+                    </div>
+                    <div class="form-group">
+                        <label for="proteinSelector">Select Protein</label>
+                        <select class="form-control" id="proteinSelector" required>
+                            <option value="">Select a protein</option>
+                            <option value="KRAS">KRAS: 4obe</option>
+                            <option value="mTOR">mTOR: 4wby</option>
+                            <option value="AKT1">AKT1: 4G1R</option>
+                            <option value="ERK2">ERK2: 1PME</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-blue btn-block">Submit</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="row justify-content-start section-spacing">
+            <div class="col-md-6">
+                <h3 class="subtitle text-start" id="subtitle-inputted1">Inputted Compound Structure 1</h3>
+                <button class="btn btn-blue btn-toggle" id="toggle-input-view1">Show 2D View</button>
+                <div class="img-container">
+                    <img id="input-2d1" style="display: none; max-width: 100%;" />
+                </div>
+                <div id="viewer"></div>
+                <a id="input-download1" class="btn btn-blue" style="display: none;" download>Download Input PDB</a>
+            </div>
+            <div class="col-md-6">
+                <h3 class="subtitle text-start" id="subtitle-inputted2">Inputted Compound Structure 2</h3>
+                <button class="btn btn-blue btn-toggle" id="toggle-input-view2">Show 2D View</button>
+                <div class="img-container">
+                    <img id="input-2d2" style="display: none; max-width: 100%;" />
+                </div>
+                <div id="viewer2"></div>
+                <a id="input-download2" class="btn btn-blue" style="display: none;" download>Download Input PDB</a>
+            </div>
+        </div>
+
+        <div class="row justify-content-start section-spacing">
+            <div class="col-md-6">
+                <h3 class="subtitle text-start" id="subtitle-fragmented1">Fragmented Compound Structure 1</h3>
+                <div id="fragment-properties1"></div>
+                <button class="btn btn-blue btn-toggle" id="toggle-fragment-view1">Show 2D View</button>
+                <div class="img-container">
+                    <img id="fragment-2d1" style="display: none; max-width: 100%;" />
+                </div>
+                <div id="viewer-fragmented"></div>
+                <a id="fragment-download1" class="btn btn-blue" style="display: none;" download>Download Fragment PDB</a>
+            </div>
+            <div class="col-md-6">
+                <h3 class="subtitle text-start" id="subtitle-fragmented2">Fragmented Compound Structure 2</h3>
+                <div id="fragment-properties2"></div>
+                <button class="btn btn-blue btn-toggle" id="toggle-fragment-view2">Show 2D View</button>
+                <div class="img-container">
+                    <img id="fragment-2d2" style="display: none; max-width: 100%;" />
+                </div>
+                <div id="viewer-fragmented2"></div>
+                <a id="fragment-download2" class="btn btn-blue" style="display: none;" download>Download Fragment PDB</a>
+            </div>
+        </div>
+
+        <div class="row justify-content-start section-spacing">
+            <div class="col-md-12">
+                <h2 id="subtitle-combined" style="display:none;">Combined Fragments</h2>
+                <div id="combined-container">
+                    <!-- Combined fragments will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- 3Dmol.js -->
+    <script src="https://3dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="app.js" defer></script>
+</body>
+</html>

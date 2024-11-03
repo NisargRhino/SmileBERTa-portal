@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Molecular Editor - MolView Style</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/Users/nisargshah/Documents/cs/Frag_Dock/ChemDoodleWeb/install/ChemDoodleWeb.css"> <!-- Adjust the path as necessary -->
+    <script src="/Users/nisargshah/Documents/cs/Frag_Dock/ChemDoodleWeb/install/ChemDoodleWeb.js"></script> <!-- Adjust the path as necessary -->
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            padding-top: 20px;
+        }
+        .blue-title {
+            color: #1e90ff;
+        }
+        .btn-blue {
+            background-color: #1e90ff;
+            border-color: #1e90ff;
+            color: white;
+            margin: 10px;
+        }
+        .btn-blue:hover {
+            background-color: #1c86ee;
+            border-color: #1c86ee;
+        }
+        #editor-container {
+            margin: 20px 0;
+        }
+        #editor {
+            width: 100%;
+            height: 500px;
+            background-color: white;
+        }
+        .form-control-file,
+        .form-control {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-12 text-center">
+                <h1 class="blue-title">Molecular Editor</h1>
+                <a href="index.html" class="btn btn-blue">Home</a>
+            </div>
+        </div>
+        <div id="editor-container" class="row justify-content-center">
+            <div class="col-md-12">
+                <canvas id="editor"></canvas>
+                <div class="text-center">
+                    <button class="btn btn-blue" onclick="optimizeGeometry()">Optimize Geometry</button>
+                    <button class="btn btn-blue" onclick="downloadPDB()">Download PDB</button>
+                    <input type="file" id="pdbFile" class="form-control-file" accept=".pdb" />
+                    <button class="btn btn-blue" onclick="uploadPDB()">Upload PDB</button>
+                    <input type="text" id="smilesInput" placeholder="Enter SMILES string" class="form-control" />
+                    <button class="btn btn-blue" onclick="loadSMILES()">Load SMILES</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize the ChemDoodle sketcher for molecule drawing and editing
+        let sketcher;
+        document.addEventListener("DOMContentLoaded", function () {
+            try {
+                sketcher = new ChemDoodle.SketcherCanvas('editor', 800, 500, {useServices: false});
+                console.log("ChemDoodle sketcher initialized successfully.");
+            } catch (error) {
+                console.error("Error initializing ChemDoodle sketcher:", error);
+            }
+        });
+
+        // Function to optimize geometry (Placeholder)
+        function optimizeGeometry() {
+            alert("Geometry optimization is not available directly in this editor.");
+        }
+
+        // Function to download the molecule as PDB
+        function downloadPDB() {
+            try {
+                const mol = sketcher.getMolecule();
+                if (mol) {
+                    const molData = ChemDoodle.writePDB(mol);
+                    const blob = new Blob([molData], { type: 'chemical/x-pdb' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = 'molecule.pdb';
+                    link.click();
+                } else {
+                    alert("No molecule to download.");
+                }
+            } catch (error) {
+                console.error("Error downloading PDB:", error);
+            }
+        }
+
+        // Function to upload a PDB file and load it into the editor
+        function uploadPDB() {
+            try {
+                const fileInput = document.getElementById('pdbFile');
+                const file = fileInput.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        try {
+                            const pdbData = e.target.result;
+                            const mol = ChemDoodle.readPDB(pdbData);
+                            sketcher.loadMolecule(mol);
+                        } catch (error) {
+                            console.error("Error loading PDB:", error);
+                        }
+                    };
+                    reader.readAsText(file);
+                } else {
+                    alert("Please select a PDB file to upload.");
+                }
+            } catch (error) {
+                console.error("Error uploading PDB:", error);
+            }
+        }
+
+        // Function to load a SMILES string into the editor
+        function loadSMILES() {
+            try {
+                const smiles = document.getElementById('smilesInput').value;
+                if (smiles) {
+                    const mol = ChemDoodle.readSMILES(smiles);
+                    sketcher.loadMolecule(mol);
+                } else {
+                    alert("Please enter a valid SMILES string.");
+                }
+            } catch (error) {
+                console.error("Error loading SMILES:", error);
+            }
+        }
+    </script>
+</body>
+</html>
