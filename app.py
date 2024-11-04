@@ -173,10 +173,13 @@ def combine():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
-
-# Load unique tags for similarity comparison if needed
-#unique_tags_df = pd.read_csv('./drug_classification_data_df.csv')
-#unique_tags_list = unique_tags_df['tags'].tolist()  
+def predict_drug_classification(smiles, model, tokenizer, max_length=128):
+    inputs = tokenizer(smiles, max_length=max_length, padding='max_length', truncation=True, return_tensors="pt")
+    with torch.no_grad():
+        outputs = model(input_ids=inputs['input_ids'], attention_mask=inputs['attention_mask'])
+    predicted_ids = torch.argmax(outputs.logits, dim=-1)
+    predicted_smiles = tokenizer.decode(predicted_ids[0], skip_special_tokens=True)
+    return predicted_smiles
 model_dc = RobertaForMaskedLM.from_pretrained('NisargRhino/drug-classification')
 tokenizer_dc = RobertaTokenizer.from_pretrained('NisargRhino/drug-classification')
 model_dc.eval()
@@ -191,7 +194,7 @@ def classify_smiles():
     
     print("reached here 3")
     try:
-        prediction = predict_fragment_smiles(smiles, model_dc, tokenizer_dc)
+        prediction = predict_drug_classification(smiles, model_dc, tokenizer_dc)
         print("reached here 4")
         return jsonify({'prediction': prediction})
         
