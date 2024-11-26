@@ -182,7 +182,7 @@ def predict_drug_classification(smiles, model, tokenizer, max_length=128):
     predicted_smiles = tokenizer.decode(predicted_ids[0], skip_special_tokens=True)
     return predicted_smiles
 """
-drug_class_options = pd.read_csv('./drugclassoptions_final.csv')['name'].tolist()
+drug_class_options = pd.read_csv('./drugclassoptions_final1.csv')['name'].tolist()
 
 def find_most_similar_option(predicted_smiles_initial, options):
     min_distance = float('inf')
