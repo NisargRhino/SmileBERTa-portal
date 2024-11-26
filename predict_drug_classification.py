@@ -5,32 +5,10 @@ import torch
 import pandas as pd
 from Levenshtein import distance as levenshtein_distance
 
-# Load model and tokenizer
-#model = RobertaForMaskedLM.from_pretrained('NisargRhino/drug-classification')
-#tokenizer = RobertaTokenizer.from_pretrained('NisargRhino/drug-classification')
-#model.eval()
 
-# Load unique tags for similarity comparison if needed
-#unique_tags_df = pd.read_csv('./drugclassoptions_final.csv')
-#unique_tags_list = unique_tags_df['tags'].tolist()
-
-#app = Flask(__name__)
-#CORS(app)
-"""
-@app.route('/classify_smiles', methods=['POST'])
-def classify_smiles():
-    data = request.get_json()
-    smiles = data.get('smiles')
-    if not smiles:
-        return jsonify({'error': 'No SMILES string provided'}), 400
-
-    try:
-        prediction = predict_fragment_smiles(smiles, model, tokenizer)
-        return jsonify({'prediction': prediction})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-"""
-drug_class_options = pd.read_csv('./drugclassoptions_final.csv')['name'].tolist()
+unique_smiles_df = pd.read_csv('./drugclassoptions_final1.csv')
+drug_class_options = unique_smiles_df['name'].tolist()
+print(drug_class_options)
 
 def find_most_similar_option(predicted_smiles_initial, options):
     min_distance = float('inf')
@@ -44,7 +22,7 @@ def find_most_similar_option(predicted_smiles_initial, options):
     return predicted_smiles
 
 
-def predict_fragment_smiles(smiles, model, tokenizer, max_length=128):
+def drug_class_smiles(smiles, model, tokenizer, max_length=128):
     inputs = tokenizer(smiles, max_length=max_length, padding='max_length', truncation=True, return_tensors="pt")
     with torch.no_grad():
         outputs = model(input_ids=inputs['input_ids'], attention_mask=inputs['attention_mask'])
@@ -55,6 +33,10 @@ def predict_fragment_smiles(smiles, model, tokenizer, max_length=128):
     return predicted_smiles_final
 
 
+# model_dc = RobertaForMaskedLM.from_pretrained('NisargRhino/drug-classification')
+# tokenizer_dc = RobertaTokenizer.from_pretrained('NisargRhino/drug-classification')
 
-# if __name__ == '__main__':
-#     app.run(debug=True, port=5000)
+# smiles = "CC(=O)C(C)c1ccc(CC(C)C)cc1"
+# smiles_final = drug_class_smiles(smiles, model_dc, tokenizer_dc)
+# print( smiles_final)
+

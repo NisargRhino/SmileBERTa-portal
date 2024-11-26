@@ -17,7 +17,7 @@ import pandas as pd
 from transformers import RobertaTokenizer, RobertaForMaskedLM
 import torch
 from Levenshtein import distance as levenshtein_distance
-
+from predict_drug_classification import drug_class_smiles
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -196,16 +196,6 @@ def find_most_similar_option(predicted_smiles_initial, options):
     return predicted_smiles
 
 
-def predict_fragment_smiles(smiles, model, tokenizer, max_length=128):
-    inputs = tokenizer(smiles, max_length=max_length, padding='max_length', truncation=True, return_tensors="pt")
-    with torch.no_grad():
-        outputs = model(input_ids=inputs['input_ids'], attention_mask=inputs['attention_mask'])
-    predicted_ids = torch.argmax(outputs.logits, dim=-1)
-    predicted_smiles_initial = tokenizer.decode(predicted_ids[0], skip_special_tokens=True)
-    predicted_smiles_final = find_most_similar_option(predicted_smiles_initial, drug_class_options)
-    print("made it here")
-    return predicted_smiles_final
-
 model_dc = RobertaForMaskedLM.from_pretrained('NisargRhino/drug-classification')
 tokenizer_dc = RobertaTokenizer.from_pretrained('NisargRhino/drug-classification')
 model_dc.eval()
@@ -220,7 +210,7 @@ def classify_smiles():
     
     print("reached here 3")
     try:
-        prediction = predict_fragment_smiles(smiles, model_dc, tokenizer_dc)
+        prediction = drug_class_smiles(smiles, model_dc, tokenizer_dc)
         print("reached here 4")
         return jsonify({'prediction': prediction})
         
