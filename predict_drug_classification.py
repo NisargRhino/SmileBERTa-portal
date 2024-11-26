@@ -30,7 +30,7 @@ def classify_smiles():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 """
-drug_class_options = pd.read_csv('./drugclassoptions.csv')['name'].tolist()
+drug_class_options = pd.read_csv('./drugclassoptions_final.csv')['name'].tolist()
 def find_most_similar_option(predicted_smiles_initial, options):
     min_distance = float('inf')
     predicted_smiles = None
