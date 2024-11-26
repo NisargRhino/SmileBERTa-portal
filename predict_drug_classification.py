@@ -11,8 +11,8 @@ from Levenshtein import distance as levenshtein_distance
 #model.eval()
 
 # Load unique tags for similarity comparison if needed
-unique_tags_df = pd.read_csv('./drugclassoptions_final.csv')
-unique_tags_list = unique_tags_df['tags'].tolist()
+#unique_tags_df = pd.read_csv('./drugclassoptions_final.csv')
+#unique_tags_list = unique_tags_df['tags'].tolist()
 
 #app = Flask(__name__)
 #CORS(app)
@@ -31,9 +31,11 @@ def classify_smiles():
         return jsonify({'error': str(e)}), 500
 """
 drug_class_options = pd.read_csv('./drugclassoptions_final.csv')['name'].tolist()
+
 def find_most_similar_option(predicted_smiles_initial, options):
     min_distance = float('inf')
     predicted_smiles = None
+    print("made it here first")
     for option in options:
         dist = levenshtein_distance(predicted_smiles_initial, option)
         if dist < min_distance:
@@ -49,6 +51,7 @@ def predict_fragment_smiles(smiles, model, tokenizer, max_length=128):
     predicted_ids = torch.argmax(outputs.logits, dim=-1)
     predicted_smiles_initial = tokenizer.decode(predicted_ids[0], skip_special_tokens=True)
     predicted_smiles_final = find_most_similar_option(predicted_smiles_initial, drug_class_options)
+    print("made it here")
     return predicted_smiles_final
 
 
