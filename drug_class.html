@@ -27,6 +27,12 @@
             background-color: #1c86ee;
             border-color: #1c86ee;
         }
+        #viewer {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #1e90ff;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -59,16 +65,19 @@
                         <span class="sr-only">Loading...</span>
                     </div>
                 </div>
+                <div id="viewer" class="mt-3"></div>
+                <button type="button" id="toggleButton" class="btn btn-blue btn-block" style="display: none;">Switch to 2D/3D</button>
             </div>
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.0.2/3Dmol.min.js"></script>
     <script>
-        document.getElementById('submitButton').addEventListener('click', function() {
+        document.getElementById('submitButton').addEventListener('click', function () {
             const smiles = document.getElementById('smilesInput').value;
             document.getElementById('spinner').style.display = 'block';
             document.getElementById('output').innerText = '';
-            
+
             fetch('https://smileberta-portal.onrender.com/classify_smiles', {
                 method: 'POST',
                 headers: {
@@ -80,6 +89,39 @@
             .then(data => {
                 document.getElementById('spinner').style.display = 'none';
                 document.getElementById('output').innerText = 'Predicted Classification: ' + data.prediction;
+
+                // Render 3D structure
+                const viewer = $3Dmol.createViewer("viewer", {
+                    backgroundColor: "#121212"
+                });
+                viewer.addModelFromQuery(`smiles:${smiles}`, "smiles", function (model) {
+                    viewer.zoomTo();
+                    viewer.setStyle({}, { stick: {} });
+                    viewer.render();
+                });
+
+                document.getElementById('toggleButton').style.display = 'block';
+
+                let is3D = true;
+                document.getElementById('toggleButton').onclick = function () {
+                    viewer.removeAllModels();
+                    if (is3D) {
+                        viewer.addModelFromQuery(`smiles:${smiles}`, "smiles", function (model) {
+                            viewer.setStyle({}, { line: {} });
+                            viewer.zoomTo();
+                            viewer.render();
+                        });
+                        this.innerText = "Switch to 3D";
+                    } else {
+                        viewer.addModelFromQuery(`smiles:${smiles}`, "smiles", function (model) {
+                            viewer.setStyle({}, { stick: {} });
+                            viewer.zoomTo();
+                            viewer.render();
+                        });
+                        this.innerText = "Switch to 2D";
+                    }
+                    is3D = !is3D;
+                };
             })
             .catch(error => {
                 console.error('Error:', error);
