@@ -27,11 +27,22 @@
             background-color: #1c86ee;
             border-color: #1c86ee;
         }
+        #viewer-container {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
         #viewer {
             width: 100%;
+            max-width: 600px;
             height: 400px;
-            border: 1px solid #1e90ff;
             margin-top: 20px;
+            border: 1px solid #1e90ff;
+            background-color: #ffffff;
+            position: relative;
+
         }
     </style>
 </head>
@@ -65,9 +76,12 @@
                         <span class="sr-only">Loading...</span>
                     </div>
                 </div>
-                <div id="viewer" class="mt-3"></div>
-                <button type="button" id="toggleButton" class="btn btn-blue btn-block" style="display: none;">Switch to 2D/3D</button>
             </div>
+        </div>
+
+        <div id="viewer-container">
+            <div id="viewer"></div>
+            <button type="button" id="toggleButton" class="btn btn-blue mt-3" style="display: none;">Switch to 2D/3D</button>
         </div>
     </div>
 
@@ -90,15 +104,21 @@
                 document.getElementById('spinner').style.display = 'none';
                 document.getElementById('output').innerText = 'Predicted Classification: ' + data.prediction;
 
-                // Render 3D structure
+                // Convert SMILES to MOL format
+                return fetch('https://cactus.nci.nih.gov/chemical/structure/' + encodeURIComponent(smiles) + '/file?format=mol')
+                    .then(response => {
+                        if (!response.ok) throw new Error('MOL conversion failed');
+                        return response.text();
+                    });
+            })
+            .then(molData => {
                 const viewer = $3Dmol.createViewer("viewer", {
-                    backgroundColor: "#121212"
+                    backgroundColor: "#ffffff"
                 });
-                viewer.addModelFromQuery(`smiles:${smiles}`, "smiles", function (model) {
-                    viewer.zoomTo();
-                    viewer.setStyle({}, { stick: {} });
-                    viewer.render();
-                });
+                viewer.addModel(molData, "mol"); // Add MOL model
+                viewer.setStyle({}, { stick: {} }); // Apply stick style for 3D view
+                viewer.zoomTo(); // Adjust zoom to fit model
+                viewer.render();
 
                 document.getElementById('toggleButton').style.display = 'block';
 
@@ -106,18 +126,16 @@
                 document.getElementById('toggleButton').onclick = function () {
                     viewer.removeAllModels();
                     if (is3D) {
-                        viewer.addModelFromQuery(`smiles:${smiles}`, "smiles", function (model) {
-                            viewer.setStyle({}, { line: {} });
-                            viewer.zoomTo();
-                            viewer.render();
-                        });
+                        viewer.addModel(molData, "mol"); // Reload as 2D
+                        viewer.setStyle({}, { line: {} }); // Apply line style for 2D view
+                        viewer.zoomTo();
+                        viewer.render();
                         this.innerText = "Switch to 3D";
                     } else {
-                        viewer.addModelFromQuery(`smiles:${smiles}`, "smiles", function (model) {
-                            viewer.setStyle({}, { stick: {} });
-                            viewer.zoomTo();
-                            viewer.render();
-                        });
+                        viewer.addModel(molData, "mol"); // Reload as 3D
+                        viewer.setStyle({}, { stick: {} }); // Apply stick style for 3D view
+                        viewer.zoomTo();
+                        viewer.render();
                         this.innerText = "Switch to 2D";
                     }
                     is3D = !is3D;
