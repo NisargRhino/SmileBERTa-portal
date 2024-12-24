@@ -28,9 +28,10 @@ def main():
     print("Reconstructed adjacency shape:", adjacency_recon.shape)
 
     # Similarity example
-    if z.size(0) >= 2:
-        sim = F.cosine_similarity(z[0].unsqueeze(0), z[1].unsqueeze(0))
-        print(f"Similarity between node 0 and 1: {sim.item():.4f}")
+    for i in range(321):
+        for j in range(i+1, 321):
+            sim = F.cosine_similarity(z[i].unsqueeze(0), z[j].unsqueeze(0))
+            print(f"Similarity between node {i} and {j}: {sim.item():.4f}")
 
 if __name__ == "__main__":
     main()
