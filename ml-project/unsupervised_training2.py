@@ -4,14 +4,16 @@ import pickle
 from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs
 from scipy.spatial.distance import pdist, squareform
-from scipy.cluster.hierarchy import linkage, fcluster
+from scipy.cluster.hierarchy import linkage, fcluster, dendrogram
+import matplotlib.pyplot as plt
 
 ##############################################################################
 # CONFIG
 ##############################################################################
-VIABLE_DRUGS_CSV = "/Users/nisargshah/Documents/cs/SmileBERTa-portal/ml-project/viable_drugs.csv"         # Input CSV with a "Viable_SMILES" column
-OUTPUT_PKL = "viable_fp_data.pkl"             # Stores fingerprints, SMILES, and cluster labels
-CLUSTER_THRESHOLD = 0.5                       # Adjust the threshold for clustering
+VIABLE_DRUGS_CSV = "/Users/nisargshah/Documents/cs/SmileBERTa-portal/ml-project/viable_drugs.csv"  # Input CSV with a "Viable_SMILES" column
+OUTPUT_PKL = "viable_fp_data.pkl"                 # Stores fingerprints, SMILES, and cluster labels
+CLUSTER_THRESHOLD = 0.5                           # Adjust the threshold for clustering
+DENDROGRAM_PNG = "dendrogram.png"                 # File name for saving the dendrogram image
 
 ##############################################################################
 # 1. Read CSV and compute fingerprints
@@ -54,24 +56,43 @@ def build_distance_matrix(fps):
     """
     n = len(fps)
     dists = []
-    # pdist-style condensed matrix: store only upper triangle
+    # pdist-style condensed matrix: store only the upper triangle
     for i in range(n):
         for j in range(i + 1, n):
             dist = tanimoto_distance(fps[i], fps[j])
             dists.append(dist)
     return dists
 
-def hierarchical_clustering(fps, threshold=CLUSTER_THRESHOLD, method='average'):
+def hierarchical_clustering(fps, threshold=CLUSTER_THRESHOLD, method='average', 
+                            plot_dendrogram=True):
     """
     Perform hierarchical clustering on the fingerprints with Tanimoto distance.
-    Returns cluster labels.
+    If plot_dendrogram=True, displays and saves a dendrogram.
+    Returns cluster labels and the linkage matrix.
     """
     dist_array = build_distance_matrix(fps)
     # Linkage on the distance array
     Z = linkage(dist_array, method=method)
+
+    # Optionally plot the dendrogram
+    if plot_dendrogram:
+        plt.figure(figsize=(10, 6))
+        dendrogram(
+            Z,
+            leaf_rotation=90.,     # Rotate x-axis labels
+            leaf_font_size=8.0,    # Font size for x-axis labels
+        )
+        plt.title("Hierarchical Clustering Dendrogram")
+        plt.xlabel("Compound Index")
+        plt.ylabel("Distance")
+        plt.tight_layout()
+        plt.savefig(DENDROGRAM_PNG, dpi=300)
+        plt.show()
+        print(f"Dendrogram saved to {DENDROGRAM_PNG}.")
+
     # Use fcluster to get cluster labels by a distance threshold
     clusters = fcluster(Z, t=threshold, criterion='distance')
-    return clusters
+    return clusters, Z
 
 ##############################################################################
 # 3. Main training routine
@@ -92,14 +113,20 @@ def main():
     print(f"Loaded {len(valid_smiles)} viable SMILES with valid fingerprints.")
 
     # 3) Hierarchical Clustering (unsupervised)
-    clusters = hierarchical_clustering(fps, threshold=CLUSTER_THRESHOLD, method='average')
+    clusters, Z = hierarchical_clustering(
+        fps, 
+        threshold=CLUSTER_THRESHOLD, 
+        method='average', 
+        plot_dendrogram=True
+    )
     print(f"Generated cluster labels for {len(clusters)} viable molecules.")
 
     # 4) Save data (fingerprints, SMILES, cluster labels)
     data_to_save = {
         'smiles': valid_smiles,
         'fingerprints': fps,
-        'cluster_labels': clusters
+        'cluster_labels': clusters,
+        'linkage_matrix': Z
     }
 
     with open(OUTPUT_PKL, 'wb') as f:
