@@ -4,12 +4,57 @@ import pickle
 from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs
 
+
+from rdkit import Chem
+
+import tensorflow as tf
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, SimpleRNN, Dense
+import numpy as np
+from minisom import MiniSom
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from gensim import corpora
+from gensim.models.ldamodel import LdaModel
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+
+from argparse import ArgumentParser
+import sys
+import os
+import logging
+from omegaconf import OmegaConf
+from rdkit import Chem
+from rdkit.Chem.Descriptors import qed
+from pathlib import Path
+
+sys.path.append("C:\\Users\\nisar\\cs\\ml3\\DeepDL\\src")
+from models import RNNLM, GCNModel
+import utils as UTILS
+import matplotlib.pyplot as plt
+import numpy as np
+
+
 ##############################################################################
 # CONFIG
 ##############################################################################
-PICKLE_PATH = "viable_fp_data.pkl"                      # The data from training.py
-CANCER_INHIBITORS_CSV = "cancer-inhibitors-augmented.csv" # Original CSV with 'SMILES' column
+PICKLE_PATH = "C:\\Users\\nisar\\cs\\ml3\\SmileBERTa-portal\\ml-project\\viable_fp_data.pkl"                      # The data from training.py
+CANCER_INHIBITORS_CSV = "C:\\Users\\nisar\\cs\\ml3\\SmileBERTa-portal\\ml-project\\cancer-inhibitors-augmented.csv" # Original CSV with 'SMILES' column
 TOP_N = 50                                               # Number of top similar drugs to retrieve
+
+def read_viable_drugs(csv_path):
+    """
+    Reads the viable_drugs.csv which has a column 'Viable_SMILES'.
+    Returns a list of SMILES strings.
+    """
+    df = pd.read_csv(csv_path, nrows=10000)
+    if 'Viable_SMILES' not in df.columns:
+        raise ValueError("CSV must have a column 'Viable_SMILES'.")
+    smiles_list = df['Viable_SMILES'].dropna().tolist()
+    return smiles_list
 
 ##############################################################################
 # 1. Load the unsupervised data (viable fingerprints, smiles)
@@ -76,8 +121,10 @@ def main():
 
     # 3) For each drug in the augmented CSV, find top 50 similar
     top_matches_per_drug = []
+    query_smi_list = []
     for idx, row in df.iterrows():
         query_smi = str(row['SMILES']).strip()
+        query_smi_list.append(query_smi)
         if not query_smi:
             continue
         top_matches = find_top_similar_drugs(query_smi, viable_smiles, viable_fps, top_n=TOP_N)
@@ -111,5 +158,92 @@ def main():
     results_df.to_csv("top50_similar_results.csv", index=False)
     print("Top 50 similarity results saved to top50_similar_results.csv")
 
+    # Save list to a text file
+    query_smi_list = [item for item in query_smi_list if item != 'nan']
+    with open('query_smiles.smi', 'w') as file:
+        for item in query_smi_list:
+            file.write(f"{item}\n")
+
+
+
+class QED_model (object):
+        @staticmethod
+        def test (smiles: str):
+            mol = Chem.MolFromSmiles(smiles)
+            return qed(mol)
+
+def main_rnnlm_gcn():
+    
+    # 1) Read viable drug SMILES
+    smiles_list = read_viable_drugs('C:\\Users\\nisar\\cs\\ml3\\SmileBERTa-portal\\ml-project\\test_smiles.txt')
+
+    # 2) Compute fingerprints
+    valid_smiles = []
+    for smi in smiles_list:
+        fp = compute_morgan_fp(smi)
+        if fp:
+            if len(smi) > 100:
+                smi = smi[:100]
+            valid_smiles.append(smi)
+
+    print(f"Loaded {len(valid_smiles)} viable SMILES with valid fingerprints.")
+
+
+    device = "cpu" #"cuda:0"
+    
+    if False :
+        model = QED_model()
+    else :
+        #config = OmegaConf.load('C:\\Users\\nisar\\cs\\ml3\\DeepDL\\test\\result\\rnn_worlddrug\\config.yaml')
+        config = OmegaConf.load('C:\\Users\\nisar\\cs\\ml3\\DeepDL\\test\\result\\gcn_worlddrug_zinc15\\config.yaml')
+        
+        model_architecture = config.model.model # RNNLM or GCNModel
+
+        if model_architecture == 'RNNLM' :
+            model = RNNLM.load_model('C:\\Users\\nisar\\cs\\ml3\\DeepDL\\test\\result\\rnn_worlddrug', device)
+        elif model_architecture == 'GCNModel' :
+            model = GCNModel.load_model('C:\\Users\\nisar\\cs\\ml3\\DeepDL\\test\\result\\gcn_worlddrug_zinc15', device)
+        else :
+            logging.warning("ERR: Not Allowed Model Architecture")
+            exit(1)
+
+    # Run
+    scores = []
+    for smiles in valid_smiles :
+        if len(smiles) > 100:
+            smiles = smiles[:100]
+            # Validate SMILES
+        if Chem.MolFromSmiles(smiles) is None:
+            logging.warning(f'Invalid SMILES: {smiles}')
+            continue
+        print(smiles)
+        score = model.test(smiles)
+        scores.append(score)
+
+        logging.info(f'{smiles},{score:.3f}')
+
+    # Plot scores
+    plt.plot(scores)
+    plt.xlabel('SMILES Index')
+    plt.ylabel('Score')
+    plt.title('Scores of SMILES')
+    plt.show()
+
+    # Plot CDF of scores
+    scores = np.array(scores)
+    sorted_scores = np.sort(scores)
+    cdf = np.arange(1, len(sorted_scores) + 1) / len(sorted_scores)
+
+    plt.plot(sorted_scores, cdf)
+    plt.xlabel('Score')
+    plt.ylabel('CDF')
+    plt.title('Cumulative Distribution Function of Scores')
+    plt.show()
+
+
 if __name__ == "__main__":
-    main()
+    #main()
+    main_rnnlm_gcn()
+
+
+
