@@ -6,6 +6,7 @@ from rdkit.Chem import AllChem, DataStructs
 from scipy.spatial.distance import pdist, squareform
 from scipy.cluster.hierarchy import linkage, fcluster, dendrogram
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 ##############################################################################
 # CONFIG
@@ -23,7 +24,7 @@ def read_viable_drugs(csv_path=VIABLE_DRUGS_CSV):
     Reads the viable_drugs.csv which has a column 'Viable_SMILES'.
     Returns a list of SMILES strings.
     """
-    df = pd.read_csv(csv_path)
+    df = pd.read_csv(csv_path, nrows=30000)
     if 'Viable_SMILES' not in df.columns:
         raise ValueError("CSV must have a column 'Viable_SMILES'.")
     smiles_list = df['Viable_SMILES'].dropna().tolist()
@@ -57,7 +58,8 @@ def build_distance_matrix(fps):
     n = len(fps)
     dists = []
     # pdist-style condensed matrix: store only the upper triangle
-    for i in range(n):
+    # We'll use tqdm to show a progress bar for the outer loop
+    for i in tqdm(range(n), desc="Building Distance Matrix"):
         for j in range(i + 1, n):
             dist = tanimoto_distance(fps[i], fps[j])
             dists.append(dist)
@@ -101,10 +103,11 @@ def main():
     # 1) Read viable drug SMILES
     smiles_list = read_viable_drugs(VIABLE_DRUGS_CSV)
 
-    # 2) Compute fingerprints
+    # 2) Compute fingerprints with a progress bar
     fps = []
     valid_smiles = []
-    for smi in smiles_list:
+    print("Computing Morgan fingerprints...")
+    for smi in tqdm(smiles_list, desc="Fingerprinting"):
         fp = compute_morgan_fp(smi)
         if fp:
             fps.append(fp)
