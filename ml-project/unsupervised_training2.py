@@ -8,10 +8,27 @@ from scipy.cluster.hierarchy import linkage, fcluster, dendrogram
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
+from rdkit import Chem
+
+import tensorflow as tf
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, SimpleRNN, Dense, TimeDistributed
+import numpy as np
+from minisom import MiniSom
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from gensim import corpora
+from gensim.models.ldamodel import LdaModel
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+
 ##############################################################################
 # CONFIG
 ##############################################################################
-VIABLE_DRUGS_CSV = "/Users/nisargshah/Documents/cs/SmileBERTa-portal/ml-project/viable_drugs.csv"  # Input CSV with a "Viable_SMILES" column
+VIABLE_DRUGS_CSV = "C:\\Users\\nisar\\cs\\ml3\\SmileBERTa-portal\\ml-project\\viable_drugs.csv"  # Input CSV with a "Viable_SMILES" column
 OUTPUT_PKL = "viable_fp_data.pkl"                 # Stores fingerprints, SMILES, and cluster labels
 CLUSTER_THRESHOLD = 0.5                           # Adjust the threshold for clustering
 DENDROGRAM_PNG = "dendrogram.png"                 # File name for saving the dendrogram image
@@ -99,7 +116,7 @@ def hierarchical_clustering(fps, threshold=CLUSTER_THRESHOLD, method='average',
 ##############################################################################
 # 3. Main training routine
 ##############################################################################
-def main():
+def main_org():
     # 1) Read viable drug SMILES
     smiles_list = read_viable_drugs(VIABLE_DRUGS_CSV)
 
@@ -137,5 +154,155 @@ def main():
 
     print(f"Saved unsupervised data (fingerprints, clusters) to {OUTPUT_PKL}.")
 
+def main():
+    algo2()
+
+def algo2():
+    # 1) Read viable drug SMILES
+    smiles_list = read_viable_drugs(VIABLE_DRUGS_CSV)
+
+    # 2) Compute fingerprints
+    fps = []
+    valid_smiles = []
+    for smi in smiles_list:
+        fp = compute_morgan_fp(smi)
+        if fp:
+            fps.append(fp)
+            if len(smi) > 100:
+                smi = smi[:100]
+            valid_smiles.append(smi)
+
+    print(f"Loaded {len(valid_smiles)} viable SMILES with valid fingerprints.")
+
+    # Tokenize the text data
+    tokenizer = Tokenizer()
+    tokenizer.fit_on_texts(valid_smiles)
+    sequences = tokenizer.texts_to_sequences(valid_smiles)
+    word_index = tokenizer.word_index
+
+    # Pad the sequences
+    max_sequence_length = max(len(seq) for seq in sequences)
+    data = pad_sequences(sequences, maxlen=max_sequence_length)
+
+    vocab_size = len(word_index) + 1
+    embedding_dim = 100
+
+    model = Sequential()
+    model.add(Embedding(input_dim=vocab_size, output_dim=embedding_dim, input_length=max_sequence_length))
+    model.add(SimpleRNN(units=128, return_sequences=True))  # Return sequences
+    model.add(SimpleRNN(units=128, return_sequences=True))  # Return sequences
+    model.add(TimeDistributed(Dense(units=vocab_size, activation='softmax')))  # Output per time step
+
+    model.compile(optimizer='adam', loss='sparse_categorical_crossentropy')
+
+    # Shift data by one time step
+    input_data = data[:, :-1]
+    target_data = data[:, 1:]
+
+    # Train the model
+    model.fit(input_data, target_data, epochs=10, batch_size=64)
+
+    # Evaluate the model
+    loss = model.evaluate(target_data, target_data)
+    print(f"Loss: {loss}")
+
+def algo3():
+    # 1) Read viable drug SMILES
+    smiles_list = read_viable_drugs(VIABLE_DRUGS_CSV)
+
+    # 2) Compute fingerprints
+    fps = []
+    valid_smiles = []
+    for smi in smiles_list:
+        fp = compute_morgan_fp(smi)
+        if fp:
+            fps.append(fp)
+            if len(smi) > 100:
+                smi = smi[:100]
+            valid_smiles.append(smi)
+
+    print(f"Loaded {len(valid_smiles)} viable SMILES with valid fingerprints.")
+    # Assuming 'smiles_list' is defined and contains the SMILES strings
+    valid_smiles = []
+    for smi in smiles_list:
+        if len(smi) > 100:
+            smi = smi[:100]
+        valid_smiles.append(smi)
+
+    print(f"Loaded {len(valid_smiles)} viable SMILES with valid fingerprints.")
+
+    # Tokenize the text data
+    tokenizer = Tokenizer()
+    tokenizer.fit_on_texts(valid_smiles)
+    sequences = tokenizer.texts_to_sequences(valid_smiles)
+    word_index = tokenizer.word_index
+
+    # Pad the sequences
+    max_sequence_length = max(len(seq) for seq in sequences)
+    data = pad_sequences(sequences, maxlen=max_sequence_length)
+
+    # Normalize the data
+    data = data.astype(float)
+    data /= np.max(data)
+
+    # Define the SOM
+    som = MiniSom(x=10, y=10, input_len=max_sequence_length, sigma=1.0, learning_rate=0.5)
+
+    # Initialize the weights
+    som.random_weights_init(data)
+
+    # Train the SOM
+    som.train_random(data, num_iteration=100)
+
+    # Get the winning nodes for each data point
+    winning_nodes = np.array([som.winner(x) for x in data])
+
+    # Print the winning nodes
+    print("Winning nodes for each data point:")
+    print(winning_nodes)
+
+def algo4():
+    # 1) Read viable drug SMILES
+    smiles_list = read_viable_drugs(VIABLE_DRUGS_CSV)
+
+    # 2) Compute fingerprints
+    fps = []
+    valid_smiles = []
+    for smi in smiles_list:
+        fp = compute_morgan_fp(smi)
+        if fp:
+            fps.append(fp)
+            if len(smi) > 100:
+                smi = smi[:100]
+            valid_smiles.append(smi)
+
+    print(f"Loaded {len(valid_smiles)} viable SMILES with valid fingerprints.")
+    # Tokenize the text data
+    tokenizer = Tokenizer()
+    tokenizer.fit_on_texts(valid_smiles)
+    sequences = tokenizer.texts_to_sequences(valid_smiles)
+    word_index = tokenizer.word_index
+
+    # Convert sequences to words
+    texts = tokenizer.sequences_to_texts(sequences)
+
+    # Create a dictionary representation of the documents
+    dictionary = corpora.Dictionary([text.split() for text in texts])
+
+    # Convert document into the bag-of-words (BoW) format
+    corpus = [dictionary.doc2bow(text.split()) for text in texts]
+
+    # Set parameters for LDA
+    num_topics = 10  # Number of topics
+    passes = 15  # Number of passes through the corpus during training
+
+    # Train the LDA model
+    lda_model = LdaModel(corpus, num_topics=num_topics, id2word=dictionary, passes=passes)
+
+    # Print the topics
+    for idx, topic in lda_model.print_topics(-1):
+        print(f"Topic: {idx} \nWords: {topic}\n")
+
 if __name__ == "__main__":
+    #main_org()
     main()
