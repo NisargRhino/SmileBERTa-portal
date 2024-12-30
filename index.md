@@ -1,4 +1,9 @@
-<!DOCTYPE html>
+---
+layout: none
+permalink: /home
+title: SmileBERTa Home
+---
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -125,9 +130,9 @@
             <a href="#">SmileBERTa</a>
         </div>
         <div class="navbar-right">
-            <a href="mol_editing">Molecular Editing</a>
-            <a href="fragmentation">Fragmentation</a>
-            <a href="drug_class">Drug Classification</a>
+            <a href="mol_editing.html">Molecular Editing</a>
+            <a href="fragmentation.html">Fragmentation</a>
+            <a href="drug_class.html">Drug Classification</a>
             <a href="#section-4">About</a>
         </div>
     </nav>
