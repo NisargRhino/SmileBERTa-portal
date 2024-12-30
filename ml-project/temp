@@ -1,0 +1,311 @@
+# training.py
+import pandas as pd
+import pickle
+from rdkit import Chem
+from rdkit.Chem import AllChem, DataStructs
+from scipy.spatial.distance import pdist, squareform
+from scipy.cluster.hierarchy import linkage, fcluster, dendrogram
+import matplotlib.pyplot as plt
+import pandas as pd
+from rdkit import Chem
+
+import tensorflow as tf
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, SimpleRNN, Dense
+import numpy as np
+from minisom import MiniSom
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from gensim import corpora
+from gensim.models.ldamodel import LdaModel
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+
+##############################################################################
+# CONFIG
+##############################################################################
+VIABLE_DRUGS_CSV = "C:\\Users\\nisar\\cs\\ml3\\SmileBERTa-portal\\ml-project\\viable_drugs.csv"  # Input CSV with a "Viable_SMILES" column
+OUTPUT_PKL = "C:\\Users\\nisar\\cs\\ml3\\SmileBERTa-portal\\ml-project\\viable_fp_data.pkl"                 # Stores fingerprints, SMILES, and cluster labels
+CLUSTER_THRESHOLD = 0.5                           # Adjust the threshold for clustering
+DENDROGRAM_PNG = "dendrogram.png"                 # File name for saving the dendrogram image
+
+##############################################################################
+# 1. Read CSV and compute fingerprints
+##############################################################################
+def read_viable_drugs(csv_path=VIABLE_DRUGS_CSV):
+    """
+    Reads the viable_drugs.csv which has a column 'Viable_SMILES'.
+    Returns a list of SMILES strings.
+    """
+    df = pd.read_csv(csv_path, nrows=10000)
+    if 'Viable_SMILES' not in df.columns:
+        raise ValueError("CSV must have a column 'Viable_SMILES'.")
+    smiles_list = df['Viable_SMILES'].dropna().tolist()
+    return smiles_list
+
+def mol_from_smiles(smiles):
+    return Chem.MolFromSmiles(smiles) if smiles else None
+
+def compute_morgan_fp(smiles, radius=2, nBits=2048):
+    """
+    Computes Morgan fingerprint for a SMILES string.
+    Returns None if SMILES is invalid.
+    """
+    mol = mol_from_smiles(smiles)
+    if mol is None:
+        return None
+    fp = AllChem.GetMorganFingerprintAsBitVect(mol, radius, nBits=nBits)
+    return fp
+
+##############################################################################
+# 2. Build distance matrix (1 - Tanimoto) and cluster
+##############################################################################
+def tanimoto_distance(fp1, fp2):
+    return 1.0 - DataStructs.TanimotoSimilarity(fp1, fp2)
+
+def build_distance_matrix(fps):
+    """
+    Given a list of fingerprints, build a condensed distance matrix
+    using (1 - Tanimoto). This can be used by SciPy's linkage function.
+    """
+    n = len(fps)
+    dists = []
+    # pdist-style condensed matrix: store only the upper triangle
+    for i in range(n):
+        for j in range(i + 1, n):
+            dist = tanimoto_distance(fps[i], fps[j])
+            dists.append(dist)
+    return dists
+
+def hierarchical_clustering(fps, threshold=CLUSTER_THRESHOLD, method='average', 
+                            plot_dendrogram=True):
+    """
+    Perform hierarchical clustering on the fingerprints with Tanimoto distance.
+    If plot_dendrogram=True, displays and saves a dendrogram.
+    Returns cluster labels and the linkage matrix.
+    """
+    dist_array = build_distance_matrix(fps)
+    # Linkage on the distance array
+    Z = linkage(dist_array, method=method)
+
+    # Optionally plot the dendrogram
+    if plot_dendrogram:
+        plt.figure(figsize=(10, 6))
+        dendrogram(
+            Z,
+            leaf_rotation=90.,     # Rotate x-axis labels
+            leaf_font_size=8.0,    # Font size for x-axis labels
+        )
+        plt.title("Hierarchical Clustering Dendrogram")
+        plt.xlabel("Compound Index")
+        plt.ylabel("Distance")
+        plt.tight_layout()
+        plt.savefig(DENDROGRAM_PNG, dpi=300)
+        plt.show()
+        print(f"Dendrogram saved to {DENDROGRAM_PNG}.")
+
+    # Use fcluster to get cluster labels by a distance threshold
+    clusters = fcluster(Z, t=threshold, criterion='distance')
+    return clusters, Z
+
+##############################################################################
+# 3. Main training routine
+##############################################################################
+
+def main():
+    algo1()
+
+
+def algo1():
+    # 1) Read viable drug SMILES
+    smiles_list = read_viable_drugs(VIABLE_DRUGS_CSV)
+
+    # 2) Compute fingerprints
+    fps = []
+    valid_smiles = []
+    for smi in smiles_list:
+        fp = compute_morgan_fp(smi)
+        if fp:
+            fps.append(fp)
+            valid_smiles.append(smi)
+
+    print(f"Loaded {len(valid_smiles)} viable SMILES with valid fingerprints.")
+
+    # 3) Hierarchical Clustering (unsupervised)
+    clusters, Z = hierarchical_clustering(
+        fps, 
+        threshold=CLUSTER_THRESHOLD, 
+        method='average', 
+        plot_dendrogram=True
+    )
+    print(f"Generated cluster labels for {len(clusters)} viable molecules.")
+
+    # 4) Save data (fingerprints, SMILES, cluster labels)
+    data_to_save = {
+        'smiles': valid_smiles,
+        'fingerprints': fps,
+        'cluster_labels': clusters,
+        'linkage_matrix': Z
+    }
+
+    with open(OUTPUT_PKL, 'wb') as f:
+        pickle.dump(data_to_save, f)
+
+    print(f"Saved unsupervised data (fingerprints, clusters) to {OUTPUT_PKL}.")
+
+
+def algo2():
+    # 1) Read viable drug SMILES
+    smiles_list = read_viable_drugs(VIABLE_DRUGS_CSV)
+
+    # 2) Compute fingerprints
+    fps = []
+    valid_smiles = []
+    for smi in smiles_list:
+        fp = compute_morgan_fp(smi)
+        if fp:
+            fps.append(fp)
+            if len(smi) > 100:
+                smi = smi[:100]
+            valid_smiles.append(smi)
+
+    print(f"Loaded {len(valid_smiles)} viable SMILES with valid fingerprints.")
+
+    # Tokenize the text data
+    tokenizer = Tokenizer()
+    tokenizer.fit_on_texts(valid_smiles)
+    sequences = tokenizer.texts_to_sequences(valid_smiles)
+    word_index = tokenizer.word_index
+
+    # Pad the sequences
+    max_sequence_length = max(len(seq) for seq in sequences)
+    data = pad_sequences(sequences, maxlen=max_sequence_length)
+
+    # Define the RNN model
+    vocab_size = len(word_index) + 1
+    embedding_dim = 100
+
+    model = Sequential()
+    model.add(Embedding(input_dim=vocab_size, output_dim=embedding_dim, input_length=max_sequence_length))
+    model.add(SimpleRNN(units=128, return_sequences=True))
+    model.add(SimpleRNN(units=128))
+    model.add(Dense(units=vocab_size, activation='softmax'))
+
+    # Compile the model
+    model.compile(optimizer='adam', loss='sparse_categorical_crossentropy')
+
+    # Since this is unsupervised learning, we don't have labels (y_train)
+    # We can use the input data itself as the target for training (autoencoder-like approach)
+    # Shift the data by one time step to create the target
+    input_data = data[:, :-1]
+    target_data = data[:, 1:]
+
+    # Train the model
+    model.fit(target_data, target_data, epochs=10, batch_size=64)
+
+    # Evaluate the model
+    loss = model.evaluate(target_data, target_data)
+    print(f"Loss: {loss}")
+
+def algo3():
+    # 1) Read viable drug SMILES
+    smiles_list = read_viable_drugs(VIABLE_DRUGS_CSV)
+
+    # 2) Compute fingerprints
+    fps = []
+    valid_smiles = []
+    for smi in smiles_list:
+        fp = compute_morgan_fp(smi)
+        if fp:
+            fps.append(fp)
+            if len(smi) > 100:
+                smi = smi[:100]
+            valid_smiles.append(smi)
+
+    print(f"Loaded {len(valid_smiles)} viable SMILES with valid fingerprints.")
+    # Assuming 'smiles_list' is defined and contains the SMILES strings
+    valid_smiles = []
+    for smi in smiles_list:
+        if len(smi) > 100:
+            smi = smi[:100]
+        valid_smiles.append(smi)
+
+    print(f"Loaded {len(valid_smiles)} viable SMILES with valid fingerprints.")
+
+    # Tokenize the text data
+    tokenizer = Tokenizer()
+    tokenizer.fit_on_texts(valid_smiles)
+    sequences = tokenizer.texts_to_sequences(valid_smiles)
+    word_index = tokenizer.word_index
+
+    # Pad the sequences
+    max_sequence_length = max(len(seq) for seq in sequences)
+    data = pad_sequences(sequences, maxlen=max_sequence_length)
+
+    # Normalize the data
+    data = data.astype(float)
+    data /= np.max(data)
+
+    # Define the SOM
+    som = MiniSom(x=10, y=10, input_len=max_sequence_length, sigma=1.0, learning_rate=0.5)
+
+    # Initialize the weights
+    som.random_weights_init(data)
+
+    # Train the SOM
+    som.train_random(data, num_iteration=100)
+
+    # Get the winning nodes for each data point
+    winning_nodes = np.array([som.winner(x) for x in data])
+
+    # Print the winning nodes
+    print("Winning nodes for each data point:")
+    print(winning_nodes)
+
+def algo4():
+    # 1) Read viable drug SMILES
+    smiles_list = read_viable_drugs(VIABLE_DRUGS_CSV)
+
+    # 2) Compute fingerprints
+    fps = []
+    valid_smiles = []
+    for smi in smiles_list:
+        fp = compute_morgan_fp(smi)
+        if fp:
+            fps.append(fp)
+            if len(smi) > 100:
+                smi = smi[:100]
+            valid_smiles.append(smi)
+
+    print(f"Loaded {len(valid_smiles)} viable SMILES with valid fingerprints.")
+    # Tokenize the text data
+    tokenizer = Tokenizer()
+    tokenizer.fit_on_texts(valid_smiles)
+    sequences = tokenizer.texts_to_sequences(valid_smiles)
+    word_index = tokenizer.word_index
+
+    # Convert sequences to words
+    texts = tokenizer.sequences_to_texts(sequences)
+
+    # Create a dictionary representation of the documents
+    dictionary = corpora.Dictionary([text.split() for text in texts])
+
+    # Convert document into the bag-of-words (BoW) format
+    corpus = [dictionary.doc2bow(text.split()) for text in texts]
+
+    # Set parameters for LDA
+    num_topics = 10  # Number of topics
+    passes = 15  # Number of passes through the corpus during training
+
+    # Train the LDA model
+    lda_model = LdaModel(corpus, num_topics=num_topics, id2word=dictionary, passes=passes)
+
+    # Print the topics
+    for idx, topic in lda_model.print_topics(-1):
+        print(f"Topic: {idx} \nWords: {topic}\n")
+
+if __name__ == "__main__":
+    main()

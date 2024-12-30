@@ -172,11 +172,17 @@ class QED_model (object):
             mol = Chem.MolFromSmiles(smiles)
             return qed(mol)
 
+def convert_csv_smiles_to_list(input_csv):
+    df = pd.read_csv(input_csv)
+    smiles_list = df['smiles'].tolist()
+    return smiles_list
+
 def main_rnnlm_gcn():
     
     # 1) Read viable drug SMILES
-    smiles_list = read_viable_drugs('C:\\Users\\nisar\\cs\\ml3\\SmileBERTa-portal\\ml-project\\test_smiles.txt')
-
+    ##smiles_list = read_viable_drugs('C:\\Users\\nisar\\cs\\ml3\\SmileBERTa-portal\\ml-project\\test_smiles.txt')
+    smiles_list = convert_csv_smiles_to_list('C:\\Users\\nisar\\cs\\ml3\\SmileBERTa-portal\\drug_classification_data_df.csv')
+    #smiles_list = ['CC1CCC2CC(C(=CC=CC=CC(CC(C(=O)C(C(C(=CC(C(=O)CC(OC(=O)C3CCCCN3C(=O)C(=O)C1(O2)O)C(C)CC4CCC(C(C4)OC)O)C)C)O)OC)C)C)C)OC']
     # 2) Compute fingerprints
     valid_smiles = []
     for smi in smiles_list:
@@ -194,8 +200,8 @@ def main_rnnlm_gcn():
     if False :
         model = QED_model()
     else :
-        #config = OmegaConf.load('C:\\Users\\nisar\\cs\\ml3\\DeepDL\\test\\result\\rnn_worlddrug\\config.yaml')
-        config = OmegaConf.load('C:\\Users\\nisar\\cs\\ml3\\DeepDL\\test\\result\\gcn_worlddrug_zinc15\\config.yaml')
+        config = OmegaConf.load('C:\\Users\\nisar\\cs\\ml3\\DeepDL\\test\\result\\rnn_worlddrug\\config.yaml')
+        #config = OmegaConf.load('C:\\Users\\nisar\\cs\\ml3\\DeepDL\\test\\result\\gcn_worlddrug_zinc15\\config.yaml')
         
         model_architecture = config.model.model # RNNLM or GCNModel
 
