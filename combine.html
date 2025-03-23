@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fragment Combiner</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background-color: #1e1e1e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 30px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 18px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .navbar a:hover {
+            color: #1e90ff;
+        }
+
+        .container {
+            margin-top: 20px;
+        }
+
+        .btn-blue {
+            background-color: #1e90ff;
+            border-color: #1e90ff;
+            color: white;
+            margin: 10px 0;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .btn-blue:hover {
+            background-color: #1c86ee;
+            border-color: #1c86ee;
+        }
+
+        .subtitle-text {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .img-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        #viewer-slot1, #viewer-slot2, #viewer-combined {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #viewer-slot1 canvas, #viewer-slot2 canvas, #viewer-combined canvas {
+            width: 80%;
+            height: 80%;
+        }
+
+        .fragment-slot {
+            padding: 15px;
+            background: #1e1e1e;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        #fragment-cart {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 100vh;
+    background: #1e1e1e;
+    color: white;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.5);
+    z-index: 9999;
+    transform: translateX(100%);
+    transition: transform 0.4s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+#fragment-cart.active {
+    transform: translateX(0);
+}
+
+.cart-header {
+    padding: 15px 20px;
+    background: #2b2b2b;
+    border-bottom: 1px solid #333;
+    flex: 0 0 auto;
+}
+
+#cart-items {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 15px 20px;
+}
+
+#cart-items .fragment-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #333;
+}
+
+/* Scrollbar styles */
+#cart-items::-webkit-scrollbar {
+    width: 8px;
+}
+#cart-items::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
+#cart-items::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
+.fixed-toggle {
+    position: fixed;
+    top: 50%; 
+    right: 0;
+    z-index: 99999;
+    padding: 10px 20px;
+    border-radius: 999px 0 0 999px;
+    background-color: #1e90ff;
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.fixed-toggle:hover {
+    background-color: #1c86ee;
+    transform: scale(1.05);
+}
+    </style>
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-left">
+            <a href="/SmileBERTa-portal">SmileBERTa</a>
+        </div>
+        <div class="navbar-right">
+            <a href="combine">Combine</a>
+            <a href="fragmentation">Fragmentation</a>
+            <a href="drug_class">Drug Classification</a>
+            <a href="index.html#section-4">About</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="text-center my-4">Combine Fragments</h1>
+
+        <!-- Fragment Slots -->
+        <form id="inputForm">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="fragment-slot">
+                        <h4>Fragment Slot 1</h4>
+                        <div id="fragment-properties1"></div>
+                        <div class="img-container">
+                            <img id="fragment-slot1-2d" style="display:none; max-width: 100%;" />
+                        </div>
+                        <div id="viewer-slot1"></div>
+                    </div>
+                </div>
+        
+                <div class="col-md-6">
+                    <div class="fragment-slot">
+                        <h4>Fragment Slot 2</h4>
+                        <div id="fragment-properties2"></div>
+                        <div class="img-container">
+                            <img id="fragment-slot2-2d" style="display:none; max-width: 100%;" />
+                        </div>
+                        <div id="viewer-slot2"></div>
+                    </div>
+                </div>
+            </div>
+        
+            
+        </form>
+        <!-- Combine Button -->
+        <div class="text-center">
+            <button id="combine-btn" class="btn btn-blue" disabled onclick="combineClicked()">Combine</button>
+        </div>
+
+        <!-- Combined Fragments Output -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h3>Combined Results</h3>
+                <div id="combined-container" style="display:inline-block"></div>
+            </div>
+        </div>
+    </div>
+    <div id="fragment-cart">
+        <div class="cart-header">
+            <h4>Fragment Library</h4>
+            <button id="close-cart" class="btn btn-sm btn-danger">&times;</button>
+        </div>
+        <div id="cart-items">
+            <!-- Dynamically added fragment items will go here -->
+        </div>
+    </div>
+    <script src="app.js" defer></script>
+    <script>
+        let smile1 = "";
+        let smile2 = "";
+        window.addEventListener('DOMContentLoaded', function() {
+            const fragmentLibrary = JSON.parse(localStorage.getItem('fragmentLibrary') || '[]');
+            const cart = document.getElementById('fragment-cart');
+            const cartItems = document.getElementById('cart-items');
+
+            fragmentLibrary.forEach(fragment => {
+                const item = document.createElement('div');
+                item.className = 'fragment-item';
+                item.innerHTML = `
+                    <div class="fragment-details mb-2">
+                        <img src="${fragment.img}" alt="Fragment 2D" style="width: 80px; height: 80px; object-fit: contain; border: 1px solid #555; border-radius: 6px; margin-bottom: 8px;">
+                        ${fragment.props}
+                        <button class="btn btn-sm btn-success select-btn mt-2">Select</button>
+                    </div>
+                `;
+                cartItems.appendChild(item);
+
+                // Select logic for combine page (this is where you can load them into Slot 1 / Slot 2)
+                item.querySelector('.select-btn').addEventListener('click', async function() {
+                    const data = {
+                        fragment_smiles: fragment.smiles,
+                        properties: fragment.props
+                    };
+                    if(  document.getElementById('viewer-slot1').childNodes.length == 0){
+                        smile1 = fragment.smiles;
+                        displayFragmentProperties('1', data);
+                        await fetch3DStructure(fragment.smiles, document.getElementById(`viewer-slot1`), null, null);
+                    } else if (document.getElementById('viewer-slot2').childNodes.length == 0){
+                        smile2 = fragment.smiles;
+                        displayFragmentProperties('2', data);
+                        await fetch3DStructure(fragment.smiles, document.getElementById(`viewer-slot2`), null, null);
+                    } else {
+                        alert('Both slots are occupied. Please clear a slot to add a new fragment.');
+                    }
+                    if(  document.getElementById('viewer-slot1').childNodes.length == 1 && document.getElementById('viewer-slot2').childNodes.length == 1){
+                        document.getElementById('combine-btn').disabled = false;
+                    } else {
+                        document.getElementById('combine-btn').disabled = true;
+                    }
+
+                });
+            });
+
+        });
+        async function combineClicked() {
+            const button = document.getElementById('combine-btn');
+            if (button.disabled) {
+                alert('Add fragments to both slots to combine.');
+            } else {
+                //document.getElementById('combined-container').scrollIntoView({ behavior: 'smooth' });
+                await combineFragments(smile1, smile2);
+            }
+        }
+        // Toggle Button Fragment Library Cart
+        const toggleCartBtn = document.createElement('button');
+        toggleCartBtn.textContent = 'Fragment Library';
+        toggleCartBtn.className = 'btn btn-blue fixed-toggle';
+        document.body.appendChild(toggleCartBtn);
+    </script>
+    
+    <script src="https://3dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+</body>
+
+</html>
