@@ -8,6 +8,56 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <style>
+        .fragment-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.fragment-details p {
+    font-size: 0.85rem;
+    margin: 0;
+}
+/* Toggle button floating */
+.btn-blue.fixed-toggle {
+    position: fixed;
+    top: 50%;
+    right: 0;
+    transform: translate(50%, -50%);
+    z-index: 9999;
+}
+
+/* Optional styling */
+.fragment-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.fixed-toggle {
+    position: fixed;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    z-index: 9999;
+    padding: 12px 24px;
+    border-radius: 999px;
+    background-color: #007BFF;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+}
+.fixed-toggle:hover {
+    background-color: #0056b3;
+    transform: translateY(-50%) scale(1.05);
+}
+
+
+
         body {
             background-color: #121212; /* Dark background */
             color: #ffffff; /* White text */
@@ -62,19 +112,29 @@
             margin-bottom: 10px;
         }
         .blue-title {
-            color: #1e90ff;
+            color: #ffffff;
         }
         .btn-blue {
-            background-color: #1e90ff;
-            border-color: #1e90ff;
-            color: white;
-            margin: 10px 0;
-            transition: background-color 0.3s, border-color 0.3s;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .btn-blue:hover {
+
+        .btn-blue:hover, .btn-blue:focus {
+            background-color: #0056b3;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+        /* .btn-blue:hover {
             background-color: #1c86ee;
             border-color: #1c86ee;
-        }
+        } */
         .btn-toggle {
             display: none;
         }
@@ -94,15 +154,114 @@
             text-align: center;
             margin: 20px 0;
         }
+        .img-container img {
+            border-radius: 12px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
         .title-container {
             text-align: center;
             margin-bottom: 40px;
         }
         .subtitle-text {
-            text-align: left;
-            margin-top: 20px;
             font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #fcfafa;
+            text-align: center;
         }
+
+        .fade {
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        .fade-out {
+            opacity: 0;
+            pointer-events: none; /* optional: prevents clicks when hidden */
+        }
+
+        .fade-in {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        @media (max-width: 768px) {
+            #viewer, #viewer-fragmented {
+                max-height: 350px;
+            }
+        }
+
+        #fragment-cart {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 100vh;
+    background: #1e1e1e;
+    color: white;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.5);
+    z-index: 9999;
+    transform: translateX(100%);
+    transition: transform 0.4s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+#fragment-cart.active {
+    transform: translateX(0);
+}
+
+.cart-header {
+    padding: 15px 20px;
+    background: #2b2b2b;
+    border-bottom: 1px solid #333;
+    flex: 0 0 auto;
+}
+
+#cart-items {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 15px 20px;
+}
+
+#cart-items .fragment-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #333;
+}
+
+/* Scrollbar styles */
+#cart-items::-webkit-scrollbar {
+    width: 8px;
+}
+#cart-items::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
+#cart-items::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
+.fixed-toggle {
+    position: fixed;
+    top: 50%;
+    right: 0;
+    z-index: 9999;
+    padding: 10px 20px;
+    border-radius: 999px 0 0 999px;
+    background-color: #1e90ff;
+    color: white;
+    font-size: 16px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.fixed-toggle:hover {
+    background-color: #1c86ee;
+    color: rgb(0, 0, 0);
+}
+
+
     </style>
 </head>
 <body>
@@ -112,7 +271,7 @@
             <a href="/SmileBERTa-portal">SmileBERTa</a>
         </div>
         <div class="navbar-right">
-            <a href="mol_editing">Sorting</a>
+            <a href="combine">Combine</a>
             <a href="fragmentation">Fragmentation</a>
             <a href="drug_class">Drug Classification</a>
             <a href="index.html#section-4">About</a>
@@ -129,7 +288,7 @@
                 <div class="col-md-4 text-center">
                     <img src="./picture5.jpg" alt="Step 1" class="img-fluid mb-2">
                     <h4>Step 1</h4>
-                    <p>Enter the SMILES strings of two drugs you want to fragment.</p>
+                    <p>Enter the SMILES string of a drug you want to fragment.</p>
                 </div>
                 <div class="col-md-4 text-center">
                     <img src="./picture8.jpg" alt="Step 2" class="img-fluid mb-2">
@@ -139,7 +298,7 @@
                 <div class="col-md-4 text-center">
                     <img src="./picture6.jpg" alt="Step 3" class="img-fluid mb-2">
                     <h4>Step 3</h4>
-                    <p>Press the "Submit Button" and view the predicted fragments and the 3D structure of the compounds as well as the combined drugs created from the fragments.</p>
+                    <p>Press the "Submit Button" and view the predicted the best fragment in 2D and the 3D structure.</p>
                 </div>
             </div>
         </div>
@@ -154,19 +313,9 @@
             <div class="col-md-8">
                 <form id="inputForm">
                     <div class="form-group">
-                        <label for="smilesInput1">SMILES String 1</label>
+                        <label for="smilesInput1">SMILES String</label>
                         <input class="form-control" id="smilesInput1" list="smilesList1" placeholder="Type or select a SMILES string" />
                         <datalist id="smilesList1">
-                            <option value="C=CCCC(=O)NCC1CN(c2ccc(N3CCOCC3)c(F)c2)C(=O)O1">
-                            <option value="CC(=O)NCC1CN(c2ccc(-c3cncs3)c(F)c2)C(=O)O1">
-                            <option value="CC(C)(C)NCC(O)COc1ccc(O)c2c1CCC(=O)N2">
-                            <option value="CC(C)C(NC(=O)CCc1ccccc1)C(=O)N1CCCC1">
-                        </datalist>
-                    </div>
-                    <div class="form-group">
-                        <label for="smilesInput2">SMILES String 2</label>
-                        <input class="form-control" id="smilesInput2" list="smilesList2" placeholder="Type or select a SMILES string" />
-                        <datalist id="smilesList2">
                             <option value="C=CCCC(=O)NCC1CN(c2ccc(N3CCOCC3)c(F)c2)C(=O)O1">
                             <option value="CC(=O)NCC1CN(c2ccc(-c3cncs3)c(F)c2)C(=O)O1">
                             <option value="CC(C)(C)NCC(O)COc1ccc(O)c2c1CCC(=O)N2">
@@ -183,62 +332,146 @@
                             <option value="ERK2">ERK2: 1PME</option> -->
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-blue btn-block">Submit</button>
+                    <button type="submit" class="btn btn-blue btn-block" id="submit-btn">
+                        <span id="btn-text">Submit</span>
+                        <span id="btn-spinner" class="spinner-border spinner-border-sm" role="status" style="display: none;"></span>
+                    </button>
                 </form>
             </div>
         </div>
-        <div class="row section-spacing">
-            <div class="col-md-6">
-                <h3 class="subtitle-text" id="subtitle-inputted1">Inputted Compound Structure 1</h3>
-                <button class="btn btn-blue btn-toggle" id="toggle-input-view1">Show 2D View</button>
-                <div class="img-container">
-                    <img id="input-2d1" style="display: none; max-width: 100%;" />
+        <div id="structure-section" class="container section-spacing" style="display: none;">
+            <div class="row justify-content-center mt-4 gx-4 gy-4">
+        
+                <!-- Inputted Compound Structure -->
+                <div class="col-lg-4 col-md-6 col-12 d-flex flex-column align-items-center">
+                    <h3 class="subtitle-text text-center" id="subtitle-inputted1">Inputted Compound</h3>
+                    <button class="btn btn-blue btn-toggle mb-2" id="toggle-input-view1">Show 2D View</button>
+                    <div class="img-container w-100 d-flex justify-content-center">
+                        <img id="input-2d1" style="display: none; max-width: 100%;" />
+                    </div>
+                    <div id="viewer" class="w-100"></div>
+                    <a id="input-download1" class="btn btn-blue mt-2" style="display: none;" download>Download Input PDB</a>
                 </div>
-                <div id="viewer"></div>
-                <a id="input-download1" class="btn btn-blue" style="display: none;" download>Download Input PDB</a>
-            </div>
-            <div class="col-md-6">
-                <h3 class="subtitle-text" id="subtitle-inputted2">Inputted Compound Structure 2</h3>
-                <button class="btn btn-blue btn-toggle" id="toggle-input-view2">Show 2D View</button>
-                <div class="img-container">
-                    <img id="input-2d2" style="display: none; max-width: 100%;" />
+        
+                <!-- Fragmented Compound Structure -->
+                <div class="col-lg-4 col-md-6 col-12 d-flex flex-column align-items-center">
+                    <h3 class="subtitle-text text-center" id="subtitle-fragmented1">Fragmented Compound</h3>
+                    <button class="btn btn-blue btn-toggle mb-2" id="toggle-fragment-view1">Show 2D View</button>
+                    <div class="img-container w-100 d-flex justify-content-center">
+                        <img id="fragment-2d1" style="display: none; max-width: 100%;" />
+                    </div>
+                    <div id="viewer-fragmented" class="w-100"></div>
+                    <a id="fragment-download1" class="btn btn-blue mt-2" style="display: none;" download>Download Fragment PDB</a>
                 </div>
-                <div id="viewer2"></div>
-                <a id="input-download2" class="btn btn-blue" style="display: none;" download>Download Input PDB</a>
-            </div>
-        </div>
-        <div class="row section-spacing">
-            <div class="col-md-6">
-                <h3 class="subtitle-text" id="subtitle-fragmented1">Fragmented Compound Structure 1</h3>
-                <div id="fragment-properties1"></div>
-                <button class="btn btn-blue btn-toggle" id="toggle-fragment-view1">Show 2D View</button>
-                <div class="img-container">
-                    <img id="fragment-2d1" style="display: none; max-width: 100%;" />
+        
+                <!-- Fragment Properties & Action -->
+                <div class="col-lg-4 col-md-12 col-12 d-flex flex-column align-items-center justify-content-center text-center" style="padding-top: 100px;">
+                    <div id="fragment-properties1" class="w-100 mb-3"></div>
+                    <button class="btn btn-blue btn-toggle mt-4" id="add-to-lib">Add to Fragment Library</button>
                 </div>
-                <div id="viewer-fragmented"></div>
-                <a id="fragment-download1" class="btn btn-blue" style="display: none;" download>Download Fragment PDB</a>
-            </div>
-            <div class="col-md-6">
-                <h3 class="subtitle-text" id="subtitle-fragmented2">Fragmented Compound Structure 2</h3>
-                <div id="fragment-properties2"></div>
-                <button class="btn btn-blue btn-toggle" id="toggle-fragment-view2">Show 2D View</button>
-                <div class="img-container">
-                    <img id="fragment-2d2" style="display: none; max-width: 100%;" />
-                </div>
-                <div id="viewer-fragmented2"></div>
-                <a id="fragment-download2" class="btn btn-blue" style="display: none;" download>Download Fragment PDB</a>
+                
+   
             </div>
         </div>
-        <div class="row section-spacing">
+        
+        <!-- <div class="row section-spacing">
             <div class="col-md-12">
                 <h2 id="subtitle-combined" style="display:none;">Combined Fragments</h2>
                 <div id="combined-container">
-                    <!-- Combined fragments will be dynamically added here -->
+                    Combined fragments will be dynamically added here 
                 </div>
             </div>
+        </div> -->
+    </div>
+    <div id="fragment-cart">
+        <div class="cart-header">
+            <h4>Fragment Library</h4>
+            <button id="close-cart" class="btn btn-sm btn-danger">&times;</button>
+        </div>
+        <div id="cart-items">
+            <!-- Dynamically added fragment items will go here -->
         </div>
     </div>
     <!-- Bootstrap JS and dependencies -->
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            localStorage.setItem('fragmentLibrary', []);
+        });
+        const toggleCartBtn = document.createElement('button');
+        toggleCartBtn.textContent = 'Fragment Library';
+        toggleCartBtn.className = 'fixed-toggle';
+        document.body.appendChild(toggleCartBtn);
+
+        document.getElementById('toggle-input-view1').addEventListener('click', function() {
+            toggleInputView('1');
+        });
+        document.getElementById('toggle-fragment-view1').addEventListener('click', function() {
+            toggleFragmentView('1');
+        });
+        
+        
+        document.getElementById('add-to-lib').addEventListener('click', function() {
+            let fragmentLibrary = JSON.parse(localStorage.getItem('fragmentLibrary') || '[]');
+            const addedFragments = new Set(fragmentLibrary.map(f => f.smiles));
+            const cart = document.getElementById('fragment-cart');
+            const fragmentProps = document.getElementById('fragment-properties1').innerHTML;
+            const fragmentImg = document.getElementById('fragment-2d1');
+            
+            // Extract SMILES from the properties panel
+            const smilesMatch = fragmentProps.match(/<strong>SMILES:<\/strong> (.*?)<\/p>/);
+            if (!smilesMatch) {
+                alert('Could not find SMILES in the fragment properties.');
+                return;
+            }
+            const fragmentSMILES = smilesMatch[1].trim();
+
+            // Check if this fragment is already added
+            if (addedFragments.has(fragmentSMILES)) {
+                alert('Fragment already added to the library.');
+                return;
+            }
+            addedFragments.add(fragmentSMILES);
+
+            // Save to localStorage
+            // Convert image to base64
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = fragmentImg.naturalWidth;
+            canvas.height = fragmentImg.naturalHeight;
+            ctx.drawImage(fragmentImg, 0, 0);
+
+            const dataUrl = canvas.toDataURL('image/png');
+            fragmentLibrary.push({
+                smiles: fragmentSMILES,
+                img: dataUrl,
+                props: fragmentProps
+            });
+            localStorage.setItem('fragmentLibrary', JSON.stringify(fragmentLibrary));
+
+            // Add to cart
+            const item = document.createElement('div');
+            item.className = 'fragment-item';
+            item.innerHTML = `
+                <div class="fragment-details mb-2">
+                    <img src="${dataUrl}" alt="Fragment 2D" style="width: 80px; height: 80px; object-fit: contain; border: 1px solid #555; border-radius: 6px; margin-bottom: 8px;">
+                    ${fragmentProps}
+                    <button class="btn btn-sm btn-success select-btn mt-2">Select</button>
+                </div>
+            `;
+
+            document.getElementById('cart-items').appendChild(item);
+
+            // Add select button logic
+            const selectBtn = item.querySelector('.select-btn');
+            selectBtn.addEventListener('click', function() {
+                alert(`Selected fragment: ${fragmentSMILES}`);
+                // Your logic here!
+            });
+
+            // Show cart automatically
+            //cart.classList.add('active');
+        });
+    </script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
