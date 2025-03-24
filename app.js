@@ -229,31 +229,9 @@ async function combineFragments(smiles1, smiles2) {
 }
 
 async function processCompounds(smiles1, protein) {
-    // document.getElementById('subtitle-inputted1').style.display = 'block';
-    // document.getElementById('toggle-input-view1').style.display = 'block';
-    // document.getElementById('subtitle-fragmented1').style.display = 'block';
-    // document.getElementById('toggle-fragment-view1').style.display = 'block';
-
-    // document.getElementById('subtitle-inputted2').style.display = 'block';
-    // document.getElementById('toggle-input-view2').style.display = 'block';
-    // document.getElementById('subtitle-fragmented2').style.display = 'block';
-    // document.getElementById('toggle-fragment-view2').style.display = 'block';
-
     await fetch2DStructure(smiles1, document.getElementById('input-2d1'));
     await fetch3DStructure(smiles1, document.getElementById('viewer'), document.getElementById('input-download1'), 'input_structure1.pdb');
-
-    // await fetch2DStructure(smiles2, document.getElementById('input-2d2'));
-    // await fetch3DStructure(smiles2, document.getElementById('viewer2'), document.getElementById('input-download2'), 'input_structure2.pdb');
-
-    const fragment1 = await predictFragment(smiles1, "1", protein);
-    // const fragment2 = await predictFragment(smiles2, "2");
-
-    //TODO: Combine fragments remove the comments
-    // if (fragment1 && fragment2) {
-    //     document.getElementById('subtitle-combined').style.display = 'block';
-    //     // document.getElementById('toggle-combined-view-${index}').style.display = 'block';
-    //     await combineFragments(fragment1, fragment2);
-    // }
+    await predictFragment(smiles1, "1", protein);
 }
 
 function toggleInputView(suffix) {
@@ -365,86 +343,6 @@ function fadeinStructure() {
     fadeIn(document.getElementById('toggle-fragment-view1'));
     document.getElementById('structure-section').scrollIntoView({ behavior: 'smooth' });
 }
-
-// document.getElementById('toggle-input-view1').addEventListener('click', function() {
-//     toggleInputView('1');
-// });
-
-// document.getElementById('toggle-input-view2').addEventListener('click', function() {
-//     toggleInputView('2');
-// });
-
-// document.getElementById('toggle-fragment-view1').addEventListener('click', function() {
-//     toggleFragmentView('1');
-// });
-
-// document.getElementById('toggle-fragment-view2').addEventListener('click', function() {
-//     toggleFragmentView('2');
-// });
-
-
-
-// Close button
-// document.getElementById('close-cart').addEventListener('click', function() {
-//     document.getElementById('fragment-cart').classList.remove('active');
-// });
-
-
-// Keep track of SMILES added to the library
-
-
-// OPEN button outside the sidebar
-
-
-// Existing close button
-// document.getElementById('close-cart').addEventListener('click', function() {
-//     document.getElementById('fragment-cart').classList.remove('active');
-// });
-
-// Add to library button
-// document.getElementById('add-to-lib').addEventListener('click', function() {
-//     const cart = document.getElementById('fragment-cart');
-//     const fragmentProps = document.getElementById('fragment-properties1').innerHTML;
-//     const fragmentImgSrc = document.getElementById('fragment-2d1').src;
-    
-//     // Extract SMILES from the properties panel
-//     const smilesMatch = fragmentProps.match(/<strong>SMILES:<\/strong> (.*?)<\/p>/);
-//     if (!smilesMatch) {
-//         alert('Could not find SMILES in the fragment properties.');
-//         return;
-//     }
-//     const fragmentSMILES = smilesMatch[1].trim();
-
-//     // Check if this fragment is already added
-//     if (addedFragments.has(fragmentSMILES)) {
-//         alert('Fragment already added to the library.');
-//         return;
-//     }
-//     addedFragments.add(fragmentSMILES);
-
-//     // Add to cart
-//     const item = document.createElement('div');
-//     item.className = 'fragment-item';
-//     item.innerHTML = `
-//         <div class="fragment-details mb-2">
-//             <img src="${fragmentImgSrc}" alt="Fragment 2D" style="width: 80px; height: 80px; object-fit: contain; border: 1px solid #555; border-radius: 6px; margin-bottom: 8px;">
-//             ${fragmentProps}
-//             <button class="btn btn-sm btn-success select-btn mt-2">Select</button>
-//         </div>
-//     `;
-
-//     document.getElementById('cart-items').appendChild(item);
-
-//     // Add select button logic
-//     const selectBtn = item.querySelector('.select-btn');
-//     selectBtn.addEventListener('click', function() {
-//         alert(`Selected fragment: ${fragmentSMILES}`);
-//         // Your logic here!
-//     });
-
-//     // Show cart automatically
-//     cart.classList.add('active');
-// });
 
 // Open sidebar and hide the button
 toggleCartBtn.addEventListener('click', function() {
