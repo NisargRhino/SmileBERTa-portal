@@ -160,13 +160,13 @@
                 max-height: 350px;
             }
             .fixed-toggle {
-                top: 180px; /* pushes it below the navbar */
+                top: 150px; /* pushes it below the navbar */
             }
         }
 
         #fragment-cart {
             position: fixed;
-            top: 5%;
+            top: 50px;
             right: 0;
             width: 300px;
             height: 100vh;
@@ -215,7 +215,7 @@
         }
         .fixed-toggle {
             position: fixed;
-            top: 5%;
+            top: 50px;
             right: 0;
             z-index: 9999;
             padding: 10px 20px;
@@ -424,7 +424,7 @@
             item.className = 'fragment-item';
             item.innerHTML = `
                 <div class="fragment-details mb-2">
-                    <img src="${dataUrl}" alt="Fragment 2D" style="width: 80px; height: 80px; object-fit: contain; border: 1px solid #555; border-radius: 6px; margin-bottom: 8px;">
+                    <img src="${dataUrl}" alt="Fragment 2D" style="width: 50px; height: 50px; object-fit: contain; border: 1px solid #555; border-radius: 6px; margin-bottom: 8px;">
                     ${fragmentProps}
                     <button class="btn btn-sm btn-success select-btn mt-2" style="background-color: #3569cf; color: #fff; border:none; outline: none"
                          >Select</button>
