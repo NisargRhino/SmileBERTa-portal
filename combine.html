@@ -173,12 +173,14 @@
             background-color: #3569cf;
             transform: scale(1.05);
         }
-        @media (max-width: 768px) {
+        @media only screen and (max-width: 768px), 
+            only screen and (max-device-width: 768px),
+            only screen and (hover: none) and (pointer: coarse) {
             .fixed-toggle {
-                top: 200px !important; /* pushes it below the navbar */
+                top: 100px !important; /* pushes it below the navbar */
             }
             .fragment-cart {
-                top: 200px !important; /* pushes it below the navbar */
+                top: 100px !important; /* pushes it below the navbar */
             } 
         }
     </style>
