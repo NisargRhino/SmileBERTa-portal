@@ -20,14 +20,6 @@
             font-size: 0.85rem;
             margin: 0;
         }
-        /* Toggle button floating */
-        .btn-blue.fixed-toggle {
-            position: fixed;
-            top: 50%;
-            right: 0;
-            transform: translate(50%, -50%);
-            z-index: 9999;
-        }
         body {
             background-color: #121212; /* Dark background */
             color: #ffffff; /* White text */
@@ -156,17 +148,17 @@
             pointer-events: auto;
         }
 
-        @media only screen and (max-width: 768px), 
+        /* @media only screen and (max-width: 768px), 
             only screen and (max-device-width: 768px),
             only screen and (hover: none) and (pointer: coarse) {
             .fixed-toggle {
-                top: 60px !important; /* pushes it below the navbar */
+                top: 60px !important; 
             }
             #fragment-cart {
                 top: 0 !important;
-                padding-top: 60px; /* pushes it below the navbar */
+                padding-top: 60px; 
             } 
-        }
+        } */
 
         #fragment-cart {
             position: fixed;
@@ -219,23 +211,26 @@
         }
         .fixed-toggle {
             position: fixed;
-            top: 50px;
-            right: 0;
-            z-index: 9999;
+            top: 30%;
+            right: 40px; /* adjust this based on button length */
+            transform: rotate(-90deg) translateY(50%);
+            transform-origin: right center;
+            z-index: 99999;
             padding: 10px 20px;
-            border-radius: 999px 0 0 999px;
+            border-radius: 999px 999px 0 0; /* adjusted for vertical look */
             background-color: #3569cf;
             color: white;
+            font-weight: 600;
             font-size: 16px;
             border: none;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
             transition: all 0.3s ease;
             cursor: pointer;
+            white-space: nowrap;
         }
-
         .fixed-toggle:hover {
             background-color: #3569cf;
-            color: rgb(0, 0, 0);
+            transform: rotate(-90deg) translateY(50%) scale(1.05);
         }
     </style>
 </head>
@@ -289,23 +284,23 @@
                 <form id="inputForm">
                     <div class="form-group">
                         <label for="smilesInput1">SMILES String</label>
-                        <select class="form-control" id="smilesInput1">
-                            <option value="">-- Select a SMILES string --</option>
-                            <option value="C=CCCC(=O)NCC1CN(c2ccc(N3CCOCC3)c(F)c2)C(=O)O1">C=CCCC(=O)NCC1CN(c2ccc(N3CCOCC3)c(F)c2)C(=O)O1</option>
-                            <option value="CC(=O)NCC1CN(c2ccc(-c3cncs3)c(F)c2)C(=O)O1">CC(=O)NCC1CN(c2ccc(-c3cncs3)c(F)c2)C(=O)O1</option>
-                            <option value="CC(C)(C)NCC(O)COc1ccc(O)c2c1CCC(=O)N2">CC(C)(C)NCC(O)COc1ccc(O)c2c1CCC(=O)N2</option>
-                            <option value="CC(C)C(NC(=O)CCc1ccccc1)C(=O)N1CCCC1">CC(C)C(NC(=O)CCc1ccccc1)C(=O)N1CCCC1</option>
-                        </select>
+                        <input class="form-control" id="smilesInput1" list="smilesList1" placeholder="Type or select a SMILES string">
+                        <datalist id="smilesList1">
+                            <option value="C=CCCC(=O)NCC1CN(c2ccc(N3CCOCC3)c(F)c2)C(=O)O1">
+                            <option value="CC(=O)NCC1CN(c2ccc(-c3cncs3)c(F)c2)C(=O)O1">
+                            <option value="CC(C)(C)NCC(O)COc1ccc(O)c2c1CCC(=O)N2">
+                            <option value="CC(C)C(NC(=O)CCc1ccccc1)C(=O)N1CCCC1">
+                        </datalist>
                     </div>
                     <div class="form-group">
                         <label for="proteinSelector">Select Protein</label>
-                        <select class="form-control" id="proteinSelector" required>
-                            <option value="">Select a protein</option>
+                        <input class="form-control" id="proteinSelector" list="proteinOptions" placeholder="Select or type a protein" required>
+                        <datalist id="proteinOptions">
                             <option value="KRAS">Lung Cancer</option>
-                            <!-- <option value="mTOR">mTOR: 4wby</option>
+                            <option value="mTOR">mTOR: 4wby</option>
                             <option value="AKT1">AKT1: 4G1R</option>
-                            <option value="ERK2">ERK2: 1PME</option> -->
-                        </select>
+                            <option value="ERK2">ERK2: 1PME</option>
+                        </datalist>
                     </div>
                     <button type="submit" class="btn btn-blue btn-block" id="submit-btn">
                         <span id="btn-text">Submit</span>
@@ -365,7 +360,7 @@
         });
         const toggleCartBtn = document.createElement('button');
         toggleCartBtn.textContent = 'Fragment Library';
-        toggleCartBtn.className = 'fixed-toggle';
+        toggleCartBtn.className = 'btn btn-blue fixed-toggle';
         document.body.appendChild(toggleCartBtn);
 
         document.getElementById('toggle-input-view1').addEventListener('click', function() {

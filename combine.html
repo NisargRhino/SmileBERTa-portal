@@ -154,11 +154,13 @@
         }
         .fixed-toggle {
             position: fixed;
-            top: 50px; 
-            right: 0;
+            top: 30%;
+            right: 40px; /* adjust this based on button length */
+            transform: rotate(-90deg) translateY(50%);
+            transform-origin: right center;
             z-index: 99999;
             padding: 10px 20px;
-            border-radius: 999px 0 0 999px;
+            border-radius: 999px 999px 0 0; /* adjusted for vertical look */
             background-color: #3569cf;
             color: white;
             font-weight: 600;
@@ -167,23 +169,24 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
             transition: all 0.3s ease;
             cursor: pointer;
+            white-space: nowrap;
         }
-
         .fixed-toggle:hover {
             background-color: #3569cf;
-            transform: scale(1.05);
+            transform: rotate(-90deg) translateY(50%) scale(1.05);
         }
-        @media only screen and (max-width: 768px), 
+
+        /* @media only screen and (max-width: 768px), 
             only screen and (max-device-width: 768px),
             only screen and (hover: none) and (pointer: coarse) {
             .fixed-toggle {
-                top: 60px !important; /* pushes it below the navbar */
+                top: 60px !important; /* pushes it below the navbar *
             }
             #fragment-cart {
                 top: 0 !important;
-                padding-top: 60px; /* pushes it below the navbar */
+                padding-top: 60px; /* pushes it below the navbar *
             } 
-        }
+        } */
     </style>
 </head>
 
