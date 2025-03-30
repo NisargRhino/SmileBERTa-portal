@@ -50,6 +50,35 @@
         .navbar a:hover {
             color: #ffffff;
         }
+        
+        .navbar-right {
+            display: flex;
+        }
+
+        .navbar-toggle {
+            display: none;
+            font-size: 26px;
+            cursor: pointer;
+        }
+
+        /* Responsive styles */
+        @media screen and (max-width: 768px) {
+            .navbar-right {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                background-color: #222;
+                padding: 10px 0;
+            }
+
+            .navbar-right.show {
+                display: flex;
+            }
+
+            .navbar-toggle {
+                display: block;
+            }
+        }
         .logout-btn {
             background-color: #ff4d4d;
             border: none;
@@ -162,7 +191,7 @@
 
         #fragment-cart {
             position: fixed;
-            top: 50px;
+            top: 0;
             right: 0;
             width: 300px;
             height: 100vh;
@@ -238,40 +267,41 @@
     <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="navbar-left">
-            <a href="/SmileBERTa-portal">SmileBERTa</a>
+          <a href="/SmileBERTa-portal" class="logo">SmileBERTa</a>
         </div>
-        <div class="navbar-right">
-            <a href="combine">Combine</a>
-            <a href="fragmentation">Fragmentation</a>
-            <a href="drug_class">Drug Classification</a>
-            <a href="index.html#section-4">About</a>
+        <div class="navbar-toggle" onclick="toggleMenu()">☰</div>
+        <div class="navbar-right" id="nav-links">
+          <a href="combine">Combine</a>
+          <a href="fragmentation">Fragmentation</a>
+          <a href="drug_class">Drug Classification</a>
+          <a href="index.html#section-4">About</a>
         </div>
     </nav>
-        <div class="container mt-5">
-            <div class="row justify-content-center">
-                <div class="col-md-8 text-center">
-                    <h2>How to Use the Fragmentation Tool</h2>
-                    <p>This tool allows you to generate fragments of drug compounds based on their SMILES strings. Follow the steps below to use the tool:</p>
-                </div>
-            </div>
-            <div class="row justify-content-center mt-4">
-                <div class="col-md-4 text-center">
-                    <img src="./picture5.jpg" alt="Step 1" class="img-fluid mb-2">
-                    <h4>Step 1</h4>
-                    <p>Enter the SMILES string of a drug you want to fragment.</p>
-                </div>
-                <div class="col-md-4 text-center">
-                    <img src="./picture8.jpg" alt="Step 2" class="img-fluid mb-2">
-                    <h4>Step 2</h4>
-                    <p>Enter the protein that you want the fragments to target.</p>
-                </div>
-                <div class="col-md-4 text-center">
-                    <img src="./picture6.jpg" alt="Step 3" class="img-fluid mb-2">
-                    <h4>Step 3</h4>
-                    <p>Press the "Submit Button" and view the predicted the best fragment in 2D and the 3D structure.</p>
-                </div>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <h2>How to Use the Fragmentation Tool</h2>
+                <p>This tool allows you to generate fragments of drug compounds based on their SMILES strings. Follow the steps below to use the tool:</p>
             </div>
         </div>
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-4 text-center">
+                <img src="./picture5.jpg" alt="Step 1" class="img-fluid mb-2">
+                <h4>Step 1</h4>
+                <p>Enter the SMILES string of a drug you want to fragment.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <img src="./picture8.jpg" alt="Step 2" class="img-fluid mb-2">
+                <h4>Step 2</h4>
+                <p>Enter the protein that you want the fragments to target.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <img src="./picture6.jpg" alt="Step 3" class="img-fluid mb-2">
+                <h4>Step 3</h4>
+                <p>Press the "Submit Button" and view the predicted the best fragment in 2D and the 3D structure.</p>
+            </div>
+        </div>
+    </div>
     <!-- Main Content -->
     <div class="container">
         <div class="row justify-content-center title-container">
@@ -358,6 +388,10 @@
         window.addEventListener('DOMContentLoaded', function() {
             localStorage.setItem('fragmentLibrary', []);
         });
+        function toggleMenu() {
+            const navLinks = document.getElementById('nav-links');
+            navLinks.classList.toggle('show');
+        }
         const toggleCartBtn = document.createElement('button');
         toggleCartBtn.textContent = 'Fragment Library';
         toggleCartBtn.className = 'btn btn-blue fixed-toggle';
