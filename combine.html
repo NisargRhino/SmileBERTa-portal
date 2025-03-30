@@ -42,11 +42,6 @@
          
         .navbar-right {
             display: flex;
-            transition: transform 0.3s ease;
-        }
-
-        .navbar-right.shifted {
-            transform: translateX(-300px);
         }
 
         .navbar-toggle {
@@ -209,10 +204,6 @@
             transform: rotate(-90deg) translateY(50%) scale(1.05);
         }
 
-        .fragment-library.open {
-            right: 0;
-        }
-
         /* @media only screen and (max-width: 768px), 
             only screen and (max-device-width: 768px),
             only screen and (hover: none) and (pointer: coarse) {
@@ -289,7 +280,7 @@
     <div id="fragment-cart">
         <div class="cart-header">
             <h4>Fragment Library</h4>
-            <button id="close-cart" class="btn btn-sm btn-danger" onclick="toggleFragmentLibrary()">&times;</button>
+            <button id="close-cart" class="btn btn-sm btn-danger">&times;</button>
         </div>
         <div id="cart-items">
             <!-- Dynamically added fragment items will go here -->
@@ -362,13 +353,6 @@
         toggleCartBtn.textContent = 'Fragment Library';
         toggleCartBtn.className = 'btn btn-blue fixed-toggle';
         document.body.appendChild(toggleCartBtn);
-        function toggleFragmentLibrary() {
-            const library = document.getElementById('fragment-library');
-            const navbarRight = document.getElementById('navbar-id');
-
-            library.classList.toggle('open');
-            navbarRight.classList.toggle('shifted');
-        }
     </script>
     
     <script src="https://3dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
