@@ -83,13 +83,23 @@ def find_closest_valid_smiles(predicted_smiles, unique_smiles_list):
             closest_smiles = smiles
     return closest_smiles
 
+import requests
+
 def find_closest_valid_smiles(predicted_smiles):
-    response = requests.post('https://smiles-corrector-1.onrender.com/correct', json={'smiles': predicted_smiles})
-    if response.status_code == 200:
-        return response.json().get('corrected')
-    else:
-        print("Error fetching 3D structure:", response.json())
-        return None
+    try:
+        response = requests.post(
+            'https://smile-corrector.onrender.com/correct',
+            json={'smiles': predicted_smiles},
+            timeout=10  # ⏱️ Add timeout so it doesn't hang forever
+        )
+        print("Status from corrector:", response.status_code)
+        print("Corrector response:", response.text)
+        if response.status_code == 200:
+            return response.json().get('corrected')
+    except Exception as e:
+        print("ERROR contacting smile-corrector:", str(e))
+    return None
+
     
 # Function to predict fragment SMILES
 def predict_fragment_smiles(smiles, protein, max_length=128):
