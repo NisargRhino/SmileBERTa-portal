@@ -73,6 +73,7 @@ def is_valid_smiles(smiles):
 
 # Function to find the closest valid SMILES string
 def find_closest_valid_smiles(predicted_smiles, unique_smiles_list):
+    print("invalid smiles: ", predicted_smiles)
     closest_smiles = None
     highest_similarity = -1
     for smiles in unique_smiles_list:
@@ -82,6 +83,14 @@ def find_closest_valid_smiles(predicted_smiles, unique_smiles_list):
             closest_smiles = smiles
     return closest_smiles
 
+def find_closest_valid_smiles(predicted_smiles):
+    response = requests.post('https://smiles-corrector-1.onrender.com/correct', json={'smiles': predicted_smiles})
+    if response.status_code == 200:
+        return response.json().get('corrected')
+    else:
+        print("Error fetching 3D structure:", response.json())
+        return None
+    
 # Function to predict fragment SMILES
 def predict_fragment_smiles(smiles, protein, max_length=128):
     #model_path = f'KennardLiong/proteinmodels/protein-models/model-{protein}'
@@ -104,20 +113,21 @@ def predict_fragment_smiles(smiles, protein, max_length=128):
     print("initial smiles: ", predicted_smiles)
     if not is_valid_smiles(predicted_smiles):
         print("Predicted SMILES is invalid. Finding the closest valid SMILES...")
-        closest_valid_smiles = find_closest_valid_smiles(predicted_smiles, unique_smiles_list)
+        #closest_valid_smiles = find_closest_valid_smiles(predicted_smiles, unique_smiles_list)
+        closest_valid_smiles = find_closest_valid_smiles(predicted_smiles)
         predicted_smiles = closest_valid_smiles
         print("new closest predicted smiles: ", predicted_smiles)
     return predicted_smiles
 
 # Example usage
-# new_drug_smiles = "CC=C(C)C(=O)OC1C(C)=CC23C(=O)C(C=C(COC(C)=O)C(O)C12O)C1C(CC3C)C1(C)C"  # Replace with your input SMILES
-# predicted_fragment_smiles = predict_fragment_smiles(new_drug_smiles, 'mTOR')
-# print("Predicted Fragment SMILES:", predicted_fragment_smiles)
+new_drug_smiles = "CCCCC1=NC2(CCCC2)C(=O)N1CC3=CC=C(C=C3)C4=CC=CC=C4C5=NN(N=N5)C6C(C(C(C(O6)C(=O)O)O)O)O"  # Replace with your input SMILES
+predicted_fragment_smiles = predict_fragment_smiles(new_drug_smiles, 'mTOR')
+print("Predicted Fragment SMILES:", predicted_fragment_smiles)
 
-# actual_fragment_smiles = ""  # Replace with the actual fragment SMILES in order to test accuracy
-# similarity = tanimoto_similarity(predicted_fragment_smiles, actual_fragment_smiles)
-# print("Tanimoto Similarity:", similarity)
+actual_fragment_smiles = ""  # Replace with the actual fragment SMILES in order to test accuracy
+similarity = tanimoto_similarity(predicted_fragment_smiles, actual_fragment_smiles)
+print("Tanimoto Similarity:", similarity)
 
-# # Calculate string similarity
-# string_sim = string_similarity(predicted_fragment_smiles, actual_fragment_smiles)
-# print("String Similarity:", string_sim)
+# Calculate string similarity
+string_sim = string_similarity(predicted_fragment_smiles, actual_fragment_smiles)
+print("String Similarity:", string_sim)
