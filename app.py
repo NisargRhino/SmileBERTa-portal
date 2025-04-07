@@ -20,7 +20,7 @@ from Levenshtein import distance as levenshtein_distance
 from predict_drug_classification import drug_class_smiles
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+CORS(app, origins="*", supports_credentials=False)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 @app.after_request
