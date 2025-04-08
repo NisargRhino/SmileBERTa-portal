@@ -34,19 +34,6 @@ def after_request(response):
 def options_handler(routes):
     return make_response('', 204)
 
-# @app.route('/score', methods=['POST'])
-# def score_compound():
-#     try:
-#         data = request.get_json()
-#         smiles = data.get('smiles')
-        
-#         if not smiles:
-#             return jsonify({'error': 'No SMILES string provided'}), 400
-        
-#         score = run_docking(smiles)
-#         return jsonify({'smiles': smiles, 'score': score})
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 500
 
 @app.route('/get_3d_structure', methods=['POST'])
 def get_3d_structure_route():
@@ -71,7 +58,7 @@ def get_3d_structure_route():
 def get_2d_structure_route():
     data = request.json
     smiles = data.get('smiles')
-    #smiles = 'CC=C(C)C(=O)OC1C(C)=CC23C(=O)C(C=C(COC(C)=O)C(O)C12O)C1C(CC3C)C1(C)C'
+    
     if not smiles:
         return jsonify({"error": "SMILES string is required"}), 400
 
@@ -97,10 +84,10 @@ def predict_fragment():
         return jsonify({"error": "SMILES string is required"}), 400
 
     fragment_smiles = predict_fragment_smiles(smiles, protein)
-    print("reached here 1 !!!!")
+    if not fragment_smiles:
+        return jsonify({"error": "Invalid SMILES string could not corrected, pick another smiles"}), 400
     cleaned_fragment_smiles = cleanup_molecule_rdkit(fragment_smiles)
-    print("reached here 2 !!!!")
-
+   
     if not cleaned_fragment_smiles:
         return jsonify({"error": "Failed to generate a valid fragment"}), 500
     mol = Chem.MolFromSmiles(cleaned_fragment_smiles)
@@ -197,14 +184,11 @@ tokenizer_dc = RobertaTokenizer.from_pretrained('NisargRhino/drug-classification
 model_dc.eval()
 @app.route('/classify_smiles', methods=['POST'])
 def classify_smiles():
-    print("reached here 1")
     data = request.get_json()
     smiles = data.get('smiles')
-    print("reached here 2")
     if not smiles:
         return jsonify({'error': 'No SMILES string provided'}), 400
     
-    print("reached here 3")
     try:
         prediction = drug_class_smiles(smiles, model_dc, tokenizer_dc)
         print("reached here 4")

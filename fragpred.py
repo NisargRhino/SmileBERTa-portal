@@ -95,7 +95,7 @@ def find_closest_valid_smiles(predicted_smiles):
         print("Status from corrector:", response.status_code)
         print("Corrector response:", response.text)
         if response.status_code == 200:
-            return response.json().get('corrected')
+            return response.json().get('corrected') if response.ok else None
     except Exception as e:
         print("ERROR contacting smile-corrector:", str(e))
     return None
