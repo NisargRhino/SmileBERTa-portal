@@ -88,7 +88,7 @@ import requests
 def find_closest_valid_smiles(predicted_smiles):
     try:
         response = requests.post(
-            'https://smile-corrector.onrender.com/correct',
+            'https://smiles-corrector-1.onrender.com/correct',
             json={'smiles': predicted_smiles},
             timeout=10  # ⏱️ Add timeout so it doesn't hang forever
         )
@@ -123,8 +123,8 @@ def predict_fragment_smiles(smiles, protein, max_length=128):
     print("initial smiles: ", predicted_smiles)
     if not is_valid_smiles(predicted_smiles):
         print("Predicted SMILES is invalid. Finding the closest valid SMILES...")
-        closest_valid_smiles = find_closest_valid_smiles(predicted_smiles, unique_smiles_list)
-        #closest_valid_smiles = find_closest_valid_smiles(predicted_smiles)
+        #closest_valid_smiles = find_closest_valid_smiles(predicted_smiles, unique_smiles_list)
+        closest_valid_smiles = find_closest_valid_smiles(predicted_smiles)
         predicted_smiles = closest_valid_smiles
         print("new closest predicted smiles: ", predicted_smiles)
     return predicted_smiles
