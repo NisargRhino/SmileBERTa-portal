@@ -90,7 +90,7 @@ def find_closest_valid_smiles(predicted_smiles):
         response = requests.post(
             'https://smiles-corrector-1.onrender.com/correct',
             json={'smiles': predicted_smiles},
-            timeout=30  # ⏱️ Add timeout so it doesn't hang forever
+            timeout=60  # ⏱️ Add timeout so it doesn't hang forever
         )
         print("Status from corrector:", response.status_code)
         print("Corrector response:", response.text)
