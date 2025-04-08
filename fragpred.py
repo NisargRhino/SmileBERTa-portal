@@ -90,7 +90,7 @@ def find_closest_valid_smiles(predicted_smiles):
         response = requests.post(
             'https://smiles-corrector-1.onrender.com/correct',
             json={'smiles': predicted_smiles},
-            timeout=10  # ⏱️ Add timeout so it doesn't hang forever
+            timeout=30  # ⏱️ Add timeout so it doesn't hang forever
         )
         print("Status from corrector:", response.status_code)
         print("Corrector response:", response.text)
@@ -130,14 +130,14 @@ def predict_fragment_smiles(smiles, protein, max_length=128):
     return predicted_smiles
 
 # Example usage
-new_drug_smiles = "CCCCC1=NC2(CCCC2)C(=O)N1CC3=CC=C(C=C3)C4=CC=CC=C4C5=NN(N=N5)C6C(C(C(C(O6)C(=O)O)O)O)O"  # Replace with your input SMILES
-predicted_fragment_smiles = predict_fragment_smiles(new_drug_smiles, 'mTOR')
-print("Predicted Fragment SMILES:", predicted_fragment_smiles)
+# new_drug_smiles = "CCCCC1=NC2(CCCC2)C(=O)N1CC3=CC=C(C=C3)C4=CC=CC=C4C5=NN(N=N5)C6C(C(C(C(O6)C(=O)O)O)O)O"  # Replace with your input SMILES
+# predicted_fragment_smiles = predict_fragment_smiles(new_drug_smiles, 'mTOR')
+# print("Predicted Fragment SMILES:", predicted_fragment_smiles)
 
-actual_fragment_smiles = ""  # Replace with the actual fragment SMILES in order to test accuracy
-similarity = tanimoto_similarity(predicted_fragment_smiles, actual_fragment_smiles)
-print("Tanimoto Similarity:", similarity)
+# actual_fragment_smiles = ""  # Replace with the actual fragment SMILES in order to test accuracy
+# similarity = tanimoto_similarity(predicted_fragment_smiles, actual_fragment_smiles)
+# print("Tanimoto Similarity:", similarity)
 
-# Calculate string similarity
-string_sim = string_similarity(predicted_fragment_smiles, actual_fragment_smiles)
-print("String Similarity:", string_sim)
+# # Calculate string similarity
+# string_sim = string_similarity(predicted_fragment_smiles, actual_fragment_smiles)
+# print("String Similarity:", string_sim)
