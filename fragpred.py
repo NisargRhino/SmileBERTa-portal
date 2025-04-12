@@ -5,6 +5,7 @@ from rdkit.Chem import AllChem, DataStructs, Descriptors
 import Levenshtein
 import pandas as pd
 import requests
+from requests.exceptions import RequestException, Timeout, ConnectionError
 
 # Load unique SMILES from CSV
 unique_smiles_df = pd.read_csv('unique_smile5.csv')  # Enter the path of unique_smile5.csv
@@ -83,21 +84,29 @@ def find_closest_valid_smiles(predicted_smiles, unique_smiles_list):
             closest_smiles = smiles
     return closest_smiles
 
-import requests
-
 def find_closest_valid_smiles(predicted_smiles):
     try:
         response = requests.post(
             'https://smiles-corrector-1.onrender.com/correct',
             json={'smiles': predicted_smiles},
-            timeout=60  # ⏱️ Add timeout so it doesn't hang forever
+            timeout=60  # ⏱️ avoid hanging forever
         )
-        print("Status from corrector:", response.status_code)
-        print("Corrector response:", response.text)
+
+        print("✅ Status from corrector:", response.status_code)
+        print("🧪 Corrector response:", response.text)
+
         if response.status_code == 200:
-            return response.json().get('corrected') if response.ok else None
-    except Exception as e:
-        print("ERROR contacting smile-corrector:", str(e))
+            return response.json().get('corrected', None)
+        else:
+            print("⚠️ Non-200 response:", response.text)
+
+    except Timeout:
+        print("❌ Timeout contacting SMILES corrector.")
+    except ConnectionError:
+        print("❌ Connection error to SMILES corrector.")
+    except RequestException as e:
+        print("❌ Request exception contacting SMILES corrector:", str(e))
+
     return None
 
     
