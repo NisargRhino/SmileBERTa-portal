@@ -95,6 +95,8 @@ async function predictFragment(smiles, suffix, protein) {
         const data = await response.json();
         if (data.error) {
             alert(data.error);
+            document.getElementById('btn-text').style.display = 'inline-block';
+            document.getElementById('btn-spinner').style.display = 'none';
             return null;
         }
 
