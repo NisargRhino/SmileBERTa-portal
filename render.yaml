@@ -2,19 +2,15 @@ services:
   # ── Flask API backend ────────────────────────────────────────────────────
   - type: web
     name: smileberta-api
-    env: python
+    env: docker
     plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app --workers 1 --timeout 120
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.11.0
+    dockerfilePath: ./Dockerfile
 
   # ── Static frontend ──────────────────────────────────────────────────────
   - type: static_site
     name: smileberta-web
     buildCommand: ""
-    staticPublishPath: .
+    staticPublishPath: frontend
     pullRequestPreviewsEnabled: false
     headers:
       - path: /*
