@@ -9,8 +9,7 @@ services:
   # ── Static frontend ──────────────────────────────────────────────────────
   - type: static_site
     name: smileberta-web
-    buildCommand: ""
-    staticPublishPath: frontend
+    staticPublishPath: ./frontend
     pullRequestPreviewsEnabled: false
     headers:
       - path: /*
