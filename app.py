@@ -4,7 +4,11 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, Draw
 from fragpred import predict_fragment_smiles, cleanup_molecule_rdkit, calculate_properties, get_3d_structure
 from combine_frag import combine_fragments
-from docking import run_docking
+try:
+    from docking import run_docking
+    DOCKING_AVAILABLE = True
+except ImportError:
+    DOCKING_AVAILABLE = False
 import os
 import sqlite3
 import secrets
