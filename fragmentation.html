@@ -3,478 +3,500 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fragmentation Generator</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
+    <title>Fragmentation — SmileBERTa</title>
     <style>
-        .fragment-item {
-            padding: 10px 0;
-            border-bottom: 1px solid #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --blue: #0071e3;
+            --blue-hover: #0077ed;
+            --bg: #000;
+            --card: #1c1c1e;
+            --border: rgba(255,255,255,0.1);
+            --text: #f5f5f7;
+            --muted: #86868b;
+            --font: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
         }
 
-        .fragment-details p {
-            font-size: 0.85rem;
-            margin: 0;
-        }
-        body {
-            background-color: #121212; /* Dark background */
-            color: #ffffff; /* White text */
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .navbar {
-            background-color: #1e1e1e;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 30px;
-            position: sticky;
-            top: 0;
-            height: auto;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-        }
-        .navbar a {
-            color: rgb(83, 124, 212);
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 18px;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-        .navbar a:hover {
-            color: #ffffff;
-        }
-        
-        .navbar-right {
-            display: flex;
-        }
+        html { scroll-behavior: smooth; }
 
-        .navbar-toggle {
-            display: none;
-            font-size: 26px;
-            cursor: pointer;
-        }
+        body { font-family: var(--font); background: var(--bg); color: var(--text); }
 
-        /* Responsive styles */
-        @media screen and (max-width: 768px) {
-            .navbar-right {
-                display: none;
-                flex-direction: column;
-                width: 100%;
-                background-color: #222;
-                padding: 10px 0;
-            }
+        /* NAV */
+        nav {
+            position: sticky; top: 0; z-index: 9800;
+            background: rgba(0,0,0,0.82);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-inner {
+            max-width: 1080px; margin: 0 auto; height: 64px;
+            display: flex; align-items: center; justify-content: space-between; padding: 0 24px;
+        }
+        .nav-brand { display: flex; align-items: center; text-decoration: none; }
+        .nav-brand img { height: 56px; width: auto; }
+        .nav-links { display: flex; gap: 28px; align-items: center; }
+        .nav-links a { font-size: 0.82rem; color: var(--text); text-decoration: none; opacity: 0.75; transition: opacity 0.2s; }
+        .nav-links a:hover { opacity: 1; }
+        .nav-username { font-size: 0.82rem; color: var(--text); opacity: 0.75; }
+        .nav-signout-btn { font-size: 0.82rem; color: var(--text); background: transparent; border: 1px solid rgba(255,255,255,0.2); border-radius: 980px; padding: 5px 14px; cursor: pointer; font-family: var(--font); }
+        .nav-signout-btn:hover { border-color: rgba(255,255,255,0.5); }
+        .nav-signin-link { font-size: 0.82rem; color: var(--blue); text-decoration: none; font-weight: 500; }
 
-            .navbar-right.show {
-                display: flex;
-            }
+        /* HERO */
+        .page-hero { position: relative; height: 300px; display: flex; align-items: flex-end; justify-content: center; text-align: center; overflow: hidden; }
+        .page-hero-bg { position: absolute; inset: 0; background-image: url('https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=1920&q=80'); background-size: cover; background-position: center 40%; filter: brightness(0.22); }
+        .page-hero-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.95) 100%); }
+        .page-hero-content { position: relative; z-index: 1; padding-bottom: 48px; }
+        .page-hero-content .eyebrow { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue); margin-bottom: 12px; }
+        .page-hero-content h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 700; letter-spacing: -0.035em; }
 
-            .navbar-toggle {
-                display: block;
-            }
-        }
-        .logout-btn {
-            background-color: #ff4d4d;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            color: white;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-        }
-        .logout-btn:hover {
-            background-color: #e43e3e;
-        }
-        .container {
-            margin-top: 20px;
-        }
-        .form-group {
-            margin-bottom: 30px;
-        }
-        .form-group label {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-        }
-        .blue-title {
-            color: #ffffff;
-        }
-        .btn-blue {
-            background-color: #3569cf;
-            color: #ffffff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+        /* MAIN */
+        .main { max-width: 1000px; margin: 0 auto; padding: 60px 24px 160px; }
 
-        .btn-blue:hover, .btn-blue:focus {
-            background-color: #3569cf;
-            color: #000;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-        }
-        /* .btn-blue:hover {
-            background-color: #1c86ee;
-            border-color: #1c86ee;
-        } */
-        .btn-toggle {
-            display: none;
-        }
-        #viewer, #viewer2, #viewer-fragmented, #viewer-fragmented2 {
-            width: 100%;
-            height: 400px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        #viewer canvas, #viewer2 canvas, #viewer-fragmented canvas, #viewer-fragmented2 canvas {
-            width: 80%;
-            height: 80%;
-        }
-        .img-container {
-            text-align: center;
-            margin: 20px 0;
-        }
-        .img-container img {
-            border-radius: 12px;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-        }
-        .title-container {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        .subtitle-text {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: #fcfafa;
-            text-align: center;
-        }
+        /* STEPS */
+        .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 52px; }
+        .step-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 28px 22px; text-align: center; }
+        .step-num { width: 44px; height: 44px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+        .step-card h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 10px; }
+        .step-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+        .divider { height: 1px; background: var(--border); margin: 0 0 52px; }
 
-        .fade {
-            opacity: 1;
-            transition: opacity 0.5s ease;
-        }
+        /* FORM CARD */
+        .form-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 36px 32px; margin-bottom: 32px; }
+        .form-card h2 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 28px; }
+        .field { margin-bottom: 22px; }
+        label { display: block; font-size: 0.82rem; font-weight: 500; color: var(--muted); margin-bottom: 8px; }
+        .smiles-input { width: 100%; background: #2c2c2e; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; color: var(--text); font-size: 0.95rem; font-family: var(--font); padding: 14px 16px; outline: none; transition: border-color 0.2s; }
+        .smiles-input:focus { border-color: var(--blue); }
+        .smiles-input::placeholder { color: #555; }
+        .btn-submit { width: 100%; background: var(--blue); color: #fff; border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 600; padding: 15px; cursor: pointer; transition: background 0.2s, transform 0.15s; font-family: var(--font); display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-submit:hover { background: var(--blue-hover); transform: translateY(-1px); }
 
-        .fade-out {
-            opacity: 0;
-            pointer-events: none; /* optional: prevents clicks when hidden */
-        }
+        .spinner-ring { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .fade-in {
-            opacity: 1;
-            pointer-events: auto;
-        }
+        /* STRUCTURE SECTION */
+        #structure-section { display: none; }
+        .structure-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .structure-panel { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 24px; display: flex; flex-direction: column; align-items: center; }
+        .subtitle-text { font-size: 1rem; font-weight: 600; margin-bottom: 16px; text-align: center; }
+        .btn-toggle { background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 980px; font-size: 0.8rem; font-weight: 500; padding: 8px 18px; cursor: pointer; font-family: var(--font); transition: background 0.2s; margin-bottom: 14px; display: none; }
+        .btn-toggle:hover { background: #2c2c2e; }
+        .img-container { width: 100%; text-align: center; margin: 8px 0; }
+        .img-container img { max-width: 100%; border-radius: 10px; }
+        #viewer, #viewer-fragmented { width: 100%; height: 280px; border-radius: 12px; border: 1px solid var(--border); position: relative; }
+        .btn-download { display: none; margin-top: 14px; background: #2c2c2e; color: var(--text); border: 1px solid var(--border); border-radius: 980px; font-size: 0.8rem; font-weight: 500; padding: 8px 18px; text-decoration: none; transition: background 0.2s; }
+        .btn-download:hover { background: #3a3a3c; color: var(--text); }
+        #fragment-properties1 { width: 100%; font-size: 0.82rem; line-height: 1.7; color: var(--muted); margin-bottom: 12px; }
+        #fragment-properties1 h3 { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 10px; }
+        #fragment-properties1 strong { color: var(--text); }
+        .btn-add-lib { display: none; background: var(--blue); color: #fff; border: none; border-radius: 980px; font-size: 0.85rem; font-weight: 500; padding: 10px 22px; cursor: pointer; font-family: var(--font); transition: background 0.2s; margin-top: 16px; }
+        .btn-add-lib:hover { background: var(--blue-hover); }
+        #notification { font-size: 0.82rem; color: #34c759; font-weight: 500; margin-top: 8px; }
 
-        /* @media only screen and (max-width: 768px), 
-            only screen and (max-device-width: 768px),
-            only screen and (hover: none) and (pointer: coarse) {
-            .fixed-toggle {
-                top: 60px !important; 
-            }
-            #fragment-cart {
-                top: 0 !important;
-                padding-top: 60px; 
-            } 
-        } */
+        /* CSV BATCH SECTION */
+        .batch-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 36px 32px; margin-top: 32px; }
+        .batch-card h2 { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; }
+        .batch-card .desc { font-size: 0.85rem; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
 
-        #fragment-cart {
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 300px;
-            height: 100vh;
-            background: #1e1e1e;
-            color: white;
-            box-shadow: -2px 0 10px rgba(0,0,0,0.5);
-            z-index: 9999;
-            transform: translateX(100%);
-            transition: transform 0.4s ease;
-            display: flex;
-            flex-direction: column;
-        }
+        .file-drop { border: 2px dashed rgba(255,255,255,0.15); border-radius: 14px; padding: 32px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+        .file-drop:hover, .file-drop.over { border-color: var(--blue); background: rgba(0,113,227,0.05); }
+        .file-drop p { color: var(--muted); font-size: 0.88rem; margin-bottom: 12px; }
+        .file-drop .upload-icon { font-size: 2rem; margin-bottom: 10px; }
 
-        #fragment-cart.active {
-            transform: translateX(0);
-        }
+        #csv-file-input { display: none; }
 
-        .cart-header {
-            padding: 15px 20px;
-            background: #2b2b2b;
-            border-bottom: 1px solid #333;
-            flex: 0 0 auto;
-        }
+        .btn-secondary { background: #2c2c2e; color: var(--text); border: 1px solid var(--border); border-radius: 980px; font-size: 0.85rem; font-weight: 500; padding: 10px 22px; cursor: pointer; font-family: var(--font); transition: background 0.2s; }
+        .btn-secondary:hover { background: #3a3a3c; }
 
-        #cart-items {
-            flex: 1 1 auto;
-            overflow-y: auto;
-            padding: 15px 20px;
-        }
+        .batch-controls { display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; margin-top: 18px; }
+        .batch-controls .field { margin-bottom: 0; flex: 1; min-width: 180px; }
 
-        #cart-items .fragment-item {
-            padding: 10px 0;
-            border-bottom: 1px solid #333;
-        }
+        .progress-bar-wrap { background: #2c2c2e; border-radius: 8px; height: 6px; overflow: hidden; margin-top: 16px; display: none; }
+        .progress-bar { height: 100%; background: var(--blue); border-radius: 8px; width: 0; transition: width 0.3s; }
+        .progress-label { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
 
-        /* Scrollbar styles */
-        #cart-items::-webkit-scrollbar {
-            width: 8px;
-        }
-        #cart-items::-webkit-scrollbar-thumb {
-            background: #555;
-            border-radius: 4px;
-        }
-        #cart-items::-webkit-scrollbar-thumb:hover {
-            background: #777;
-        }
-        .fixed-toggle {
-            position: fixed;
-            top: 30%;
-            right: 40px; /* adjust this based on button length */
-            transform: rotate(-90deg) translateY(50%);
-            transform-origin: right center;
-            z-index: 99999;
-            padding: 10px 20px;
-            border-radius: 999px 999px 0 0; /* adjusted for vertical look */
-            background-color: #3569cf;
-            color: white;
-            font-weight: 600;
-            font-size: 16px;
-            border: none;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-        .fixed-toggle:hover {
-            background-color: #3569cf;
-            transform: rotate(-90deg) translateY(50%) scale(1.05);
+        /* RESULTS TABLE */
+        .results-wrap { margin-top: 24px; overflow-x: auto; }
+        .results-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+        .results-table th { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--muted); font-weight: 500; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+        .results-table td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.05); vertical-align: top; word-break: break-all; }
+        .results-table tr:last-child td { border-bottom: none; }
+        .badge-ok { color: #34c759; }
+        .badge-err { color: #ff453a; }
+
+        .btn-dl-csv { display: none; margin-top: 18px; background: var(--blue); color: #fff; border: none; border-radius: 980px; font-size: 0.85rem; font-weight: 600; padding: 11px 24px; cursor: pointer; font-family: var(--font); transition: background 0.2s; }
+        .btn-dl-csv:hover { background: var(--blue-hover); }
+
+        /* FRAGMENT CART */
+        #fragment-cart { position: fixed; top: 0; right: 0; width: 320px; height: 100vh; background: #1c1c1e; border-left: 1px solid var(--border); z-index: 10000; transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); display: flex; flex-direction: column; }
+        #fragment-cart.active { transform: translateX(0); }
+        .cart-header { padding: 16px 20px; background: #2c2c2e; border-bottom: 1px solid var(--border); flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; }
+        .cart-header h4 { font-size: 0.95rem; font-weight: 600; margin: 0; }
+        #close-cart { background: transparent; border: none; color: var(--muted); font-size: 1.4rem; cursor: pointer; line-height: 1; }
+        #close-cart:hover { color: var(--text); }
+        #cart-items { flex: 1 1 auto; overflow-y: auto; padding: 16px 20px; }
+        #cart-items::-webkit-scrollbar { width: 6px; }
+        #cart-items::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+        .fragment-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .fragment-details p { font-size: 0.78rem; margin: 2px 0; }
+        .cart-empty { color: var(--muted); font-size: 0.85rem; text-align: center; padding: 40px 0; }
+
+        /* FLOATING FAB (Fragment Library) */
+        #lib-fab { position: fixed; right: 24px; bottom: 36px; z-index: 9999; background: var(--blue); color: #fff; border: none; border-radius: 980px; font-size: 0.88rem; font-weight: 600; padding: 14px 22px; cursor: pointer; font-family: var(--font); box-shadow: 0 4px 20px rgba(0,113,227,0.5); transition: transform 0.2s, box-shadow 0.2s; white-space: nowrap; }
+        #lib-fab:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,113,227,0.6); }
+
+        @media (max-width: 768px) {
+            .steps { grid-template-columns: 1fr; }
+            .structure-grid { grid-template-columns: 1fr; }
+            .form-card { padding: 24px 18px; }
+            .batch-card { padding: 24px 18px; }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="navbar-left">
-          <a href="/SmileBERTa-portal" class="logo">SmileBERTa</a>
-        </div>
-        <div class="navbar-toggle" onclick="toggleMenu()">☰</div>
-        <div class="navbar-right" id="nav-links">
-          <a href="combine">Combine</a>
-          <a href="fragmentation">Fragmentation</a>
-          <a href="drug_class">Drug Classification</a>
-          <a href="index.html#section-4">About</a>
+
+    <nav>
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand"><img src="smileberta.png" alt="SmileBERTa"></a>
+            <div class="nav-links">
+                <a href="combine.html">Combine</a>
+                <a href="fragmentation.html">Fragmentation</a>
+                <a href="drug_class.html">Drug Classification</a>
+                <a href="index.html#about">About</a>
+                <div id="nav-auth" style="display:flex;align-items:center;gap:12px;"></div>
+            </div>
         </div>
     </nav>
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8 text-center">
-                <h2>How to Use the Fragmentation Tool</h2>
-                <p>This tool allows you to generate fragments of drug compounds based on their SMILES strings. Follow the steps below to use the tool:</p>
-            </div>
-        </div>
-        <div class="row justify-content-center mt-4">
-            <div class="col-md-4 text-center">
-                <img src="./picture5.jpg" alt="Step 1" class="img-fluid mb-2">
-                <h4>Step 1</h4>
-                <p>Enter the SMILES string of a drug you want to fragment.</p>
-            </div>
-            <div class="col-md-4 text-center">
-                <img src="./picture8.jpg" alt="Step 2" class="img-fluid mb-2">
-                <h4>Step 2</h4>
-                <p>Enter the protein that you want the fragments to target.</p>
-            </div>
-            <div class="col-md-4 text-center">
-                <img src="./picture6.jpg" alt="Step 3" class="img-fluid mb-2">
-                <h4>Step 3</h4>
-                <p>Press the "Submit Button" and view the predicted the best fragment in 2D and the 3D structure.</p>
-            </div>
+
+    <div class="page-hero">
+        <div class="page-hero-bg"></div>
+        <div class="page-hero-overlay"></div>
+        <div class="page-hero-content">
+            <p class="eyebrow">Fragment-Based Discovery</p>
+            <h1>Fragmentation Generator</h1>
         </div>
     </div>
-    <!-- Main Content -->
-    <div class="container">
-        <div class="row justify-content-center title-container">
-            <div class="col-md-12">
-                <h1><span class="blue-title">Fragmentation Generator</span></h1>
-            </div>
+
+    <div class="main">
+
+        <!-- STEPS -->
+        <div class="steps">
+            <div class="step-card"><div class="step-num">1</div><h4>Enter SMILES</h4><p>Paste the SMILES string of the drug compound you want to fragment.</p></div>
+            <div class="step-card"><div class="step-num">2</div><h4>Select Protein</h4><p>Choose the target protein to optimize fragment binding predictions.</p></div>
+            <div class="step-card"><div class="step-num">3</div><h4>View Results</h4><p>Explore the top fragment in 2D and interactive 3D. Save it to your library.</p></div>
         </div>
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <form id="inputForm">
-                    <div class="form-group">
-                        <label for="smilesInput1">SMILES String</label>
-                        <input class="form-control" id="smilesInput1" list="smilesList1" placeholder="Type or select a SMILES string">
-                        <datalist id="smilesList1">
-                            <option value="C=CCCC(=O)NCC1CN(c2ccc(N3CCOCC3)c(F)c2)C(=O)O1">
-                            <option value="CC(=O)NCC1CN(c2ccc(-c3cncs3)c(F)c2)C(=O)O1">
-                            <option value="CC(C)(C)NCC(O)COc1ccc(O)c2c1CCC(=O)N2">
-                            <option value="CC(C)C(NC(=O)CCc1ccccc1)C(=O)N1CCCC1">
-                        </datalist>
-                    </div>
-                    <div class="form-group">
-                        <label for="proteinSelector">Select Protein</label>
-                        <input class="form-control" id="proteinSelector" list="proteinOptions" placeholder="Select or type a protein" required>
-                        <datalist id="proteinOptions">
-                            <option value="KRAS">Lung Cancer</option>
-                            <option value="mTOR">mTOR: 4wby</option>
-                            <option value="AKT1">AKT1: 4G1R</option>
-                            <option value="ERK2">ERK2: 1PME</option>
-                        </datalist>
-                    </div>
-                    <button type="submit" class="btn btn-blue btn-block" id="submit-btn">
-                        <span id="btn-text">Submit</span>
-                        <span id="btn-spinner" class="spinner-border spinner-border-sm" role="status" style="display: none;"></span>
-                    </button>
-                </form>
-            </div>
+
+        <div class="divider"></div>
+
+        <!-- SINGLE SMILES FORM -->
+        <div class="form-card">
+            <h2>Generate Fragment</h2>
+            <form id="inputForm">
+                <div class="field">
+                    <label for="smilesInput1">SMILES String</label>
+                    <input class="smiles-input" id="smilesInput1" list="smilesList1" placeholder="e.g. CC(=O)NCC1CN(c2ccc(-c3cncs3)c(F)c2)C(=O)O1" autocomplete="off">
+                    <datalist id="smilesList1">
+                        <option value="C=CCCC(=O)NCC1CN(c2ccc(N3CCOCC3)c(F)c2)C(=O)O1">
+                        <option value="CC(=O)NCC1CN(c2ccc(-c3cncs3)c(F)c2)C(=O)O1">
+                        <option value="CC(C)(C)NCC(O)COc1ccc(O)c2c1CCC(=O)N2">
+                        <option value="CC(C)C(NC(=O)CCc1ccccc1)C(=O)N1CCCC1">
+                    </datalist>
+                </div>
+                <div class="field">
+                    <label for="proteinSelector">Target Protein</label>
+                    <input class="smiles-input" id="proteinSelector" list="proteinOptions" placeholder="Select or type a protein" required autocomplete="off">
+                    <datalist id="proteinOptions">
+                        <option value="KRAS">
+                        <option value="mTOR">
+                        <option value="AKT1">
+                        <option value="ERK2">
+                    </datalist>
+                </div>
+                <button type="submit" class="btn-submit" id="submit-btn">
+                    <span id="btn-text">Generate Fragment</span>
+                    <span id="btn-spinner" class="spinner-ring" role="status" style="display:none;"></span>
+                </button>
+            </form>
         </div>
-        <div id="structure-section" class="container section-spacing" style="display: none;">
-            <div class="row justify-content-center mt-4 gx-4 gy-4">
-        
-                <!-- Inputted Compound Structure -->
-                <div class="col-lg-4 col-md-6 col-12 d-flex flex-column align-items-center">
-                    <h3 class="subtitle-text text-center" id="subtitle-inputted1">Inputted Compound</h3>
-                    <button class="btn btn-blue btn-toggle mb-2" id="toggle-input-view1">Show 2D View</button>
-                    <div class="img-container w-100 d-flex justify-content-center">
-                        <img id="input-2d1" style="display: none; max-width: 100%;" />
-                    </div>
-                    <div id="viewer" class="w-100"></div>
-                    <a id="input-download1" class="btn btn-blue mt-2" style="display: none;" download>Download Input PDB</a>
+
+        <!-- STRUCTURE OUTPUT -->
+        <div id="structure-section">
+            <div class="structure-grid">
+                <div class="structure-panel">
+                    <h3 class="subtitle-text" id="subtitle-inputted1">Inputted Compound</h3>
+                    <button class="btn-toggle" id="toggle-input-view1">Show 2D View</button>
+                    <div class="img-container"><img id="input-2d1" style="display:none; max-width:100%;" /></div>
+                    <div id="viewer"></div>
+                    <a id="input-download1" class="btn-download" download>Download Input PDB</a>
                 </div>
-        
-                <!-- Fragmented Compound Structure -->
-                <div class="col-lg-4 col-md-6 col-12 d-flex flex-column align-items-center">
-                    <h3 class="subtitle-text text-center" id="subtitle-fragmented1">Fragmented Compound</h3>
-                    <button class="btn btn-blue btn-toggle mb-2" id="toggle-fragment-view1">Show 2D View</button>
-                    <div class="img-container w-100 d-flex justify-content-center">
-                        <img id="fragment-2d1" style="display: none; max-width: 100%;" />
-                    </div>
-                    <div id="viewer-fragmented" class="w-100"></div>
-                    <a id="fragment-download1" class="btn btn-blue mt-2" style="display: none;" download>Download Fragment PDB</a>
+                <div class="structure-panel">
+                    <h3 class="subtitle-text" id="subtitle-fragmented1">Fragmented Compound</h3>
+                    <button class="btn-toggle" id="toggle-fragment-view1">Show 2D View</button>
+                    <div class="img-container"><img id="fragment-2d1" style="display:none; max-width:100%;" /></div>
+                    <div id="viewer-fragmented"></div>
+                    <a id="fragment-download1" class="btn-download" download>Download Fragment PDB</a>
                 </div>
-        
-                <!-- Fragment Properties & Action -->
-                <div class="col-lg-4 col-md-12 col-12 d-flex flex-column align-items-center justify-content-center text-center" style="padding-top: 100px;">
-                    <div id="fragment-properties1" class="w-100 mb-3"></div>
-                    <button class="btn btn-blue btn-toggle mt-4" id="add-to-lib">Add to Fragment Library</button>
-                    <div id="notification" style="color: rgb(136, 170, 136); font-weight: bold; margin-top: 10px;"></div>
+                <div class="structure-panel" style="justify-content:center;">
+                    <div id="fragment-properties1"></div>
+                    <button class="btn-add-lib btn-toggle" id="add-to-lib">+ Save to Library</button>
+                    <div id="notification"></div>
                 </div>
             </div>
         </div>
+
+        <!-- CSV BATCH -->
+        <div class="batch-card">
+            <h2>Batch Process CSV</h2>
+            <p class="desc">Upload a CSV with a <strong>smiles</strong> column (or use the first column). The fragment generator will run on each molecule sequentially and you can download all results.</p>
+
+            <div class="file-drop" id="file-drop" onclick="document.getElementById('csv-file-input').click()">
+                <div class="upload-icon">📂</div>
+                <p>Drop a CSV file here or click to browse</p>
+                <button type="button" class="btn-secondary" onclick="event.stopPropagation(); document.getElementById('csv-file-input').click();">Choose File</button>
+            </div>
+            <input type="file" id="csv-file-input" accept=".csv,.txt">
+
+            <div id="csv-preview" style="margin-top:16px; font-size:0.83rem; color:var(--muted);"></div>
+
+            <div class="batch-controls">
+                <div class="field">
+                    <label for="batch-protein">Target Protein</label>
+                    <input class="smiles-input" id="batch-protein" list="proteinOptions2" placeholder="KRAS, mTOR, AKT1, ERK2" autocomplete="off">
+                    <datalist id="proteinOptions2">
+                        <option value="KRAS">
+                        <option value="mTOR">
+                        <option value="AKT1">
+                        <option value="ERK2">
+                    </datalist>
+                </div>
+                <button type="button" class="btn-submit" id="batch-run-btn" style="width:auto; padding: 14px 28px; flex-shrink:0;" disabled onclick="runBatch()">
+                    Run Batch
+                </button>
+            </div>
+
+            <div class="progress-bar-wrap" id="batch-progress-wrap">
+                <div class="progress-bar" id="batch-progress-bar"></div>
+            </div>
+            <div class="progress-label" id="batch-progress-label"></div>
+
+            <div class="results-wrap" id="batch-results-wrap" style="display:none;">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Input SMILES</th>
+                            <th>Fragment SMILES</th>
+                            <th>MW (Da)</th>
+                            <th>LogP</th>
+                            <th>H-Bond Acc.</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="batch-results-body"></tbody>
+                </table>
+                <button type="button" class="btn-dl-csv" id="batch-dl-btn" onclick="downloadBatchCSV()">Download Results CSV</button>
+            </div>
+        </div>
+
     </div>
+
+    <!-- FRAGMENT CART SIDEBAR -->
     <div id="fragment-cart">
         <div class="cart-header">
-            <h4>Fragment Library</h4>
-            <button id="close-cart" class="btn btn-sm btn-danger">&times;</button>
+            <h4>Fragment Library <span id="cart-count" style="color:var(--muted); font-weight:400; font-size:0.85rem;"></span></h4>
+            <button id="close-cart">&times;</button>
         </div>
-        <div id="cart-items">
-            <!-- Dynamically added fragment items will go here -->
-        </div>
+        <div id="cart-items"><p class="cart-empty">No fragments saved yet.</p></div>
     </div>
-    
-    <!-- Bootstrap JS and dependencies -->
+
+    <!-- FAB -->
+    <button id="lib-fab">🧪 Fragment Library</button>
+
+    <script src="auth.js"></script>
     <script>
-        window.addEventListener('DOMContentLoaded', function() {
-            localStorage.setItem('fragmentLibrary', []);
-        });
-        function toggleMenu() {
-            const navLinks = document.getElementById('nav-links');
-            navLinks.classList.toggle('show');
-        }
-        const toggleCartBtn = document.createElement('button');
-        toggleCartBtn.textContent = 'Fragment Library';
-        toggleCartBtn.className = 'btn btn-blue fixed-toggle';
-        document.body.appendChild(toggleCartBtn);
+        renderNavAuth('nav-auth');
 
-        document.getElementById('toggle-input-view1').addEventListener('click', function() {
-            toggleInputView('1');
-        });
-        document.getElementById('toggle-fragment-view1').addEventListener('click', function() {
-            toggleFragmentView('1');
-        });
-        function showMessage(msg, duration = 3000) {
-            const notification = document.getElementById('notification');
-            notification.textContent = msg;
-            notification.style.display = 'block';
-            
-            // Auto-hide after `duration` milliseconds
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, duration);
-        }
-        
-        document.getElementById('add-to-lib').addEventListener('click', function() {
-            let fragmentLibrary = JSON.parse(localStorage.getItem('fragmentLibrary') || '[]');
-            const addedFragments = new Set(fragmentLibrary.map(f => f.smiles));
-            const cart = document.getElementById('fragment-cart');
-            const fragmentProps = document.getElementById('fragment-properties1').innerHTML;
-            const fragmentImg = document.getElementById('fragment-2d1');
-            
-            // Extract SMILES from the properties panel
-            const smilesMatch = fragmentProps.match(/<strong>SMILES:<\/strong> (.*?)<\/p>/);
-            if (!smilesMatch) {
-                alert('Could not find SMILES in the fragment properties.');
+        const API = 'https://smileberta-api.onrender.com';
+        let batchSmilesList = [];
+        let batchResults   = [];
+
+        // ── Fragment Library (FAB + sidebar) ─────────────────────────────────
+        // Named toggleCartBtn so app.js can reference it (app.js attaches the click handlers)
+        var toggleCartBtn = document.getElementById('lib-fab');
+
+        async function loadCartUI() {
+            const fragments = await loadFragmentLibrary();
+            const container = document.getElementById('cart-items');
+            if (!fragments.length) {
+                container.innerHTML = '<p class="cart-empty">No fragments saved yet.</p>';
+                document.getElementById('cart-count').textContent = '';
                 return;
             }
-            const fragmentSMILES = smilesMatch[1].trim();
-
-            // Check if this fragment is already added
-            if (addedFragments.has(fragmentSMILES)) {
-                alert('Fragment already added to the library.');
-                return;
-            }
-            addedFragments.add(fragmentSMILES);
-
-            // Save to localStorage
-            // Convert image to base64
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = fragmentImg.naturalWidth;
-            canvas.height = fragmentImg.naturalHeight;
-            ctx.drawImage(fragmentImg, 0, 0);
-
-            const dataUrl = canvas.toDataURL('image/png');
-            fragmentLibrary.push({
-                smiles: fragmentSMILES,
-                img: dataUrl,
-                props: fragmentProps
+            document.getElementById('cart-count').textContent = '(' + fragments.length + ')';
+            container.innerHTML = '';
+            fragments.forEach(f => {
+                const item = document.createElement('div');
+                item.className = 'fragment-item';
+                item.innerHTML =
+                    '<div class="fragment-details">' +
+                    (f.img ? '<img src="' + f.img + '" style="width:60px;height:60px;object-fit:contain;border:1px solid #444;border-radius:8px;margin-bottom:8px;display:block;">' : '') +
+                    (f.props || '') +
+                    '<button class="btn-secondary" style="margin-top:8px;padding:5px 12px;font-size:0.75rem;" onclick="removeFromLib(this, \'' + f.smiles.replace(/'/g, "\\'") + '\')">Remove</button>' +
+                    '</div>';
+                container.appendChild(item);
             });
-            localStorage.setItem('fragmentLibrary', JSON.stringify(fragmentLibrary));
+        }
 
-            // Add to cart
-            const item = document.createElement('div');
-            item.className = 'fragment-item';
-            item.innerHTML = `
-                <div class="fragment-details mb-2">
-                    <img src="${dataUrl}" alt="Fragment 2D" style="width: 50px; height: 50px; object-fit: contain; border: 1px solid #555; border-radius: 6px; margin-bottom: 8px;">
-                    ${fragmentProps}
-                    <button class="btn btn-sm btn-success select-btn mt-2" style="background-color: #3569cf; color: #fff; border:none; outline: none"
-                         >Select</button>
-                </div>
-            `;
+        async function removeFromLib(btn, smiles) {
+            await deleteFragment(smiles);
+            await loadCartUI();
+        }
 
-            document.getElementById('cart-items').appendChild(item);
+        loadCartUI();
 
-            showMessage('Fragment added to the library.');
-    });
+        // Save fragment button
+        document.getElementById('add-to-lib').addEventListener('click', async function() {
+            const propsHTML = document.getElementById('fragment-properties1').innerHTML;
+            const imgEl     = document.getElementById('fragment-2d1');
+            const match     = propsHTML.match(/<strong>SMILES:<\/strong> (.*?)<\/p>/);
+            if (!match) { alert('No fragment loaded yet.'); return; }
+            const smiles = match[1].trim();
+
+            let imgData = null;
+            if (imgEl && imgEl.naturalWidth) {
+                const canvas = document.createElement('canvas');
+                canvas.width  = imgEl.naturalWidth;
+                canvas.height = imgEl.naturalHeight;
+                canvas.getContext('2d').drawImage(imgEl, 0, 0);
+                imgData = canvas.toDataURL('image/png');
+            }
+
+            const ok = await saveFragment(smiles, imgData, propsHTML);
+            const n  = document.getElementById('notification');
+            if (ok === true || ok) {
+                n.textContent = isLoggedIn() ? 'Saved to your library ✓' : 'Saved locally ✓';
+                await loadCartUI();
+            } else {
+                n.textContent = 'Fragment already in library.';
+            }
+            n.style.display = 'block';
+            setTimeout(() => { n.style.display = 'none'; }, 3000);
+        });
+
+        function showMessage(msg, duration = 3000) {
+            const n = document.getElementById('notification');
+            n.textContent = msg;
+            n.style.display = 'block';
+            setTimeout(() => { n.style.display = 'none'; }, duration);
+        }
+
+        // ── CSV Batch ─────────────────────────────────────────────────────────
+        const fileInput = document.getElementById('csv-file-input');
+        const fileDrop  = document.getElementById('file-drop');
+
+        fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.classList.add('over'); });
+        fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('over'));
+        fileDrop.addEventListener('drop', e => {
+            e.preventDefault();
+            fileDrop.classList.remove('over');
+            const file = e.dataTransfer.files[0];
+            if (file) handleCSVFile(file);
+        });
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files[0]) handleCSVFile(fileInput.files[0]);
+        });
+
+        function handleCSVFile(file) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                batchSmilesList = parseCSV(e.target.result);
+                document.getElementById('csv-preview').textContent =
+                    batchSmilesList.length
+                        ? '✓ Found ' + batchSmilesList.length + ' SMILES in "' + file.name + '"'
+                        : '⚠ No SMILES column found. Make sure the file has a "smiles" header or SMILES in the first column.';
+                document.getElementById('batch-run-btn').disabled = !batchSmilesList.length;
+                batchResults = [];
+                document.getElementById('batch-results-wrap').style.display = 'none';
+            };
+            reader.readAsText(file);
+        }
+
+        async function runBatch() {
+            const protein = document.getElementById('batch-protein').value.trim();
+            if (!protein) { alert('Please select a target protein.'); return; }
+            if (!batchSmilesList.length) return;
+
+            const btn    = document.getElementById('batch-run-btn');
+            const wrap   = document.getElementById('batch-progress-wrap');
+            const bar    = document.getElementById('batch-progress-bar');
+            const label  = document.getElementById('batch-progress-label');
+            const tbody  = document.getElementById('batch-results-body');
+            const dlBtn  = document.getElementById('batch-dl-btn');
+
+            btn.disabled = true;
+            wrap.style.display = 'block';
+            tbody.innerHTML = '';
+            batchResults = [];
+            document.getElementById('batch-results-wrap').style.display = 'block';
+            dlBtn.style.display = 'none';
+
+            for (let i = 0; i < batchSmilesList.length; i++) {
+                const smiles = batchSmilesList[i];
+                const pct = Math.round(((i) / batchSmilesList.length) * 100);
+                bar.style.width = pct + '%';
+                label.textContent = 'Processing ' + (i + 1) + ' / ' + batchSmilesList.length + ' — ' + smiles.slice(0,40) + (smiles.length > 40 ? '…' : '');
+
+                let row;
+                try {
+                    const res = await fetch(API + '/predict_fragment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ smiles, protein })
+                    });
+                    const data = await res.json();
+                    if (data.error) throw new Error(data.error);
+                    const p = data.properties || {};
+                    row = { input: smiles, fragment: data.fragment_smiles, mw: p.molecular_weight || '', logp: p.log_p || '', hba: p.hydrogen_bond_acceptors || '', status: 'ok' };
+                } catch (err) {
+                    row = { input: smiles, fragment: '—', mw: '—', logp: '—', hba: '—', status: 'error: ' + err.message };
+                }
+                batchResults.push(row);
+
+                const tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td>' + (i + 1) + '</td>' +
+                    '<td><code style="font-size:0.75rem;">' + smiles.slice(0, 40) + (smiles.length > 40 ? '…' : '') + '</code></td>' +
+                    '<td><code style="font-size:0.75rem;">' + row.fragment + '</code></td>' +
+                    '<td>' + row.mw + '</td>' +
+                    '<td>' + row.logp + '</td>' +
+                    '<td>' + row.hba + '</td>' +
+                    '<td class="' + (row.status === 'ok' ? 'badge-ok' : 'badge-err') + '">' + (row.status === 'ok' ? '✓' : row.status) + '</td>';
+                tbody.appendChild(tr);
+            }
+
+            bar.style.width = '100%';
+            label.textContent = 'Done — ' + batchSmilesList.length + ' molecules processed.';
+            btn.disabled = false;
+            dlBtn.style.display = 'inline-block';
+        }
+
+        function downloadBatchCSV() {
+            const header = ['Input SMILES', 'Fragment SMILES', 'MW (Da)', 'LogP', 'H-Bond Acceptors', 'Status'];
+            const rows = batchResults.map(r => [r.input, r.fragment, r.mw, r.logp, r.hba, r.status]);
+            downloadCSV([header, ...rows], 'smileberta_fragments.csv');
+        }
+
+        // Toggle 2D/3D views
+        document.getElementById('toggle-input-view1').addEventListener('click', function() { toggleInputView('1'); });
+        document.getElementById('toggle-fragment-view1').addEventListener('click', function() { toggleFragmentView('1'); });
     </script>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <!-- 3Dmol.js -->
     <script src="https://3dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
-    <!-- Custom JS -->
     <script src="app.js" defer></script>
 </body>
 </html>

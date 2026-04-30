@@ -3,178 +3,412 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to SmileBERTa</title>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>SmileBERTa — AI Drug Discovery</title>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #121212; /* Dark background */
-            color: #ffffff; /* White text */
-            scroll-behavior: smooth; /* Enables smooth scrolling */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --blue: #0071e3;
+            --blue-hover: #0077ed;
+            --bg: #000;
+            --surface: #111;
+            --text: #f5f5f7;
+            --muted: #86868b;
+            --font: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
         }
 
-        /* Navigation Bar */
-        .navbar {
-            background-color: #1e1e1e;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 30px;
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        /* NAV */
+        nav {
             position: sticky;
             top: 0;
-            height: auto;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            z-index: 9800;
+            background: rgba(0,0,0,0.82);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
         }
 
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 18px;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        .navbar a:hover {
-            color: #1e90ff;
-        }
-
-        .logout-btn {
-            background-color: #ff4d4d;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            color: white;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            background-color: #e43e3e;
-        }
-
-        /* Section Styling */
-        .section {
-            height: 100vh;
+        .nav-inner {
+            max-width: 1080px;
+            margin: 0 auto;
+            height: 64px;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .nav-brand img {
+            height: 56px;
+            width: auto;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            font-size: 0.82rem;
+            color: var(--text);
+            text-decoration: none;
+            opacity: 0.75;
+            transition: opacity 0.2s;
+        }
+
+        .nav-links a:hover { opacity: 1; }
+
+        .nav-username {
+            font-size: 0.82rem;
+            color: var(--text);
+            opacity: 0.75;
+        }
+
+        .nav-signout-btn {
+            font-size: 0.82rem;
+            color: var(--text);
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 980px;
+            padding: 5px 14px;
+            cursor: pointer;
+            font-family: var(--font);
+            transition: border-color 0.2s;
+        }
+
+        .nav-signout-btn:hover { border-color: rgba(255,255,255,0.5); }
+
+        .nav-signin-link {
+            font-size: 0.82rem;
+            color: var(--blue);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* HERO */
+        .hero {
+            position: relative;
+            height: 100vh;
+            min-height: 620px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            padding: 20px;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background-image: url('https://images.unsplash.com/photo-1614935151651-0bea6508db6b?w=1920&q=80');
             background-size: cover;
             background-position: center;
-            background-attachment: fixed;
-            color: white;
-            text-shadow: 0 0 10px rgba(0, 0, 0, 0.7); /* Subtle shadow for better readability */
+            filter: brightness(0.28);
+            transform: scale(1.04);
         }
 
-        .section h1 {
-            font-size: 3.5rem;
-            margin-bottom: 20px;
-            font-weight: bold;
+        .hero-gradient {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0) 60%, rgba(0,0,0,1) 100%);
         }
 
-        .section p {
-            font-size: 1.3rem;
-            margin-bottom: 30px;
-            line-height: 1.6;
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            padding: 0 24px;
+            max-width: 860px;
         }
 
-        .blue-theme a {
-            color: #1e90ff;
+        .eyebrow {
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--blue);
+            margin-bottom: 22px;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 7.5vw, 6rem);
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            line-height: 1.04;
+            margin-bottom: 24px;
+        }
+
+        .hero p {
+            font-size: clamp(1rem, 2.2vw, 1.25rem);
+            color: var(--muted);
+            max-width: 560px;
+            margin: 0 auto 40px;
+            line-height: 1.65;
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--blue);
+            color: #fff;
             text-decoration: none;
-            font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 0.92rem;
+            font-weight: 500;
+            padding: 14px 28px;
+            border-radius: 980px;
+            transition: background 0.2s, transform 0.15s;
         }
 
-        .blue-theme a:hover {
-            text-decoration: underline;
-            color: #00bfff;
+        .btn:hover {
+            background: var(--blue-hover);
+            transform: scale(1.03);
+            color: #fff;
+            text-decoration: none;
         }
 
-        /* Backgrounds for each section */
-        .section-1 {
-            background-image: url('./picture1.jpg');
-            background-color: #1e1e1e; /* Fallback color */
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.25);
+            color: var(--text);
+            margin-left: 12px;
         }
 
-        .section-2 {
-            background-image: url('./picture2.jpg');
-            background-color: #222222; /* Fallback color */
+        .btn-ghost:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.4);
+            color: var(--text);
         }
 
-        .section-3 {
-            background-image: url('./picture3.jpg');
-            background-color: #1e1e1e; /* Fallback color */
+        .scroll-cue {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            color: var(--muted);
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            animation: cue 2.2s ease-in-out infinite;
         }
 
-        .section-4 {
-            background-image: url('./picture4.png');
-            background-color: #222222; /* Fallback color */
+        @keyframes cue {
+            0%, 100% { opacity: 0.5; transform: translateX(-50%) translateY(0); }
+            50% { opacity: 0.9; transform: translateX(-50%) translateY(7px); }
+        }
+
+        /* FEATURE SECTIONS */
+        .feature {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .feature-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.22);
+        }
+
+        .feature-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.6) 100%);
+        }
+
+        .feature-content {
+            position: relative;
+            z-index: 1;
+            max-width: 680px;
+            padding: 80px 28px;
+        }
+
+        .feature-tag {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--blue);
+            margin-bottom: 18px;
+        }
+
+        .feature h2 {
+            font-size: clamp(2.2rem, 5.5vw, 4rem);
+            font-weight: 700;
+            letter-spacing: -0.035em;
+            line-height: 1.08;
+            margin-bottom: 22px;
+        }
+
+        .feature p {
+            font-size: 1.05rem;
+            color: var(--muted);
+            line-height: 1.72;
+            margin-bottom: 38px;
+            max-width: 520px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* ABOUT */
+        .about {
+            background: var(--surface);
+            padding: 130px 24px;
+            text-align: center;
+        }
+
+        .about-inner {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .about h2 {
+            font-size: clamp(2rem, 4.5vw, 3.2rem);
+            font-weight: 700;
+            letter-spacing: -0.035em;
+            margin-bottom: 24px;
+        }
+
+        .about p {
+            font-size: 1rem;
+            color: var(--muted);
+            line-height: 1.75;
+            margin-bottom: 12px;
+        }
+
+        .about a {
+            color: var(--blue);
+            text-decoration: none;
+        }
+
+        .about a:hover { text-decoration: underline; }
+
+        /* FOOTER */
+        footer {
+            background: var(--bg);
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding: 40px 24px;
+            text-align: center;
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+
+        @media (max-width: 640px) {
+            .nav-links { gap: 16px; }
+            .btn-ghost { display: none; }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="navbar-left">
-            <a href="/SmileBERTa-portal">SmilesBERTa</a>
-        </div>
-        <div class="navbar-right">
-            <a href="combine">Combine</a>
-            <a href="fragmentation">Fragmentation</a>
-            <a href="drug_class">Drug Classification</a>
-            <a href="index.html#section-4">About</a>
+
+    <nav>
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand"><img src="smileberta.png" alt="SmileBERTa"></a>
+            <div class="nav-links">
+                <a href="combine.html">Combine</a>
+                <a href="fragmentation.html">Fragmentation</a>
+                <a href="drug_class.html">Drug Classification</a>
+                <a href="#about">About</a>
+                <div id="nav-auth" style="display:flex;align-items:center;gap:12px;"></div>
+            </div>
         </div>
     </nav>
 
-    <!-- Section 1 -->
-    <div class="section section-1" id="section-1">
-        <div>
-            <h1>Welcome to SmileBERTa</h1>
-            <p>Welcome to our powerful platform for accelerating drug discovery. Explore our tools to bring your ideas to life.</p>
-            <a class="blue-theme" href="mol_editing">Start with Sorting</a>
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-gradient"></div>
+        <div class="hero-content">
+            <img src="smileberta.png" alt="SmileBERTa" style="height:180px;width:auto;margin-bottom:28px;">
+            <p class="eyebrow">AI-Powered Drug Discovery</p>
+            <h1>The Future of Molecular Research</h1>
+            <p>SmileBERTa uses transformer models trained on SMILES notation to fragment, classify, and combine drug-like molecules — accelerating every step of your discovery pipeline.</p>
+            <a href="fragmentation.html" class="btn">Get Started</a>
+            <a href="#fragmentation" class="btn btn-ghost">Learn More</a>
         </div>
-    </div>
-
-    <!-- Section 2 -->
-    <div class="section section-2" id="section-2">
-        <div>
-            <h1>Fragmentation</h1>
-            <p>Effortlessly break down complex molecules with our state-of-the-art fragmentation tools. Analyze your data faster and smarter.</p>
-            <a class="blue-theme" href="fragmentation">Learn More about Fragmentation</a>
+        <div class="scroll-cue">
+            <span>Scroll</span>
+            <svg width="14" height="18" viewBox="0 0 14 18" fill="none">
+                <path d="M7 0v15M1 10l6 7 6-7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
         </div>
-    </div>
+    </section>
 
-    <!-- Section 3 -->
-    <div class="section section-3" id="section-3">
-        <div>
-            <h1>Drug Classification</h1>
-            <p>Classify and analyze the properties of drugs using our advanced algorithms. Make data-driven decisions with ease.</p>
-            <a class="blue-theme" href="drug_class">Explore Drug Classification</a>
+    <!-- FRAGMENTATION -->
+    <section class="feature" id="fragmentation">
+        <div class="feature-bg" style="background-image: url('https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=1920&q=80');"></div>
+        <div class="feature-overlay"></div>
+        <div class="feature-content">
+            <p class="feature-tag">Fragment-Based Discovery</p>
+            <h2>Fragmentation Generator</h2>
+            <p>Decompose complex drug-like molecules into optimal fragments. Our model predicts which pieces bind best to your target protein — so you can focus on what matters.</p>
+            <a href="fragmentation.html" class="btn">Explore Fragmentation</a>
         </div>
-    </div>
+    </section>
 
-    <!-- Section 4 -->
-    <div class="section section-4" id="section-4">
-        <div>
-            <h1>About Us</h1>
-            <p>SmileBERTa is revolutionizing fragment-based drug discovery with cutting-edge AI tools. Learn more about our mission and vision.
-                
-            </p>
-            <p>Contact Info: Nisarg Shah 11th Grade at Del Norte High School </p>
-            <p>Email: nisargs2018@gmail.com</p>
-            
+    <!-- DRUG CLASS -->
+    <section class="feature" id="drug-class">
+        <div class="feature-bg" style="background-image: url('https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1920&q=80');"></div>
+        <div class="feature-overlay"></div>
+        <div class="feature-content">
+            <p class="feature-tag">Predictive Classification</p>
+            <h2>Drug Classification</h2>
+            <p>Input a SMILES string and our fine-tuned RoBERTa model instantly classifies the compound by drug type. Data-driven decisions at molecular speed.</p>
+            <a href="drug_class.html" class="btn">Classify a Compound</a>
         </div>
-    </div>
+    </section>
 
-    <!-- Bootstrap JS -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- COMBINE -->
+    <section class="feature" id="combine">
+        <div class="feature-bg" style="background-image: url('https://images.unsplash.com/photo-1576086213369-97a306d36557?w=1920&q=80');"></div>
+        <div class="feature-overlay"></div>
+        <div class="feature-content">
+            <p class="feature-tag">Fragment Combination</p>
+            <h2>Combine Fragments</h2>
+            <p>Select two fragments from your library and intelligently merge them into novel drug candidates. Preview results in interactive 2D and 3D molecular views.</p>
+            <a href="combine.html" class="btn">Combine Fragments</a>
+        </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="about" id="about">
+        <div class="about-inner">
+            <h2>About SmileBERTa</h2>
+            <p>SmileBERTa is an AI-driven research platform built to accelerate fragment-based drug discovery. Powered by transformer models trained on SMILES chemical notation, it brings modern machine learning into your molecular pipeline.</p>
+            <p>Built by Nisarg Shah · Del Norte High School<br>
+            <a href="mailto:nisargs2018@gmail.com">nisargs2018@gmail.com</a></p>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2025 SmileBERTa · Built for drug discovery research</p>
+    </footer>
+
+    <script src="auth.js"></script>
+    <script>renderNavAuth('nav-auth');</script>
 </body>
 </html>

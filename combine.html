@@ -1,361 +1,252 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fragment Combiner</title>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Combine Fragments — SmileBERTa</title>
     <style>
-        body {
-            background-color: #121212;
-            color: #ffffff;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --blue: #0071e3;
+            --blue-hover: #0077ed;
+            --bg: #000;
+            --card: #1c1c1e;
+            --border: rgba(255,255,255,0.1);
+            --text: #f5f5f7;
+            --muted: #86868b;
+            --font: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
         }
 
-        .navbar {
-            background-color: #1e1e1e;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 30px;
-            position: sticky;
-            top: 0;
-            height: auto;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-        }
+        html { scroll-behavior: smooth; }
+        body { font-family: var(--font); background: var(--bg); color: var(--text); }
 
-        .navbar a {
-            color: rgb(83, 124, 212);
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 18px;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-        .navbar a:hover {
-            color: #ffffff;
-        }
-         
-        .navbar-right {
-            display: flex;
-        }
+        nav { position: sticky; top: 0; z-index: 9800; background: rgba(0,0,0,0.82); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid var(--border); }
+        .nav-inner { max-width: 1080px; margin: 0 auto; height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+        .nav-brand { display: flex; align-items: center; text-decoration: none; }
+        .nav-brand img { height: 56px; width: auto; }
+        .nav-links { display: flex; gap: 28px; align-items: center; }
+        .nav-links a { font-size: 0.82rem; color: var(--text); text-decoration: none; opacity: 0.75; transition: opacity 0.2s; }
+        .nav-links a:hover { opacity: 1; }
+        .nav-username { font-size: 0.82rem; color: var(--text); opacity: 0.75; }
+        .nav-signout-btn { font-size: 0.82rem; color: var(--text); background: transparent; border: 1px solid rgba(255,255,255,0.2); border-radius: 980px; padding: 5px 14px; cursor: pointer; font-family: var(--font); }
+        .nav-signin-link { font-size: 0.82rem; color: var(--blue); text-decoration: none; font-weight: 500; }
 
-        .navbar-toggle {
-            display: none;
-            font-size: 26px;
-            cursor: pointer;
-        }
+        .page-hero { position: relative; height: 280px; display: flex; align-items: flex-end; justify-content: center; text-align: center; overflow: hidden; }
+        .page-hero-bg { position: absolute; inset: 0; background-image: url('https://images.unsplash.com/photo-1576086213369-97a306d36557?w=1920&q=80'); background-size: cover; background-position: center 30%; filter: brightness(0.22); }
+        .page-hero-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.95) 100%); }
+        .page-hero-content { position: relative; z-index: 1; padding-bottom: 48px; }
+        .page-hero-content .eyebrow { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue); margin-bottom: 12px; }
+        .page-hero-content h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 700; letter-spacing: -0.035em; }
 
-        /* Responsive styles */
-        @media screen and (max-width: 768px) {
-            .navbar-right {
-                display: none;
-                flex-direction: column;
-                width: 100%;
-                background-color: #222;
-                padding: 10px 0;
-            }
+        .main { max-width: 1080px; margin: 0 auto; padding: 52px 24px 160px; }
 
-            .navbar-right.show {
-                display: flex;
-            }
+        .section-title { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 20px; }
+        .section-sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 28px; }
 
-            .navbar-toggle {
-                display: block;
-            }
-        }
-        .container {
-            margin-top: 20px;
-        }
+        .slots-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
 
-        .btn-blue {
-            background-color: #3569cf;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+        .fragment-slot { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 28px; min-height: 200px; }
+        .fragment-slot-label { font-size: 0.72rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; }
 
-        .btn-blue:hover, .btn-blue:focus {
-            background-color: #3569cf;
-            color: #000;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-        }
+        .slot-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 150px; color: var(--muted); font-size: 0.85rem; gap: 10px; }
+        .slot-empty-icon { font-size: 2rem; opacity: 0.4; }
 
-        .btn-blue:disabled {
-            background-color: #3569cf;
-            color: #000;
-            box-shadow: none;
-            cursor: not-allowed;
-            transform: none;
-            transition: none;
-        }
-        .subtitle-text {
-            text-align: center;
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-        }
+        .img-container { text-align: center; margin: 12px 0; }
+        .img-container img { max-width: 100%; border-radius: 10px; }
 
-        .img-container {
-            text-align: center;
-            margin: 20px 0;
-        }
+        #viewer-slot1, #viewer-slot2 { width: 100%; height: 240px; border-radius: 12px; border: 1px solid var(--border); position: relative; }
 
-        #viewer-slot1, #viewer-slot2, #viewer-combined {
-            width: 100%;
-            height: 300px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        #fragment-properties1, #fragment-properties2 { font-size: 0.82rem; color: var(--muted); line-height: 1.7; margin-bottom: 10px; }
+        #fragment-properties1 strong, #fragment-properties2 strong { color: var(--text); }
 
-        #viewer-slot1 canvas, #viewer-slot2 canvas, #viewer-combined canvas {
-            width: 80%;
-            height: 80%;
-        }
+        .combine-row { text-align: center; margin: 28px 0; }
 
-        .fragment-slot {
-            padding: 15px;
-            background: #1e1e1e;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-        }
+        #combine-btn { background: var(--blue); color: #fff; border: none; border-radius: 980px; font-size: 1rem; font-weight: 600; padding: 15px 48px; cursor: pointer; font-family: var(--font); transition: background 0.2s, transform 0.15s, opacity 0.2s; }
+        #combine-btn:hover:not(:disabled) { background: var(--blue-hover); transform: scale(1.03); }
+        #combine-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
 
-        #fragment-cart {
-            position: fixed;
-            top: 0px;
-            right: 0;
-            width: 300px;
-            height: 100vh;
-            background: #1e1e1e;
-            color: white;
-            box-shadow: -2px 0 10px rgba(0,0,0,0.5);
-            z-index: 9999;
-            transform: translateX(100%);
-            transition: transform 0.4s ease;
-            display: flex;
-            flex-direction: column;
-        }
+        .results-title { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 20px; }
+        #combined-container { display: block; width: 100%; }
+        #combined-container > div { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 24px; margin-bottom: 20px; }
+        #combined-container h3 { font-size: 1rem; font-weight: 600; margin-bottom: 14px; }
+        #combined-container p { font-size: 0.83rem; color: var(--muted); margin-bottom: 4px; }
+        #combined-container strong { color: var(--text); }
+        .img-container-combined { text-align: center; margin: 14px 0; }
+        .img-container-combined img { max-width: 100%; border-radius: 10px; }
+        [id^="viewer-combined-"] { width: 100%; height: 300px; border-radius: 12px; border: 1px solid var(--border); margin-top: 10px; }
+        #combined-container a[id^="combined-download-"] { background: var(--blue) !important; border-radius: 980px !important; font-size: 0.85rem !important; padding: 10px 22px !important; }
 
-        #fragment-cart.active {
-            transform: translateX(0);
-        }
+        /* FRAGMENT CART */
+        #fragment-cart { position: fixed; top: 0; right: 0; width: 320px; height: 100vh; background: #1c1c1e; border-left: 1px solid var(--border); z-index: 10000; transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); display: flex; flex-direction: column; }
+        #fragment-cart.active { transform: translateX(0); }
+        .cart-header { padding: 16px 20px; background: #2c2c2e; border-bottom: 1px solid var(--border); flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; }
+        .cart-header h4 { font-size: 0.95rem; font-weight: 600; margin: 0; }
+        #close-cart { background: transparent; border: none; color: var(--muted); font-size: 1.4rem; cursor: pointer; }
+        #close-cart:hover { color: var(--text); }
+        #cart-items { flex: 1 1 auto; overflow-y: auto; padding: 16px 20px; }
+        #cart-items::-webkit-scrollbar { width: 6px; }
+        #cart-items::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+        .fragment-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .fragment-details p { font-size: 0.78rem; margin: 2px 0; }
+        .cart-empty { color: var(--muted); font-size: 0.85rem; text-align: center; padding: 40px 0; }
 
-        .cart-header {
-            padding: 15px 20px;
-            background: #2b2b2b;
-            border-bottom: 1px solid #333;
-            flex: 0 0 auto;
-        }
+        .btn-select { background: var(--blue); color: #fff; border: none; border-radius: 980px; font-size: 0.78rem; font-weight: 500; padding: 7px 16px; cursor: pointer; font-family: var(--font); margin-top: 8px; transition: background 0.2s; }
+        .btn-select:hover { background: var(--blue-hover); }
 
-        #cart-items {
-            flex: 1 1 auto;
-            overflow-y: auto;
-            padding: 15px 20px;
-        }
+        /* FAB */
+        #lib-fab { position: fixed; right: 24px; bottom: 36px; z-index: 9999; background: var(--blue); color: #fff; border: none; border-radius: 980px; font-size: 0.88rem; font-weight: 600; padding: 14px 22px; cursor: pointer; font-family: var(--font); box-shadow: 0 4px 20px rgba(0,113,227,0.5); transition: transform 0.2s, box-shadow 0.2s; white-space: nowrap; }
+        #lib-fab:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,113,227,0.6); }
 
-        #cart-items .fragment-item {
-            padding: 10px 0;
-            border-bottom: 1px solid #333;
-        }
-
-        /* Scrollbar styles */
-        #cart-items::-webkit-scrollbar {
-            width: 8px;
-        }
-        #cart-items::-webkit-scrollbar-thumb {
-            background: #555;
-            border-radius: 4px;
-        }
-        #cart-items::-webkit-scrollbar-thumb:hover {
-            background: #777;
-        }
-        .fixed-toggle {
-            position: fixed;
-            top: 30%;
-            right: 40px; /* adjust this based on button length */
-            transform: rotate(-90deg) translateY(50%);
-            transform-origin: right center;
-            z-index: 99999;
-            padding: 10px 20px;
-            border-radius: 999px 999px 0 0; /* adjusted for vertical look */
-            background-color: #3569cf;
-            color: white;
-            font-weight: 600;
-            font-size: 16px;
-            border: none;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-        .fixed-toggle:hover {
-            background-color: #3569cf;
-            transform: rotate(-90deg) translateY(50%) scale(1.05);
-        }
-
-        /* @media only screen and (max-width: 768px), 
-            only screen and (max-device-width: 768px),
-            only screen and (hover: none) and (pointer: coarse) {
-            .fixed-toggle {
-                top: 60px !important; /* pushes it below the navbar *
-            }
-            #fragment-cart {
-                top: 0 !important;
-                padding-top: 60px; /* pushes it below the navbar *
-            } 
-        } */
+        @media (max-width: 768px) { .slots-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
-
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="navbar-left">
-          <a href="/SmileBERTa-portal" class="logo">SmileBERTa</a>
-        </div>
-        <div class="navbar-toggle" onclick="toggleMenu()">☰</div>
-        <div class="navbar-right" id="nav-links">
-          <a href="combine">Combine</a>
-          <a href="fragmentation">Fragmentation</a>
-          <a href="drug_class">Drug Classification</a>
-          <a href="index.html#section-4">About</a>
+
+    <nav>
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand"><img src="smileberta.png" alt="SmileBERTa"></a>
+            <div class="nav-links">
+                <a href="combine.html">Combine</a>
+                <a href="fragmentation.html">Fragmentation</a>
+                <a href="drug_class.html">Drug Classification</a>
+                <a href="index.html#about">About</a>
+                <div id="nav-auth" style="display:flex;align-items:center;gap:12px;"></div>
+            </div>
         </div>
     </nav>
 
-    <div class="container">
-        <h1 class="text-center my-4">Combine Fragments</h1>
-
-        <!-- Fragment Slots -->
-        <form id="inputForm">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="fragment-slot">
-                        <h4>Fragment Slot 1</h4>
-                        <div id="fragment-properties1"></div>
-                        <div class="img-container">
-                            <img id="fragment-slot1-2d" style="display:none; max-width: 100%;" />
-                        </div>
-                        <div id="viewer-slot1"></div>
-                    </div>
-                </div>
-        
-                <div class="col-md-6">
-                    <div class="fragment-slot">
-                        <h4>Fragment Slot 2</h4>
-                        <div id="fragment-properties2"></div>
-                        <div class="img-container">
-                            <img id="fragment-slot2-2d" style="display:none; max-width: 100%;" />
-                        </div>
-                        <div id="viewer-slot2"></div>
-                    </div>
-                </div>
-            </div>
-        
-            
-        </form>
-        <!-- Combine Button -->
-        <div class="text-center">
-            <button id="combine-btn" class="btn btn-blue" disabled onclick="combineClicked()">Combine</button>
-        </div>
-
-        <!-- Combined Fragments Output -->
-        <div class="row mt-4">
-            <div class="col-md-12">
-                <h3>Combined Results</h3>
-                <div id="combined-container" style="display:inline-block"></div>
-            </div>
+    <div class="page-hero">
+        <div class="page-hero-bg"></div>
+        <div class="page-hero-overlay"></div>
+        <div class="page-hero-content">
+            <p class="eyebrow">Fragment Combination</p>
+            <h1>Combine Fragments</h1>
         </div>
     </div>
+
+    <div class="main">
+        <p class="section-title">Build from your library</p>
+        <p class="section-sub">Open the Fragment Library, select two fragments, then hit Combine to generate candidate molecules.</p>
+
+        <form id="inputForm">
+            <div class="slots-grid">
+                <div class="fragment-slot">
+                    <div class="fragment-slot-label">Slot 1</div>
+                    <div id="slot1-empty" class="slot-empty">
+                        <span class="slot-empty-icon">🧩</span>
+                        <span>Select from Fragment Library</span>
+                    </div>
+                    <div id="fragment-properties1"></div>
+                    <div class="img-container"><img id="fragment-slot1-2d" style="display:none; max-width:100%;" /></div>
+                    <div id="viewer-slot1"></div>
+                </div>
+
+                <div class="fragment-slot">
+                    <div class="fragment-slot-label">Slot 2</div>
+                    <div id="slot2-empty" class="slot-empty">
+                        <span class="slot-empty-icon">🧩</span>
+                        <span>Select from Fragment Library</span>
+                    </div>
+                    <div id="fragment-properties2"></div>
+                    <div class="img-container"><img id="fragment-slot2-2d" style="display:none; max-width:100%;" /></div>
+                    <div id="viewer-slot2"></div>
+                </div>
+            </div>
+        </form>
+
+        <div class="combine-row">
+            <button id="combine-btn" disabled onclick="combineClicked()">Combine</button>
+        </div>
+
+        <div>
+            <p class="results-title">Combined Results</p>
+            <div id="combined-container"></div>
+        </div>
+    </div>
+
+    <!-- CART -->
     <div id="fragment-cart">
         <div class="cart-header">
-            <h4>Fragment Library</h4>
-            <button id="close-cart" class="btn btn-sm btn-danger">&times;</button>
+            <h4>Fragment Library <span id="cart-count" style="color:var(--muted); font-weight:400; font-size:0.85rem;"></span></h4>
+            <button id="close-cart">&times;</button>
         </div>
-        <div id="cart-items">
-            <!-- Dynamically added fragment items will go here -->
-        </div>
+        <div id="cart-items"><p class="cart-empty">No fragments saved yet.</p></div>
     </div>
-    <script src="app.js" defer></script>
-    <script>
-        function toggleMenu() {
-            const navLinks = document.getElementById('nav-links');
-            navLinks.classList.toggle('show');
-        }
-        let smile1 = "";
-        let smile2 = "";
-        window.addEventListener('DOMContentLoaded', function() {
-            const fragmentLibrary = JSON.parse(localStorage.getItem('fragmentLibrary') || '[]');
-            const cart = document.getElementById('fragment-cart');
-            const cartItems = document.getElementById('cart-items');
 
-            fragmentLibrary.forEach(fragment => {
+    <!-- FAB -->
+    <button id="lib-fab">🧪 Fragment Library</button>
+
+    <script src="auth.js"></script>
+    <script>
+        renderNavAuth('nav-auth');
+
+        const API = 'https://smileberta-api.onrender.com';
+        let smile1 = "", smile2 = "";
+
+        function checkCombineReady() {
+            const s1 = document.getElementById('viewer-slot1').childNodes.length;
+            const s2 = document.getElementById('viewer-slot2').childNodes.length;
+            document.getElementById('combine-btn').disabled = !(s1 > 0 && s2 > 0);
+        }
+
+        async function loadCartUI() {
+            const fragments = await loadFragmentLibrary();
+            const cartItems = document.getElementById('cart-items');
+            if (!fragments.length) {
+                cartItems.innerHTML = '<p class="cart-empty">No fragments yet. Use the Fragmentation tool to generate and save some.</p>';
+                document.getElementById('cart-count').textContent = '';
+                return;
+            }
+            document.getElementById('cart-count').textContent = '(' + fragments.length + ')';
+            cartItems.innerHTML = '';
+
+            fragments.forEach(fragment => {
                 const item = document.createElement('div');
                 item.className = 'fragment-item';
-                item.innerHTML = `
-                    <div class="fragment-details mb-2">
-                        <img src="${fragment.img}" alt="Fragment 2D" style="width: 80px; height: 80px; object-fit: contain; border: 1px solid #555; border-radius: 6px; margin-bottom: 8px;">
-                        ${fragment.props}
-                        <button class="btn btn-sm btn-success select-btn mt-2" style="background-color: #3569cf; color: #fff; border:none; outline: none"
-                         >Select</button>
-                    </div>
-                `;
+                item.innerHTML =
+                    '<div class="fragment-details">' +
+                    (fragment.img ? '<img src="' + fragment.img + '" style="width:70px;height:70px;object-fit:contain;border:1px solid #555;border-radius:6px;margin-bottom:8px;display:block;">' : '') +
+                    (fragment.props || '<p style="font-size:0.78rem;color:var(--muted);">' + fragment.smiles + '</p>') +
+                    '<button class="btn-select">Select</button>' +
+                    '</div>';
                 cartItems.appendChild(item);
 
-                // Select logic for combine page (this is where you can load them into Slot 1 / Slot 2)
-                item.querySelector('.select-btn').addEventListener('click', async function() {
-                    const data = {
-                        fragment_smiles: fragment.smiles,
-                        properties: fragment.props
-                    };
-                    if(  document.getElementById('viewer-slot1').childNodes.length == 0){
+                item.querySelector('.btn-select').addEventListener('click', async function() {
+                    if (document.getElementById('viewer-slot1').childNodes.length === 0) {
                         smile1 = fragment.smiles;
-                        displayFragmentProperties('1', data);
-                        await fetch3DStructure(fragment.smiles, document.getElementById(`viewer-slot1`), null, null);
-                    } else if (document.getElementById('viewer-slot2').childNodes.length == 0){
+                        // Use stored props HTML directly so we don't show "undefined" values
+                        document.getElementById('fragment-properties1').innerHTML =
+                            fragment.props || '<p><strong>SMILES:</strong> ' + fragment.smiles + '</p>';
+                        document.getElementById('slot1-empty').style.display = 'none';
+                        await fetch3DStructure(fragment.smiles, document.getElementById('viewer-slot1'), null, null);
+                    } else if (document.getElementById('viewer-slot2').childNodes.length === 0) {
                         smile2 = fragment.smiles;
-                        displayFragmentProperties('2', data);
-                        await fetch3DStructure(fragment.smiles, document.getElementById(`viewer-slot2`), null, null);
+                        document.getElementById('fragment-properties2').innerHTML =
+                            fragment.props || '<p><strong>SMILES:</strong> ' + fragment.smiles + '</p>';
+                        document.getElementById('slot2-empty').style.display = 'none';
+                        await fetch3DStructure(fragment.smiles, document.getElementById('viewer-slot2'), null, null);
                     } else {
-                        alert('Both slots are occupied. Please clear a slot to add a new fragment.');
+                        alert('Both slots occupied. Refresh the page to clear them.');
+                        return;
                     }
-                    if(  document.getElementById('viewer-slot1').childNodes.length == 1 && document.getElementById('viewer-slot2').childNodes.length == 1){
-                        document.getElementById('combine-btn').disabled = false;
-                    } else {
-                        document.getElementById('combine-btn').disabled = true;
-                    }
-
+                    checkCombineReady();
                 });
             });
-
-        });
-        async function combineClicked() {
-            const button = document.getElementById('combine-btn');
-            if (button.disabled) {
-                alert('Add fragments to both slots to combine.');
-            } else {
-                //document.getElementById('combined-container').scrollIntoView({ behavior: 'smooth' });
-                await combineFragments(smile1, smile2);
-            }
         }
-        // Toggle Button Fragment Library Cart
-        const toggleCartBtn = document.createElement('button');
-        toggleCartBtn.textContent = 'Fragment Library';
-        toggleCartBtn.className = 'btn btn-blue fixed-toggle';
-        document.body.appendChild(toggleCartBtn);
+
+        loadCartUI();
+
+        async function combineClicked() {
+            if (document.getElementById('combine-btn').disabled) return;
+            await combineFragments(smile1, smile2);
+        }
+
+        // app.js references toggleCartBtn to open/close the sidebar — point it at the FAB
+        var toggleCartBtn = document.getElementById('lib-fab');
     </script>
-    
+
+    <script src="app.js" defer></script>
     <script src="https://3dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
 </body>
-
 </html>
