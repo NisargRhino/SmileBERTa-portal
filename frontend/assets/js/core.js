@@ -8,6 +8,11 @@
   let override = null;
   try { override = localStorage.getItem('sb_api'); } catch (e) { /* ignore */ }
   const API = (override || (isLocal ? 'http://localhost:5001' : PROD_API)).replace(/\/$/, '');
+  // Docking runs on its own lightweight service (no PyTorch) so Vina has enough memory.
+  const PROD_DOCK_API = 'https://smileberta-dock.onrender.com';
+  let dockOverride = null;
+  try { dockOverride = localStorage.getItem('sb_dock_api'); } catch (e) { /* ignore */ }
+  const DOCK_API = (dockOverride || (isLocal ? API : PROD_DOCK_API)).replace(/\/$/, '');
 
   // ── Storage helpers ───────────────────────────────────────────────────────
   const store = {
@@ -126,7 +131,7 @@
 
   // ── API client ────────────────────────────────────────────────────────────
   async function api(path, opts = {}) {
-    const { method = opts.body ? 'POST' : 'GET', body, timeout = 120000, raw = false, auth: useAuth = true } = opts;
+    const { method = opts.body ? 'POST' : 'GET', body, timeout = 120000, raw = false, auth: useAuth = true, base = API } = opts;
     const headers = {};
     if (body !== undefined) headers['Content-Type'] = 'application/json';
     if (useAuth && auth.token()) headers.Authorization = 'Bearer ' + auth.token();
@@ -134,7 +139,7 @@
     const timer = setTimeout(() => ctrl.abort(), timeout);
     let res;
     try {
-      res = await fetch(API + path, { method, headers, body: body !== undefined ? JSON.stringify(body) : undefined, signal: ctrl.signal });
+      res = await fetch(base + path, { method, headers, body: body !== undefined ? JSON.stringify(body) : undefined, signal: ctrl.signal });
     } catch (e) {
       clearTimeout(timer);
       if (e.name === 'AbortError') throw new Error('The request timed out. The server may be waking up — please try again.');
@@ -496,7 +501,7 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 
   window.SB = {
-    API, api, auth, store, icon, LOGO, TOOLS, LEARN, esc, $, $$, h, sleep, fmt, debounce, param,
+    API, DOCK_API, api, auth, store, icon, LOGO, TOOLS, LEARN, esc, $, $$, h, sleep, fmt, debounce, param,
     toast, modal, promptText, requireLoginModal, saveItem, loadItem, download, copy, readFile, parseCSV, toCSV, bindDropzone,
     library, handoff, takeHandoff, loadRDKit, depictSVG, depict, validSmiles, canonical, viewer3d, show3DFromSmiles, applyMolStyle,
     propertyTiles, druglikeBadges, onStatus, initReveal, status,

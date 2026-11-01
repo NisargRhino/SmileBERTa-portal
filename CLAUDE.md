@@ -18,7 +18,7 @@ cd frontend && python3 -m http.server 8080
 
 ## Architecture
 
-**Two Render services** (`render.yaml`): `smileberta-api` (Docker, Flask) and `smileberta-web` (static site from `frontend/`).
+**Three Render services** (`render.yaml`): `smileberta-api` (Docker, Flask + PyTorch models, accounts), `smileberta-dock` (`Dockerfile.dock` → `dock_service.py`, Vina only, no PyTorch) and `smileberta-web` (static site from `frontend/`). Docking lives in its own service because the ML API sits near 400 MB and Vina pushed it past the 512 MB free-tier limit (OOM restarts). The frontend calls `SB.DOCK_API` for `/dock`.
 
 **Backend modules:**
 - `app.py` — all routes: auth (`/register`, `/login`, `/me`, `/account/password`), workspace items (`/items` CRUD, kinds: molecule, fragment, classification, combination, docking, structure), fragment library, `/analyze`, `/depict`, builder (`/builder/*`), ML (`/predict_fragment`, `/classify_smiles`, batch variants, `/combine`), docking (`/dock`, `/dock/<job_id>`).

@@ -151,12 +151,12 @@
     try {
       const body = { receptor_pdb: receptor.text, chains, center: c, size: s, exhaustiveness: +$('#exh').value, num_modes: +$('#modes').value };
       if (ligMolblock) body.ligand_molblock = ligMolblock; else body.ligand_smiles = smiles;
-      const { job_id } = await api('/dock', { body, timeout: 90000 });
+      const { job_id } = await api('/dock', { body, timeout: 120000, base: SB.DOCK_API, auth: false });
       job = job_id;
       const t0 = Date.now();
       while (true) {
         await SB.sleep(2000);
-        const j = await api('/dock/' + job_id, { timeout: 30000 });
+        const j = await api('/dock/' + job_id, { timeout: 60000, base: SB.DOCK_API, auth: false });
         $('#run-progress > div').style.width = j.progress + '%';
         $('#run-status').innerHTML = `<b style="color:#fff">${esc(j.message)}</b> <span class="muted">· ${Math.round((Date.now() - t0) / 1000)}s</span>`;
         $('#run-log').innerHTML = j.log.map((l) => `<div class="${l.includes('Error') ? 'err' : l.includes('Done') ? 'ok' : ''}">${esc(l)}</div>`).join('');
@@ -220,6 +220,16 @@
   function init() {
     if (!window.$3Dmol) return setTimeout(init, 80);
     viewer = $3Dmol.createViewer($('#viewer'), { backgroundColor: '#070a12', antialias: true });
+    // Wake the docking service early: free instances sleep when idle and take ~1 min to start.
+    (async () => {
+      const st = $('#run-status');
+      st.innerHTML = '<span class="spinner" style="width:12px;height:12px"></span> Waking the docking engine…';
+      for (let i = 0; i < 20; i++) {
+        try { const r = await fetch(SB.DOCK_API + '/health', { cache: 'no-store' }); if (r.ok) { const h = await r.json(); st.innerHTML = h.docking ? '<span style="color:var(--green)">●</span> Docking engine ready (AutoDock Vina)' : '<span style="color:var(--red)">●</span> Docking engine unavailable'; return; } } catch (e) { /* retry */ }
+        await SB.sleep(5000);
+      }
+      st.innerHTML = '<span style="color:var(--amber)">●</span> Docking engine is not responding yet. You can still try running.';
+    })();
     $('#run').innerHTML = icon('play') + ' Run docking';
     $('#save').innerHTML = icon('save') + ' Save';
     $('#upload').innerHTML = icon('upload');

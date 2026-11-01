@@ -14,6 +14,17 @@ services:
       - key: MODEL_CACHE_SIZE
         value: "1"
 
+  # ── Docking API (AutoDock Vina, no PyTorch → fits in 512 MB) ───────────
+  - type: web
+    name: smileberta-dock
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile.dock
+    healthCheckPath: /health
+    envVars:
+      - key: VINA_CPU
+        value: "1"
+
   # ── Static frontend ──────────────────────────────────────────────────────
   - type: static_site
     name: smileberta-web

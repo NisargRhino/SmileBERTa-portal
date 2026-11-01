@@ -1,0 +1,13 @@
+# Lightweight docking service: RDKit + Open Babel + AutoDock Vina, no PyTorch.
+FROM python:3.11-slim
+WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends libxrender1 libxext6 libgomp1 ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+ADD https://github.com/forlilab/AutoDock-Vina/releases/download/v1.2.7/vina_1.2.7_linux_x86_64 /usr/local/bin/vina
+RUN chmod +x /usr/local/bin/vina
+COPY requirements-dock.txt .
+RUN pip install --no-cache-dir -r requirements-dock.txt
+COPY docking.py chem_tools.py dock_service.py ./
+ENV PYTHONUNBUFFERED=1 VINA_CPU=1
+EXPOSE 10000
+CMD ["gunicorn", "dock_service:app", "--workers", "1", "--worker-class", "gthread", "--threads", "4", "--timeout", "300", "--bind", "0.0.0.0:10000"]
