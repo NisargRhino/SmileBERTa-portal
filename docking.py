@@ -278,6 +278,20 @@ def get_job(job_id):
         return out
 
 
+VINA_MEM_MB = int(os.environ.get('VINA_MEM_MB', '320'))
+
+
+def _limit_child():
+    """Lowest CPU priority + a hard address-space cap so Vina can never take the container down."""
+    os.nice(19)
+    try:
+        import resource
+        cap = VINA_MEM_MB * 1024 * 1024
+        resource.setrlimit(resource.RLIMIT_AS, (cap, cap))
+    except Exception:
+        pass
+
+
 def _run_job(job_id, receptor_pdb, chains, smiles, molblock, center, size, exh, modes):
     with _run_lock:
         workdir = tempfile.mkdtemp(prefix='dock_')
@@ -320,7 +334,7 @@ def _run_job(job_id, receptor_pdb, chains, smiles, molblock, center, size, exh, 
             # Lowest CPU priority: on small instances Vina would otherwise starve the web
             # process, health checks fail and the platform restarts the container.
             proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1,
-                                    preexec_fn=lambda: os.nice(19))
+                                    preexec_fn=_limit_child)
             stars = 0
             tail = []
             start = time.time()
@@ -338,7 +352,10 @@ def _run_job(job_id, receptor_pdb, chains, smiles, molblock, center, size, exh, 
             proc.wait()
             output = ''.join(tail)
             if proc.returncode != 0 or not os.path.exists(out_path):
-                msg = output.strip().splitlines()[-1] if output.strip() else 'Vina failed'
+                lines = [l for l in output.strip().splitlines() if l.strip()]
+                msg = ' | '.join(lines[-3:]) if lines else f'Vina failed (exit code {proc.returncode})'
+                if proc.returncode < 0 or 'bad_alloc' in output or 'memory' in output.lower():
+                    msg = f'Vina ran out of memory (limit {VINA_MEM_MB} MB). Try a smaller box. [{msg[:160]}]'
                 raise DockingError(msg[:300])
 
             with open(out_path) as f:
