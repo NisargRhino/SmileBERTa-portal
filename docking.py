@@ -278,7 +278,7 @@ def get_job(job_id):
         return out
 
 
-VINA_MEM_MB = int(os.environ.get('VINA_MEM_MB', '320'))
+VINA_MEM_MB = int(os.environ.get('VINA_MEM_MB', '1200'))
 
 
 def _limit_child():
