@@ -3,8 +3,11 @@ FROM python:3.11-slim
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends libxrender1 libxext6 libgomp1 ca-certificates \
     && rm -rf /var/lib/apt/lists/*
-ADD https://github.com/forlilab/AutoDock-Vina/releases/download/v1.2.7/vina_1.2.7_linux_x86_64 /usr/local/bin/vina
-RUN chmod +x /usr/local/bin/vina
+# AutoDock Vina 1.1.2 (official static binary). 1.2.7 needed >380 MB RSS for drug-sized
+# ligands and was OOM-killed on the 512 MB free instance; 1.1.2 peaks at ~35 MB.
+ADD https://vina.scripps.edu/wp-content/uploads/sites/55/2020/12/autodock_vina_1_1_2_linux_x86.tgz /tmp/vina.tgz
+RUN tar xzf /tmp/vina.tgz -C /tmp && cp /tmp/autodock_vina_1_1_2_linux_x86/bin/vina /usr/local/bin/vina \
+    && chmod +x /usr/local/bin/vina && rm -rf /tmp/vina.tgz /tmp/autodock_vina_1_1_2_linux_x86
 COPY requirements-dock.txt .
 RUN pip install --no-cache-dir -r requirements-dock.txt
 COPY docking.py chem_tools.py dock_service.py ./

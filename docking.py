@@ -31,7 +31,13 @@ except Exception:  # pragma: no cover
     OPENBABEL_AVAILABLE = False
 
 VINA_BIN = os.environ.get('VINA_BIN') or shutil.which('vina')
-DOCKING_AVAILABLE = bool(OPENBABEL_AVAILABLE and VINA_BIN)
+VINA_VERSION = None
+if VINA_BIN:
+    try:
+        VINA_VERSION = subprocess.run([VINA_BIN, '--version'], capture_output=True, text=True, timeout=20).stdout.strip()[:80] or None
+    except Exception:
+        VINA_VERSION = None
+DOCKING_AVAILABLE = bool(OPENBABEL_AVAILABLE and VINA_VERSION)
 
 MAX_BOX = 40.0
 MAX_RECEPTOR_ATOMS = 40000
