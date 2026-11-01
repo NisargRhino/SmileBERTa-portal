@@ -317,7 +317,10 @@ def _run_job(job_id, receptor_pdb, chains, smiles, molblock, center, size, exh, 
             _update(job_id, status='running', progress=10, message='Vina: computing grid maps & Monte-Carlo search')
             _log(job_id, f'Search box center ({center[0]:.1f}, {center[1]:.1f}, {center[2]:.1f}) '
                          f'size {size[0]:.0f}×{size[1]:.0f}×{size[2]:.0f} Å, exhaustiveness {exh}')
-            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
+            # Lowest CPU priority: on small instances Vina would otherwise starve the web
+            # process, health checks fail and the platform restarts the container.
+            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1,
+                                    preexec_fn=lambda: os.nice(19))
             stars = 0
             tail = []
             start = time.time()
@@ -329,7 +332,7 @@ def _run_job(job_id, receptor_pdb, chains, smiles, molblock, center, size, exh, 
                 if ch == '*':
                     stars += 1
                     _update(job_id, progress=min(97, 10 + int(stars / 51 * 87)))
-                if time.time() - start > 1500:
+                if time.time() - start > 2400:
                     proc.kill()
                     raise DockingError('Docking timed out — try a smaller box or lower exhaustiveness')
             proc.wait()
