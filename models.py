@@ -53,3 +53,14 @@ def unload_all():
             ctypes.CDLL('libc.so.6').malloc_trim(0)
         except Exception:
             pass
+
+
+def rss_mb():
+    """Resident memory of this process in MB (Linux), or None."""
+    try:
+        with open('/proc/self/status') as f:
+            for line in f:
+                if line.startswith('VmRSS:'):
+                    return round(int(line.split()[1]) / 1024)
+    except Exception:
+        return None

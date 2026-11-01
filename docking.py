@@ -212,6 +212,13 @@ def _update(job_id, **kw):
 
 
 def _log(job_id, msg):
+    try:
+        import models
+        mem = models.rss_mb()
+        if mem:
+            msg += f'  [mem {mem} MB]'
+    except Exception:
+        pass
     with _jobs_lock:
         job = _jobs.get(job_id)
         if job:
@@ -279,6 +286,7 @@ def _run_job(job_id, receptor_pdb, chains, smiles, molblock, center, size, exh, 
                     models.unload_all()
                 except Exception:
                     pass
+            _log(job_id, 'Job started')
             _update(job_id, status='preparing', progress=2, message='Preparing receptor')
             clean = clean_receptor(receptor_pdb, chains)
             rec_atoms = parse_pdb_atoms(clean)

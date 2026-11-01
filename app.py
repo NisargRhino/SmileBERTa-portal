@@ -130,6 +130,7 @@ def health():
         'uptime': round(time.time() - STARTED_AT),
         'models': _models_state,
         'models_in_memory': models.loaded(),
+        'rss_mb': models.rss_mb(),
         'docking': docking.DOCKING_AVAILABLE,
         'database': 'postgres' if db.IS_POSTGRES else 'sqlite',
         'persistent_storage': db.IS_POSTGRES,
