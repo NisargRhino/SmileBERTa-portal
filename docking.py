@@ -272,6 +272,13 @@ def _run_job(job_id, receptor_pdb, chains, smiles, molblock, center, size, exh, 
     with _run_lock:
         workdir = tempfile.mkdtemp(prefix='dock_')
         try:
+            # Free the transformer models first: on a 512 MB instance they and Vina don't fit together.
+            if os.environ.get('MODEL_CACHE_SIZE', '1') == '1':
+                try:
+                    import models
+                    models.unload_all()
+                except Exception:
+                    pass
             _update(job_id, status='preparing', progress=2, message='Preparing receptor')
             clean = clean_receptor(receptor_pdb, chains)
             rec_atoms = parse_pdb_atoms(clean)
@@ -296,7 +303,7 @@ def _run_job(job_id, receptor_pdb, chains, smiles, molblock, center, size, exh, 
                    '--center_x', f'{center[0]:.3f}', '--center_y', f'{center[1]:.3f}', '--center_z', f'{center[2]:.3f}',
                    '--size_x', f'{size[0]:.2f}', '--size_y', f'{size[1]:.2f}', '--size_z', f'{size[2]:.2f}',
                    '--exhaustiveness', str(exh), '--num_modes', str(modes), '--energy_range', '4',
-                   '--cpu', str(max(1, min(os.cpu_count() or 1, 4))), '--seed', '42', '--out', out_path]
+                   '--cpu', os.environ.get('VINA_CPU', '1'), '--seed', '42', '--out', out_path]
             _update(job_id, status='running', progress=10, message='Vina: computing grid maps & Monte-Carlo search')
             _log(job_id, f'Search box center ({center[0]:.1f}, {center[1]:.1f}, {center[2]:.1f}) '
                          f'size {size[0]:.0f}×{size[1]:.0f}×{size[2]:.0f} Å, exhaustiveness {exh}')

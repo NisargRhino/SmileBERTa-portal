@@ -41,3 +41,15 @@ def model_lock():
 def loaded():
     with _lock:
         return list(_cache.keys())
+
+
+def unload_all():
+    """Free every cached model and hand the memory back to the OS (used before docking)."""
+    with _lock:
+        _cache.clear()
+        gc.collect()
+        try:
+            import ctypes
+            ctypes.CDLL('libc.so.6').malloc_trim(0)
+        except Exception:
+            pass
