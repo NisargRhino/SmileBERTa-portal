@@ -1,152 +1,111 @@
-import torch
-from transformers import RobertaTokenizer, RobertaForMaskedLM
-from rdkit import Chem
-from rdkit.Chem import AllChem, DataStructs, Descriptors
+"""Fragment prediction with the SmileBERTa fragment model (RoBERTa, ChemBERTa-initialised).
+
+The model is used as a position-wise "translator": the drug SMILES is tokenised,
+every output position is decoded with argmax, and the resulting token sequence is
+read back as the fragment SMILES. Invalid outputs are repaired by a SMILES
+corrector service, falling back to the closest valid reference fragment.
+"""
 import Levenshtein
 import pandas as pd
 import requests
-from requests.exceptions import RequestException, Timeout, ConnectionError
+import torch
+from rdkit import Chem
+from rdkit.Chem import AllChem, DataStructs, Descriptors
+from requests.exceptions import RequestException
+from models import get_model, model_lock
 
-# Load unique SMILES from CSV
-unique_smiles_df = pd.read_csv('unique_smile5.csv')  # Enter the path of unique_smile5.csv
-unique_smiles_list = unique_smiles_df['SMILES'].tolist()
+FRAGMENT_MODEL = 'NisargRhino/protein-models'
+CORRECTOR_URL = 'https://smiles-corrector-1.onrender.com/correct'
 
-# Function to clean up a molecule
+unique_smiles_list = pd.read_csv('unique_smile5.csv')['SMILES'].dropna().tolist()
+
+def load_fragment_model():
+    """Load (or fetch from the shared cache) the fragment model."""
+    return get_model(FRAGMENT_MODEL)
+
+
 def cleanup_molecule_rdkit(smiles):
+    if not smiles:
+        return None
     mol = Chem.MolFromSmiles(smiles)
     if mol is None:
         return None
     Chem.SanitizeMol(mol)
     return Chem.MolToSmiles(mol)
 
-# Function to calculate properties of a molecule
+
 def calculate_properties(smiles):
     mol = Chem.MolFromSmiles(smiles)
     if mol is None:
         return None
-    mol_wt = round(Descriptors.MolWt(mol), 2)
-    log_p = round(Descriptors.MolLogP(mol), 2)
-    h_bond_donors = Descriptors.NumHDonors(mol)
-    h_bond_acceptors = Descriptors.NumHAcceptors(mol)
-    tpsa = round(Descriptors.TPSA(mol), 2)
     return {
-        'molecular_weight': mol_wt,
-        'log_p': log_p,
-        'hydrogen_bond_donors': h_bond_donors,
-        'hydrogen_bond_acceptors': h_bond_acceptors,
-        'tpsa': tpsa
+        'molecular_weight': round(Descriptors.MolWt(mol), 2),
+        'log_p': round(Descriptors.MolLogP(mol), 2),
+        'hydrogen_bond_donors': Descriptors.NumHDonors(mol),
+        'hydrogen_bond_acceptors': Descriptors.NumHAcceptors(mol),
+        'tpsa': round(Descriptors.TPSA(mol), 2),
     }
 
-# Function to get 3D structure of a molecule
-def get_3d_structure(smiles):
-    response = requests.post('https://smileberta-api.onrender.com/get_3d_structure', json={'smiles': smiles})
-    if response.status_code == 200:
-        return response.json().get('pdb')
-    else:
-        print("Error fetching 3D structure:", response.json())
-        return None
 
-# Function to calculate Tanimoto similarity
 def tanimoto_similarity(smiles1, smiles2):
-    mol1 = Chem.MolFromSmiles(smiles1)
-    mol2 = Chem.MolFromSmiles(smiles2)
-    
+    mol1, mol2 = Chem.MolFromSmiles(smiles1), Chem.MolFromSmiles(smiles2)
     if mol1 is None or mol2 is None:
         return 0.0
-    
     fp1 = AllChem.GetMorganFingerprintAsBitVect(mol1, 2, nBits=2048)
     fp2 = AllChem.GetMorganFingerprintAsBitVect(mol2, 2, nBits=2048)
-    
     return DataStructs.TanimotoSimilarity(fp1, fp2)
 
-# Function to calculate string similarity using Levenshtein distance
+
 def string_similarity(smiles1, smiles2):
-    distance = Levenshtein.distance(smiles1, smiles2)
     max_len = max(len(smiles1), len(smiles2))
     if max_len == 0:
         return 1.0
-    return 1 - (distance / max_len)
+    return 1 - Levenshtein.distance(smiles1, smiles2) / max_len
 
-# Function to check if a SMILES string is valid
+
 def is_valid_smiles(smiles):
-    mol = Chem.MolFromSmiles(smiles)
-    return mol is not None
+    return bool(smiles) and Chem.MolFromSmiles(smiles) is not None
 
-# Function to find the closest valid SMILES string
-def find_closest_valid_smiles(predicted_smiles, unique_smiles_list):
-    print("invalid smiles: ", predicted_smiles)
-    closest_smiles = None
-    highest_similarity = -1
-    for smiles in unique_smiles_list:
-        similarity = string_similarity(predicted_smiles, smiles)
-        if similarity > highest_similarity:
-            highest_similarity = similarity
-            closest_smiles = smiles
-    return closest_smiles
 
-def find_closest_valid_smiles(predicted_smiles):
+def closest_reference_smiles(predicted_smiles):
+    """Offline fallback: nearest valid fragment from the reference set by edit distance."""
+    best, best_sim = None, -1.0
+    for s in unique_smiles_list:
+        sim = string_similarity(predicted_smiles, s)
+        if sim > best_sim:
+            best, best_sim = s, sim
+    return best
+
+
+def correct_smiles_remote(predicted_smiles):
     try:
-        response = requests.post(
-            'https://smiles-corrector-1.onrender.com/correct',
-            json={'smiles': predicted_smiles},
-            timeout=60  # ⏱️ avoid hanging forever
-        )
-
-        print("✅ Status from corrector:", response.status_code)
-        print("🧪 Corrector response:", response.text)
-
-        if response.status_code == 200:
-            return response.json().get('corrected', None)
-        else:
-            print("⚠️ Non-200 response:", response.text)
-
-    except Timeout:
-        print("❌ Timeout contacting SMILES corrector.")
-    except ConnectionError:
-        print("❌ Connection error to SMILES corrector.")
-    except RequestException as e:
-        print("❌ Request exception contacting SMILES corrector:", str(e))
-
+        r = requests.post(CORRECTOR_URL, json={'smiles': predicted_smiles}, timeout=45)
+        if r.status_code == 200:
+            corrected = r.json().get('corrected')
+            if is_valid_smiles(corrected):
+                return corrected
+    except (RequestException, ValueError):
+        pass
     return None
 
-    
-# Function to predict fragment SMILES
-def predict_fragment_smiles(smiles, protein, max_length=128):
-    #model_path = f'KennardLiong/proteinmodels/protein-models/model-{protein}'
-    #tokenizer_path = f'KennardLiong/proteinmodels/protein-models/tokenizer-{protein}'
-    model_path = f'NisargRhino/protein-models'
-    tokenizer_path = f'NisargRhino/protein-models'
-    print("model path ----: " + model_path)
-    print("tokenizer path ----: " + tokenizer_path)
 
-    model = RobertaForMaskedLM.from_pretrained(model_path)
-    tokenizer = RobertaTokenizer.from_pretrained(tokenizer_path)
-    model.eval()
+def predict_fragment_detailed(smiles, protein=None, max_length=128):
+    """Return the fragment plus provenance (raw model output, whether it was corrected)."""
+    with model_lock():
+        model, tokenizer = load_fragment_model()
+        inputs = tokenizer(smiles, max_length=max_length, padding='max_length', truncation=True, return_tensors='pt')
+        with torch.no_grad():
+            logits = model(input_ids=inputs['input_ids'], attention_mask=inputs['attention_mask']).logits
+        predicted_ids = torch.argmax(logits, dim=-1)
+        raw = tokenizer.decode(predicted_ids[0], skip_special_tokens=True).strip()
+    if is_valid_smiles(raw):
+        return {'fragment': raw, 'raw': raw, 'corrected': False, 'correction': None}
+    fixed = correct_smiles_remote(raw)
+    if fixed:
+        return {'fragment': fixed, 'raw': raw, 'corrected': True, 'correction': 'corrector-model'}
+    fixed = closest_reference_smiles(raw)
+    return {'fragment': fixed, 'raw': raw, 'corrected': True, 'correction': 'nearest-reference'}
 
-    inputs = tokenizer(smiles, max_length=max_length, padding='max_length', truncation=True, return_tensors="pt")
-    with torch.no_grad():
-        outputs = model(input_ids=inputs['input_ids'], attention_mask=inputs['attention_mask'])
-    logits = outputs.logits
-    predicted_ids = torch.argmax(logits, dim=-1)
-    predicted_smiles = tokenizer.decode(predicted_ids[0], skip_special_tokens=True)
-    print("initial smiles: ", predicted_smiles)
-    if not is_valid_smiles(predicted_smiles):
-        print("Predicted SMILES is invalid. Finding the closest valid SMILES...")
-        #closest_valid_smiles = find_closest_valid_smiles(predicted_smiles, unique_smiles_list)
-        closest_valid_smiles = find_closest_valid_smiles(predicted_smiles)
-        predicted_smiles = closest_valid_smiles
-        print("new closest predicted smiles: ", predicted_smiles)
-    return predicted_smiles
 
-# Example usage
-# new_drug_smiles = "CCCCC1=NC2(CCCC2)C(=O)N1CC3=CC=C(C=C3)C4=CC=CC=C4C5=NN(N=N5)C6C(C(C(C(O6)C(=O)O)O)O)O"  # Replace with your input SMILES
-# predicted_fragment_smiles = predict_fragment_smiles(new_drug_smiles, 'mTOR')
-# print("Predicted Fragment SMILES:", predicted_fragment_smiles)
-
-# actual_fragment_smiles = ""  # Replace with the actual fragment SMILES in order to test accuracy
-# similarity = tanimoto_similarity(predicted_fragment_smiles, actual_fragment_smiles)
-# print("Tanimoto Similarity:", similarity)
-
-# # Calculate string similarity
-# string_sim = string_similarity(predicted_fragment_smiles, actual_fragment_smiles)
-# print("String Similarity:", string_sim)
+def predict_fragment_smiles(smiles, protein=None, max_length=128):
+    return predict_fragment_detailed(smiles, protein, max_length)['fragment']

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How drug classification works — SmileBERTa</title>
+  <meta name="description" content="How SmileBERTa predicts the therapeutic class of a molecule from its SMILES string, from training data to label matching.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>.figure .bar { transform-origin: left; transform: scaleX(0); transition: transform 1.1s var(--ease); } .figure.in .bar { transform: scaleX(1); }</style>
+  <script src="assets/js/core.js" defer></script>
+  <script src="assets/js/learn.js" defer></script>
+</head>
+<body>
+  <div id="site-nav"></div>
+  <main class="container">
+    <div class="page-head">
+      <div class="crumbs"><a href="index.html">Home</a><span>/</span><a href="learn.html">Learn</a><span>/</span><span>Drug classification</span></div>
+      <div class="eyebrow">Technical guide · 9 min read</div>
+      <h1>How SmileBERTa classifies drugs</h1>
+      <p class="lead">Predicting what a molecule is <em>for</em> from what it <em>is</em>: the data, the model, and the matching step that turns text into a therapeutic class.</p>
+    </div>
+    <div class="doc-layout">
+      <nav class="doc-toc" aria-label="On this page"></nav>
+      <article class="doc">
+        <h2 id="task">The task</h2>
+        <p>Molecules that treat the same kind of disease often share structural features. Statins share a dihydroxy-acid side chain, fluoroquinolones a bicyclic core, and many CNS drugs carry a basic amine. Medicinal chemists use this <strong>structure–activity intuition</strong> constantly. SmileBERTa's classifier learns it from data: given a SMILES string, it predicts the compound's therapeutic area.</p>
+        <p>Classification is useful early in discovery for profiling screening hits, spotting repurposing opportunities, flagging likely off-target areas, and annotating large virtual libraries in batch.</p>
+
+        <h2 id="data">Training data</h2>
+        <p>The classifier was trained on <strong>8,336 labelled compounds</strong> covering <strong>12 therapeutic categories</strong>. About 16% of the compounds (1,350) belong to more than one category. An antibiotic that is also used in oncology, for example, is labelled <code>antiinfective antineoplastic</code>. In total the model can output <strong>38 distinct labels</strong>, single categories plus the combinations seen in the data.</p>
+        <figure class="figure">
+          <svg viewBox="0 0 760 330" role="img" aria-label="Number of compounds per therapeutic category"><g id="dist"></g></svg>
+          <figcaption>Figure 1. Compounds per category in the training set (a multi-label compound counts towards each of its categories). The dataset is imbalanced: anti-infectives are about 60× more common than urological agents, which affects accuracy on rare classes.</figcaption>
+        </figure>
+
+        <h2 id="model">The model</h2>
+        <p>The classifier uses the same architecture as the fragment model: a 6-layer RoBERTa encoder initialised from <strong>ChemBERTa-zinc-base-v1</strong> (see <a href="learn-fragmentation.html#architecture">the architecture section</a> of the fragmentation guide). It is fine-tuned on a different objective. Instead of rewriting the input as a fragment, it writes out the <em>name of the class</em>, token by token, using the same 767-token vocabulary.</p>
+        <figure class="figure">
+          <svg viewBox="0 0 760 170" role="img" aria-label="Classification as text generation">
+            <defs><marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#22d3ee"/></marker></defs>
+            <rect class="dg-box" x="10" y="50" width="200" height="60" rx="10"/><text class="dg-m" x="110" y="78" text-anchor="middle">CNCCC(Oc1ccc(C(F)…</text><text class="dg-s" x="110" y="96" text-anchor="middle">fluoxetine SMILES</text>
+            <path class="dg-flow" d="M210 80H262" marker-end="url(#a3)"/>
+            <rect class="dg-box-hi" x="265" y="40" width="210" height="80" rx="10"/><text class="dg-t" x="370" y="74" text-anchor="middle">SmileBERTa-Class</text><text class="dg-s" x="370" y="92" text-anchor="middle">RoBERTa · 6 layers · LM head</text>
+            <path class="dg-flow" d="M475 80H527" marker-end="url(#a3)"/>
+            <rect class="dg-box-gr" x="530" y="50" width="220" height="60" rx="10"/><text class="dg-m" x="640" y="78" text-anchor="middle" style="fill:#6ee7b7">“cns”</text><text class="dg-s" x="640" y="96" text-anchor="middle">decoded class text</text>
+            <text class="dg-s" x="380" y="155" text-anchor="middle">The answer comes out as text and is decoded with the same argmax-per-position step as fragments.</text>
+          </svg>
+          <figcaption>Figure 2. Classification framed as text generation. For fluoxetine (Prozac) the model writes “cns” exactly.</figcaption>
+        </figure>
+
+        <h2 id="matching">Snapping text to a label</h2>
+        <p>Free-form text output is flexible, but it can come out garbled, especially for molecules unlike anything in training. SmileBERTa makes every answer valid by comparing the raw text with each of the 38 known labels using <strong>Levenshtein edit distance</strong>: the minimum number of single-character insertions, deletions or substitutions needed to turn one string into the other. The closest label wins.</p>
+        <div class="eq">similarity(raw, label) = 1 − levenshtein(raw, label) / max(|raw|, |label|)</div>
+        <p>Here is a real example. For ibuprofen, the model's raw output is not a word, but it is clearly closest to the correct class:</p>
+        <figure class="figure">
+          <svg viewBox="0 0 760 250" role="img" aria-label="Edit-distance matching of a garbled output to the label antiinflammatory">
+            <text class="dg-s" x="20" y="30">Raw model output for ibuprofen</text>
+            <rect x="20" y="40" width="300" height="40" rx="9" fill="rgba(251,191,36,.08)" stroke="#fbbf24"/><text class="dg-m" x="170" y="65" text-anchor="middle" style="fill:#fde68a">aetaitflnfmatmrrera</text>
+            <g id="match"></g>
+          </svg>
+          <figcaption>Figure 3. Matching a noisy output to the label set (real values from the deployed model). The tool shows this ranking as “Closest label matches”, so you can see how decisive the prediction was.</figcaption>
+        </figure>
+        <p>When the raw output matches a label exactly (similarity 1.00), the model is confident and on-distribution. When the best similarity is low and the runners-up are close behind, treat the prediction as tentative.</p>
+
+        <h2 id="druglike">Drug-likeness metrics</h2>
+        <p>Next to the class, the tool computes a drug-likeness profile with RDKit:</p>
+        <ul>
+          <li><strong>Lipinski's Rule of Five</strong>: MW ≤ 500, cLogP ≤ 5, H-bond donors ≤ 5, acceptors ≤ 10. Orally active drugs rarely break more than one of these.</li>
+          <li><strong>Veber rules</strong>: rotatable bonds ≤ 10 and TPSA ≤ 140 Å², which correlate with good oral bioavailability.</li>
+          <li><strong>QED</strong> (quantitative estimate of drug-likeness): a 0–1 score combining eight properties against the distributions seen in marketed drugs. Above about 0.5 is drug-like.</li>
+          <li><strong>TPSA, Fsp³, aromatic ring count, stereocentres</strong>: descriptors chemists use to judge permeability, solubility and synthetic complexity.</li>
+        </ul>
+
+        <h2 id="limits">Limitations</h2>
+        <div class="callout warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><div>The classifier learns statistical associations, not mechanisms. It can be confidently wrong. For example, it labels the antibiotic ciprofloxacin as <em>antineoplastic</em>, probably because quinolone-like scaffolds are common in kinase inhibitors. Rare classes (urological, lipid-regulating) are predicted less reliably. Use predictions for prioritisation and hypothesis generation, never as a substitute for biological assays.</div></div>
+        <div class="row" style="margin-top:28px"><a class="btn btn-primary" href="drug_class.html">Try drug classification</a><a class="btn" href="learn-docking.html">Next: docking →</a></div>
+      </article>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const data = [['Anti-infective', 2923, '#34d399'], ['Antineoplastic', 1642, '#f472b6'], ['CNS', 1528, '#a78bfa'], ['Cardiovascular', 1262, '#f87171'], ['Anti-inflammatory', 591, '#fbbf24'], ['Gastrointestinal', 490, '#fdba74'], ['Hematologic', 462, '#fb7185'], ['Respiratory', 281, '#38bdf8'], ['Dermatologic', 226, '#2dd4bf'], ['Reproductive', 225, '#e879f9'], ['Lipid-regulating', 203, '#facc15'], ['Urological', 48, '#60a5fa']];
+      const max = 2923; let s = '';
+      data.forEach(([n, v, c], i) => {
+        const y = 14 + i * 25, w = v / max * 480;
+        s += `<text x="150" y="${y + 13}" text-anchor="end" class="dg-s" style="fill:#b8c0d2;font-size:12px">${n}</text><rect class="bar" x="162" y="${y}" width="${w}" height="17" rx="4" fill="${c}" opacity=".85" style="transition-delay:${i * 60}ms"/><text x="${170 + w}" y="${y + 13}" class="dg-m" style="font-size:11px">${v.toLocaleString()}</text>`;
+      });
+      document.getElementById('dist').innerHTML = s;
+      const m = [['antiinflammatory', 10, 0.474, true], ['antiinfective', 12, 0.368], ['hematologic cardio', 14, 0.263], ['cns antiinfective', 14, 0.263], ['antineoplastic', 15, 0.211]];
+      let t = '';
+      m.forEach(([n, d, sim, win], i) => {
+        const y = 100 + i * 28;
+        t += `<path d="M320 60 C 360 60, 360 ${y + 10}, 390 ${y + 10}" class="dg-line" style="stroke:${win ? '#34d399' : 'rgba(255,255,255,.15)'};stroke-width:${win ? 2 : 1}"/>`;
+        t += `<text x="400" y="${y + 14}" class="dg-m" style="fill:${win ? '#6ee7b7' : '#94a3b8'}">${n}</text><text x="600" y="${y + 14}" class="dg-s">distance ${d}</text><rect class="bar" x="680" y="${y + 3}" width="${sim * 70}" height="12" rx="3" fill="${win ? '#34d399' : '#475569'}"/>`;
+      });
+      t += '<text x="680" y="88" class="dg-s">similarity</text>';
+      document.getElementById('match').innerHTML = t;
+    });
+  </script>
+</body>
+</html>

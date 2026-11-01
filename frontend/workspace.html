@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Workspace — SmileBERTa</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    .ws-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; }
+    .item-card { display: flex; flex-direction: column; gap: 10px; padding: 18px; }
+    .item-card .name { font-weight: 600; color: #fff; word-break: break-word; }
+    .item-card .summary { font-size: .8rem; color: var(--muted); font-family: var(--mono); word-break: break-all; flex: 1; }
+    .item-card .foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .stat-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+    @media (max-width: 900px) { .stat-row { grid-template-columns: repeat(3, 1fr); } }
+  </style>
+  <script src="assets/js/core.js" defer></script>
+  <script src="assets/js/workspace.js" defer></script>
+</head>
+<body>
+  <div id="site-nav"></div>
+  <main class="container" style="padding-bottom:80px">
+    <div class="page-head">
+      <div class="row-between" style="align-items:flex-end">
+        <div><div class="eyebrow">Your workspace</div><h1 id="hello">Workspace</h1><p class="lead" id="sub">Everything you've saved across SmileBERTa tools.</p></div>
+        <div class="row"><button class="btn" id="pw">Change password</button><button class="btn btn-ghost" id="signout">Sign out</button></div>
+      </div>
+    </div>
+    <div id="gate" class="hidden">
+      <div class="card center" style="padding:60px 24px"><div class="icon-tile" style="margin:0 auto 18px;width:56px;height:56px"></div><h2>Sign in to see your workspace</h2><p class="text-2" style="max-width:480px;margin:0 auto 26px">Save molecules, fragment predictions, classifications, docking runs and annotated structures, and come back to them on any device.</p><div class="row" style="justify-content:center"><a class="btn btn-primary btn-lg" href="login.html?next=workspace.html">Sign in</a><a class="btn btn-lg" href="login.html?mode=register&next=workspace.html">Create account</a></div></div>
+    </div>
+    <div id="ws" class="hidden">
+      <div id="persist-note"></div>
+      <div class="stat-row" id="stats" style="margin-bottom:28px"></div>
+      <div class="row-between" style="margin-bottom:16px">
+        <div class="tabs" id="kinds" style="margin:0;border:0"></div>
+        <input class="input input-sm" id="search" placeholder="Search saved items…" style="max-width:260px">
+      </div>
+      <div class="ws-grid" id="items"></div>
+      <div class="row-between" style="margin:56px 0 16px"><h3 style="margin:0">Fragment library</h3><a class="btn btn-sm" href="combine.html">Link fragments →</a></div>
+      <div class="ws-grid" id="library"></div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+</body>
+</html>

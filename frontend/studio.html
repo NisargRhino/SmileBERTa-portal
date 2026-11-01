@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Structure Studio — SmileBERTa</title>
+  <meta name="description" content="Explore protein and small-molecule structures: chains, backbones, surfaces, secondary structure, binding sites and measurements.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    .chain-row { display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; align-items: center; padding: 9px 10px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 6px; font-size: .82rem; }
+    .chain-row.off { opacity: .45; }
+    .swatch { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; font: 700 .72rem var(--display); color: #03121c; }
+    .seq-strip { border-top: 1px solid var(--border); background: var(--bg-2); padding: 8px 12px; display: flex; gap: 10px; align-items: center; min-height: 52px; }
+    .seq { display: flex; gap: 1px; overflow-x: auto; flex: 1; padding-bottom: 4px; font-family: var(--mono); font-size: .72rem; scrollbar-width: thin; }
+    .seq span { flex: 0 0 auto; width: 15px; text-align: center; padding: 3px 0 2px; border-radius: 3px; cursor: pointer; color: var(--text-2); border-bottom: 2px solid transparent; position: relative; }
+    .seq span:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .seq span.h { border-bottom-color: #f472b6; } .seq span.s { border-bottom-color: #fbbf24; }
+    .seq span.sel { background: var(--cyan); color: #03121c; }
+    .seq span.tick::before { content: attr(data-n); position: absolute; top: -12px; left: 0; font-size: .58rem; color: var(--faint); }
+    .seq-legend { font-size: .68rem; color: var(--muted); white-space: nowrap; }
+    .layer-row { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 9px; font-size: .78rem; margin-bottom: 5px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .color-input { width: 100%; height: 34px; border: 1px solid var(--border-strong); border-radius: 8px; background: none; padding: 2px; cursor: pointer; }
+    .meas-row { display: flex; justify-content: space-between; gap: 8px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 9px; font-size: .8rem; margin-bottom: 5px; }
+  </style>
+  <script src="assets/js/core.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.5.2/3Dmol-min.js" defer></script>
+  <script src="assets/js/studio.js" defer></script>
+</head>
+<body data-bg="none">
+  <div id="site-nav"></div>
+  <main class="app-shell">
+    <!-- LEFT -->
+    <aside class="app-side">
+      <section>
+        <div class="panel-title">Load structure</div>
+        <div class="input-group"><input class="input input-sm mono" id="pdb-id" placeholder="PDB ID, e.g. 4HHB" maxlength="4" style="text-transform:uppercase"><button class="btn btn-sm" id="fetch">Fetch</button><button class="btn btn-sm btn-icon" id="upload" title="Open file (PDB, mmCIF, SDF, MOL2, XYZ)"></button></div>
+        <div class="row" style="gap:5px;margin-top:10px" id="examples"></div>
+      </section>
+      <section>
+        <div class="panel-title">Protein representation</div>
+        <div class="seg" id="rep" style="width:100%">
+          <button class="active" data-r="cartoon">Cartoon</button><button data-r="tube">Tube</button><button data-r="backbone">Backbone</button><button data-r="lines">Lines</button><button data-r="stick">Sticks</button><button data-r="ballstick">Ball&amp;stick</button><button data-r="sphere">Spheres</button><button data-r="none">Hide</button>
+        </div>
+        <div class="panel-title" style="margin-top:16px">Colour by</div>
+        <select class="select input-sm" id="color">
+          <option value="ss">Secondary structure</option><option value="chain" selected>Chain</option><option value="spectrum">Rainbow (N → C)</option>
+          <option value="element">Element</option><option value="amino">Residue type</option><option value="hydro">Hydrophobicity (Kyte–Doolittle)</option>
+          <option value="bfactor">B-factor (flexibility)</option><option value="single">Single colour</option>
+        </select>
+        <input type="color" class="color-input hidden" id="single-color" value="#60a5fa" style="margin-top:8px">
+        <div style="margin-top:12px">
+          <label class="check"><input type="checkbox" id="sidechains"> Show side chains</label>
+          <label class="check"><input type="checkbox" id="ligands" checked> Ligands &amp; cofactors</label>
+          <label class="check"><input type="checkbox" id="waters"> Water molecules</label>
+          <label class="check"><input type="checkbox" id="hydrogens"> Hydrogens</label>
+        </div>
+      </section>
+      <section>
+        <div class="panel-title">Molecular surface</div>
+        <div class="grid-2">
+          <select class="select input-sm" id="surf-type"><option value="none">Off</option><option value="MS">Solvent-excluded</option><option value="SAS">Solvent-accessible</option><option value="VDW">Van der Waals</option></select>
+          <select class="select input-sm" id="surf-color"><option value="white">White</option><option value="chain">Chain</option><option value="hydro">Hydrophobicity</option><option value="element">Element</option><option value="bfactor">B-factor</option></select>
+        </div>
+        <label class="field" style="margin:10px 0 0"><span>Opacity</span><input type="range" id="surf-op" min="0.1" max="1" step="0.05" value="0.7"></label>
+      </section>
+      <section>
+        <div class="panel-title">Scene</div>
+        <div class="grid-2">
+          <select class="select input-sm" id="bg"><option value="#070a12">Midnight</option><option value="#000000">Black</option><option value="#ffffff">White</option><option value="#1f2937">Slate</option></select>
+          <select class="select input-sm" id="proj"><option value="perspective">Perspective</option><option value="orthographic">Orthographic</option></select>
+        </div>
+        <div class="row" style="margin-top:10px;gap:10px"><label class="check"><input type="checkbox" id="outline"> Outline</label><label class="check"><input type="checkbox" id="spin"> Spin</label><label class="check"><input type="checkbox" id="fog" checked> Depth fog</label></div>
+      </section>
+    </aside>
+
+    <!-- CENTER -->
+    <div class="app-main">
+      <div class="app-topbar">
+        <b id="title" style="font-size:.86rem">No structure loaded</b>
+        <span class="badge hidden" id="title-badge"></span>
+        <div style="margin-left:auto" class="row">
+          <button class="btn btn-sm btn-ghost" id="reset">Reset view</button>
+          <button class="btn btn-sm btn-ghost" id="shot">PNG</button>
+          <button class="btn btn-sm btn-ghost" id="full">Fullscreen</button>
+          <button class="btn btn-sm" id="save"></button>
+        </div>
+      </div>
+      <div class="app-stage" id="stage">
+        <div class="viewer-host" id="viewer"></div>
+        <div class="empty" id="stage-empty" style="position:absolute;inset:0;z-index:3;pointer-events:none"><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7 3c0 4 10 5 10 9s-10 5-10 9"/><path d="M17 3c0 4-10 5-10 9s10 5 10 9"/><path d="M8.5 7h7M8.5 17h7M10 12h4"/></svg><h3 style="color:var(--text)">Open a structure</h3><p>Fetch any of 200,000+ entries from the Protein Data Bank, or open a local file.</p></div></div>
+        <div class="hud tr hidden" id="measure-hud"><div class="hud-card" style="border-color:var(--amber)">Measuring <b id="mh-kind">distance</b>: pick atoms · <span id="mh-count">0</span> selected</div></div>
+        <div class="hud bl"><div class="hud-card mono hidden" id="sel-hud" style="font-size:.74rem;max-width:420px"></div></div>
+      </div>
+      <div class="seq-strip hidden" id="seq-strip">
+        <select class="select input-sm" id="seq-chain" style="width:auto"></select>
+        <div class="seq" id="seq"></div>
+        <div class="seq-legend"><span style="color:#f472b6">▬</span> helix <span style="color:#fbbf24">▬</span> sheet</div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <aside class="app-side right">
+      <section style="padding-bottom:0"><div class="tabs" style="margin:0"><button class="active" data-tab="chains">Chains</button><button data-tab="select">Select</button><button data-tab="measure">Measure</button><button data-tab="info">Info</button></div></section>
+      <section data-pane="chains"><div id="chains"><p class="muted" style="font-size:.84rem">Chains appear here once a structure is loaded.</p></div></section>
+      <section data-pane="select" class="hidden">
+        <div class="panel-title">Binding site</div>
+        <div class="input-group"><select class="select input-sm" id="site-lig"><option value="">No ligands</option></select><select class="select input-sm" id="site-r" style="width:80px"><option>4</option><option selected>5</option><option>6</option><option>8</option></select></div>
+        <button class="btn btn-sm btn-block" id="site-go" style="margin-top:8px">Show pocket residues</button>
+        <hr class="divider">
+        <div class="panel-title">Custom selection</div>
+        <div class="grid-2">
+          <label class="field"><span>Chain</span><select class="select input-sm" id="q-chain"><option value="">Any</option></select></label>
+          <label class="field"><span>Residues</span><input class="input input-sm mono" id="q-resi" placeholder="10-40, 57"></label>
+          <label class="field"><span>Residue names</span><input class="input input-sm mono" id="q-resn" placeholder="HIS, CYS"></label>
+          <label class="field"><span>Atom names</span><input class="input input-sm mono" id="q-atom" placeholder="CA, CB"></label>
+          <label class="field"><span>Element</span><input class="input input-sm mono" id="q-elem" placeholder="S, FE"></label>
+          <label class="field"><span>Display as</span><select class="select input-sm" id="q-style"><option value="stick">Sticks</option><option value="ballstick">Ball &amp; stick</option><option value="sphere">Spheres</option><option value="surface">Surface</option><option value="cartoon">Cartoon</option></select></label>
+        </div>
+        <div class="row" style="gap:6px"><input type="color" id="q-color" value="#22d3ee" class="color-input" style="width:44px;flex:none"><label class="check"><input type="checkbox" id="q-label"> Label residues</label></div>
+        <div class="row" style="gap:6px;margin-top:10px"><button class="btn btn-sm btn-primary" id="q-add">Add layer</button><button class="btn btn-sm" id="q-zoom">Zoom to</button><button class="btn btn-sm" id="q-isolate">Isolate</button></div>
+        <hr class="divider">
+        <div class="row-between"><div class="panel-title" style="margin:0">Layers</div><button class="btn btn-xs btn-ghost" id="layers-clear">Clear all</button></div>
+        <div id="layers" style="margin-top:8px"><p class="muted" style="font-size:.8rem">No custom layers.</p></div>
+      </section>
+      <section data-pane="measure" class="hidden">
+        <div class="seg seg-block" id="m-kind"><button class="active" data-k="2">Distance</button><button data-k="3">Angle</button><button data-k="4">Dihedral</button></div>
+        <p class="hint-line muted" style="font-size:.8rem;margin:10px 0">While this tab is open, click atoms in the viewer to measure. Results stay on screen until you clear them.</p>
+        <div id="measures"></div>
+        <button class="btn btn-sm btn-block" id="m-clear">Clear measurements</button>
+      </section>
+      <section data-pane="info" class="hidden"><div id="info"><p class="muted" style="font-size:.84rem">Load a structure to see its details.</p></div></section>
+      <section id="atom-panel" class="hidden">
+        <div class="panel-title">Selected atom</div>
+        <div id="atom-info"></div>
+      </section>
+    </aside>
+  </main>
+</body>
+</html>

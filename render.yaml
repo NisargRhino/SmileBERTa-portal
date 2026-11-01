@@ -5,6 +5,14 @@ services:
     env: docker
     plan: free
     dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      # Optional: Postgres connection string (Neon, Supabase, Render Postgres…).
+      # Without it accounts are stored in SQLite and reset on every redeploy.
+      - key: DATABASE_URL
+        sync: false
+      - key: MODEL_CACHE_SIZE
+        value: "1"
 
   # ── Static frontend ──────────────────────────────────────────────────────
   - type: static_site
@@ -15,4 +23,4 @@ services:
     headers:
       - path: /*
         name: Cache-Control
-        value: no-cache, no-store, must-revalidate
+        value: no-cache

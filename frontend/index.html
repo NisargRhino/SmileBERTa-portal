@@ -1,414 +1,245 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmileBERTa — AI Drug Discovery</title>
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SmileBERTa — AI-powered drug discovery tools</title>
+  <meta name="description" content="Fragment prediction, drug classification, molecule building, docking and 3D structure analysis — open drug discovery tools powered by transformer models.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    .hero { position: relative; padding: 72px 0 90px; overflow: hidden; }
+    #hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; opacity: .55; }
+    .hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 56px; align-items: center; }
+    .hero h1 { margin: 22px 0 22px; font-size: clamp(2.6rem, 5.4vw, 4.4rem); }
+    .hero .lead { font-size: 1.15rem; color: var(--text-2); max-width: 560px; margin-bottom: 34px; }
+    .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+    .hero-meta { display: flex; gap: 22px; margin-top: 38px; color: var(--muted); font-size: .84rem; flex-wrap: wrap; }
+    .hero-meta span { display: inline-flex; align-items: center; gap: 7px; }
+    .hero-meta svg { width: 15px; height: 15px; color: var(--green); }
+    .window { position: relative; border-radius: 18px; background: rgba(10, 14, 26, .78); border: 1px solid var(--border-strong); box-shadow: 0 40px 120px -30px rgba(34,211,238,.25), 0 30px 80px -20px rgba(0,0,0,.8); overflow: hidden; backdrop-filter: blur(10px); }
+    .window-bar { display: flex; align-items: center; gap: 7px; padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: .76rem; color: var(--muted); }
+    .window-bar i { width: 10px; height: 10px; border-radius: 50%; background: #2a3142; display: inline-block; }
+    .window-bar i:nth-child(1) { background: #ff5f57; } .window-bar i:nth-child(2) { background: #febc2e; } .window-bar i:nth-child(3) { background: #28c840; }
+    .window-bar .addr { margin-left: 10px; font-family: var(--mono); background: rgba(255,255,255,.04); padding: 3px 10px; border-radius: 6px; }
+    #hero-mol { height: 400px; position: relative; }
+    .float-chip { position: absolute; z-index: 4; padding: 10px 14px; border-radius: 12px; background: rgba(8, 11, 20, .85); border: 1px solid var(--border-strong); backdrop-filter: blur(10px); font-size: .78rem; box-shadow: var(--shadow); animation: bob 6s ease-in-out infinite; }
+    .float-chip .k { color: var(--muted); font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; }
+    .float-chip .v { font-family: var(--display); font-weight: 600; font-size: 1.02rem; color: #fff; }
+    .fc1 { top: 64px; left: -18px; } .fc2 { top: 46%; right: -16px; animation-delay: -2s; } .fc3 { bottom: 74px; left: 8%; animation-delay: -4s; }
+    @keyframes bob { 50% { transform: translateY(-10px); } }
+    .smiles-ticker { font-family: var(--mono); font-size: .74rem; color: #7dd3fc; padding: 10px 14px; border-top: 1px solid var(--border); white-space: nowrap; overflow: hidden; }
+    .smiles-ticker .caret { display: inline-block; width: 7px; height: 13px; background: var(--cyan); vertical-align: -2px; animation: blink 1s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
 
-        :root {
-            --blue: #0071e3;
-            --blue-hover: #0077ed;
-            --bg: #000;
-            --surface: #111;
-            --text: #f5f5f7;
-            --muted: #86868b;
-            --font: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-        }
+    .logos { display: flex; justify-content: center; gap: 44px; flex-wrap: wrap; color: var(--faint); font-family: var(--display); font-weight: 600; font-size: 1.05rem; letter-spacing: -.01em; }
+    .logos span { transition: color .2s; } .logos span:hover { color: var(--text-2); }
 
-        html { scroll-behavior: smooth; }
+    .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .tool-card { display: flex; flex-direction: column; min-height: 260px; color: var(--text); overflow: hidden; }
+    .tool-card:hover { color: var(--text); }
+    .tool-card h3 { margin: 18px 0 8px; font-size: 1.2rem; }
+    .tool-card p { color: var(--muted); font-size: .92rem; flex: 1; }
+    .tool-card .go { display: inline-flex; align-items: center; gap: 6px; font-size: .86rem; font-weight: 600; color: var(--cyan); }
+    .tool-card .go svg { width: 15px; height: 15px; transition: transform .2s; }
+    .tool-card:hover .go svg { transform: translateX(4px); }
+    .tool-card .corner { position: absolute; top: 22px; right: 22px; }
+    .tool-card::after { content: ''; position: absolute; width: 240px; height: 240px; right: -90px; bottom: -120px; background: radial-gradient(circle, rgba(34,211,238,.13), transparent 70%); opacity: 0; transition: opacity .3s; pointer-events: none; }
+    .tool-card:hover::after { opacity: 1; }
 
-        body {
-            font-family: var(--font);
-            background: var(--bg);
-            color: var(--text);
-            overflow-x: hidden;
-        }
+    .pipeline { padding: 34px; }
+    .pipe-row { display: grid; grid-template-columns: 1.1fr auto 1.2fr auto 1fr auto 1fr; align-items: center; gap: 14px; }
+    .pipe-step .label { font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .pipe-arrow { color: var(--faint); } .pipe-arrow svg { width: 22px; height: 22px; }
+    .pipe-smiles { font-family: var(--mono); font-size: .85rem; color: #7dd3fc; background: rgba(0,0,0,.3); padding: 12px; border-radius: 10px; border: 1px solid var(--border); word-break: break-all; }
+    .tokens { display: flex; flex-wrap: wrap; gap: 5px; }
+    .tok { font-family: var(--mono); font-size: .74rem; padding: 4px 7px; border-radius: 6px; background: rgba(59,130,246,.12); border: 1px solid rgba(59,130,246,.35); color: #bfdbfe; opacity: 0; transform: translateY(6px); }
+    .pipeline.in .tok { animation: tokIn .4s var(--ease) forwards; }
+    @keyframes tokIn { to { opacity: 1; transform: none; } }
+    .layers { display: flex; flex-direction: column; gap: 5px; }
+    .layer { height: 14px; border-radius: 4px; background: rgba(255,255,255,.05); border: 1px solid var(--border); position: relative; overflow: hidden; }
+    .layer::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(34,211,238,.55), transparent); transform: translateX(-100%); animation: sweep 2.4s ease-in-out infinite; }
+    .layer:nth-child(2)::after { animation-delay: .15s; } .layer:nth-child(3)::after { animation-delay: .3s; } .layer:nth-child(4)::after { animation-delay: .45s; } .layer:nth-child(5)::after { animation-delay: .6s; } .layer:nth-child(6)::after { animation-delay: .75s; }
+    @keyframes sweep { 60%, 100% { transform: translateX(100%); } }
+    .pipe-out .o { padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: rgba(0,0,0,.25); margin-bottom: 8px; font-size: .82rem; }
+    .pipe-out .o b { display: block; font-family: var(--mono); font-weight: 500; color: var(--green); font-size: .78rem; word-break: break-all; }
 
-        /* NAV */
-        nav {
-            position: sticky;
-            top: 0;
-            z-index: 9800;
-            background: rgba(0,0,0,0.82);
-            backdrop-filter: saturate(180%) blur(20px);
-            -webkit-backdrop-filter: saturate(180%) blur(20px);
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
+    .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative; }
+    .flow::before { content: ''; position: absolute; top: 27px; left: 12%; right: 12%; height: 2px; background: linear-gradient(90deg, var(--blue), var(--cyan), var(--teal)); transform-origin: left; transform: scaleX(0); transition: transform 1.6s var(--ease); }
+    .flow.in::before { transform: scaleX(1); }
+    .flow-step { text-align: center; padding: 0 14px; }
+    .flow-step .n { width: 56px; height: 56px; margin: 0 auto 18px; border-radius: 50%; display: grid; place-items: center; background: var(--bg); border: 2px solid var(--border-strong); font-family: var(--display); font-weight: 700; position: relative; z-index: 1; transition: border-color .4s, box-shadow .4s; }
+    .flow.in .flow-step .n { border-color: var(--cyan); box-shadow: 0 0 24px -4px rgba(34,211,238,.6); }
+    .flow-step h4 { margin-bottom: 6px; } .flow-step p { color: var(--muted); font-size: .88rem; }
 
-        .nav-inner {
-            max-width: 1080px;
-            margin: 0 auto;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-        }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+    .stats > div { background: var(--bg-2); padding: 34px 26px; }
+    .stats .n { font-family: var(--display); font-size: 2.6rem; font-weight: 700; letter-spacing: -.03em; line-height: 1; }
+    .stats .l { color: var(--muted); font-size: .88rem; margin-top: 10px; }
 
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-        }
+    .learn-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .learn-card { color: var(--text); padding: 22px; }
+    .learn-card:hover { color: var(--text); }
+    .learn-card h4 { margin: 14px 0 6px; } .learn-card p { color: var(--muted); font-size: .86rem; margin: 0; }
 
-        .nav-brand img {
-            height: 56px;
-            width: auto;
-        }
+    .cta { text-align: center; padding: 72px 32px; border-radius: 28px; position: relative; overflow: hidden; background: radial-gradient(ellipse at 50% 0%, rgba(59,130,246,.25), transparent 60%), radial-gradient(ellipse at 50% 120%, rgba(45,212,191,.18), transparent 60%), var(--bg-2); border: 1px solid var(--border-strong); }
+    .cta h2 { max-width: 700px; margin: 0 auto 16px; }
+    .cta p { color: var(--text-2); max-width: 560px; margin: 0 auto 30px; }
+    .about-card { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
 
-        .nav-links {
-            display: flex;
-            gap: 28px;
-            align-items: center;
-        }
-
-        .nav-links a {
-            font-size: 0.82rem;
-            color: var(--text);
-            text-decoration: none;
-            opacity: 0.75;
-            transition: opacity 0.2s;
-        }
-
-        .nav-links a:hover { opacity: 1; }
-
-        .nav-username {
-            font-size: 0.82rem;
-            color: var(--text);
-            opacity: 0.75;
-        }
-
-        .nav-signout-btn {
-            font-size: 0.82rem;
-            color: var(--text);
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 980px;
-            padding: 5px 14px;
-            cursor: pointer;
-            font-family: var(--font);
-            transition: border-color 0.2s;
-        }
-
-        .nav-signout-btn:hover { border-color: rgba(255,255,255,0.5); }
-
-        .nav-signin-link {
-            font-size: 0.82rem;
-            color: var(--blue);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        /* HERO */
-        .hero {
-            position: relative;
-            height: 100vh;
-            min-height: 620px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            overflow: hidden;
-        }
-
-        .hero-bg {
-            position: absolute;
-            inset: 0;
-            background-image: url('https://images.unsplash.com/photo-1614935151651-0bea6508db6b?w=1920&q=80');
-            background-size: cover;
-            background-position: center;
-            filter: brightness(0.28);
-            transform: scale(1.04);
-        }
-
-        .hero-gradient {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to bottom, rgba(0,0,0,0) 60%, rgba(0,0,0,1) 100%);
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 1;
-            padding: 0 24px;
-            max-width: 860px;
-        }
-
-        .eyebrow {
-            font-size: 0.82rem;
-            font-weight: 600;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: var(--blue);
-            margin-bottom: 22px;
-        }
-
-        .hero h1 {
-            font-size: clamp(3rem, 7.5vw, 6rem);
-            font-weight: 700;
-            letter-spacing: -0.04em;
-            line-height: 1.04;
-            margin-bottom: 24px;
-        }
-
-        .hero p {
-            font-size: clamp(1rem, 2.2vw, 1.25rem);
-            color: var(--muted);
-            max-width: 560px;
-            margin: 0 auto 40px;
-            line-height: 1.65;
-        }
-
-        .btn {
-            display: inline-block;
-            background: var(--blue);
-            color: #fff;
-            text-decoration: none;
-            font-size: 0.92rem;
-            font-weight: 500;
-            padding: 14px 28px;
-            border-radius: 980px;
-            transition: background 0.2s, transform 0.15s;
-        }
-
-        .btn:hover {
-            background: var(--blue-hover);
-            transform: scale(1.03);
-            color: #fff;
-            text-decoration: none;
-        }
-
-        .btn-ghost {
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.25);
-            color: var(--text);
-            margin-left: 12px;
-        }
-
-        .btn-ghost:hover {
-            background: rgba(255,255,255,0.08);
-            border-color: rgba(255,255,255,0.4);
-            color: var(--text);
-        }
-
-        .scroll-cue {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            color: var(--muted);
-            font-size: 0.72rem;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            animation: cue 2.2s ease-in-out infinite;
-        }
-
-        @keyframes cue {
-            0%, 100% { opacity: 0.5; transform: translateX(-50%) translateY(0); }
-            50% { opacity: 0.9; transform: translateX(-50%) translateY(7px); }
-        }
-
-        /* FEATURE SECTIONS */
-        .feature {
-            position: relative;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            overflow: hidden;
-        }
-
-        .feature-bg {
-            position: absolute;
-            inset: 0;
-            background-size: cover;
-            background-position: center;
-            filter: brightness(0.22);
-        }
-
-        .feature-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.6) 100%);
-        }
-
-        .feature-content {
-            position: relative;
-            z-index: 1;
-            max-width: 680px;
-            padding: 80px 28px;
-        }
-
-        .feature-tag {
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--blue);
-            margin-bottom: 18px;
-        }
-
-        .feature h2 {
-            font-size: clamp(2.2rem, 5.5vw, 4rem);
-            font-weight: 700;
-            letter-spacing: -0.035em;
-            line-height: 1.08;
-            margin-bottom: 22px;
-        }
-
-        .feature p {
-            font-size: 1.05rem;
-            color: var(--muted);
-            line-height: 1.72;
-            margin-bottom: 38px;
-            max-width: 520px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* ABOUT */
-        .about {
-            background: var(--surface);
-            padding: 130px 24px;
-            text-align: center;
-        }
-
-        .about-inner {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .about h2 {
-            font-size: clamp(2rem, 4.5vw, 3.2rem);
-            font-weight: 700;
-            letter-spacing: -0.035em;
-            margin-bottom: 24px;
-        }
-
-        .about p {
-            font-size: 1rem;
-            color: var(--muted);
-            line-height: 1.75;
-            margin-bottom: 12px;
-        }
-
-        .about a {
-            color: var(--blue);
-            text-decoration: none;
-        }
-
-        .about a:hover { text-decoration: underline; }
-
-        /* FOOTER */
-        footer {
-            background: var(--bg);
-            border-top: 1px solid rgba(255,255,255,0.08);
-            padding: 40px 24px;
-            text-align: center;
-            font-size: 0.78rem;
-            color: var(--muted);
-        }
-
-        @media (max-width: 640px) {
-            .nav-links { gap: 16px; }
-            .btn-ghost { display: none; }
-        }
-    </style>
+    @media (max-width: 1000px) {
+      .hero-grid, .about-card { grid-template-columns: 1fr; }
+      .tools-grid, .learn-grid { grid-template-columns: 1fr 1fr; }
+      .pipe-row { grid-template-columns: 1fr; } .pipe-arrow { transform: rotate(90deg); justify-self: center; }
+      .flow { grid-template-columns: 1fr 1fr; row-gap: 30px; } .flow::before { display: none; }
+      .stats { grid-template-columns: 1fr 1fr; }
+      .fc1 { left: 8px; } .fc2 { right: 8px; }
+    }
+    @media (max-width: 620px) { .tools-grid, .learn-grid { grid-template-columns: 1fr; } }
+  </style>
+  <script src="assets/js/core.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.5.2/3Dmol-min.js" defer></script>
+  <script src="assets/js/home.js" defer></script>
 </head>
 <body>
+  <div id="site-nav"></div>
 
-    <nav>
-        <div class="nav-inner">
-            <a href="index.html" class="nav-brand"><img src="smileberta.png" alt="SmileBERTa"></a>
-            <div class="nav-links">
-                <a href="combine.html">Combine</a>
-                <a href="fragmentation.html">Fragmentation</a>
-                <a href="drug_class.html">Drug Classification</a>
-                <a href="#about">About</a>
-                <div id="nav-auth" style="display:flex;align-items:center;gap:12px;"></div>
-            </div>
+  <header class="hero">
+    <canvas id="hero-canvas" aria-hidden="true"></canvas>
+    <div class="container hero-grid">
+      <div>
+        <a class="pill-link reveal" href="docking.html"><span class="badge">New</span> Protein–ligand docking with AutoDock Vina →</a>
+        <h1 class="reveal" data-delay="1">Drug discovery,<br><span class="grad-text">accelerated by AI.</span></h1>
+        <p class="lead reveal" data-delay="2">SmileBERTa brings transformer models, physics-based docking and interactive 3D chemistry together in one workspace. Predict fragments, classify compounds, build molecules and dock them into protein targets, all in your browser.</p>
+        <div class="hero-ctas reveal" data-delay="3">
+          <a class="btn btn-primary btn-lg" href="#tools">Explore the toolkit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          <a class="btn btn-lg" href="learn.html">How it works</a>
         </div>
-    </nav>
-
-    <!-- HERO -->
-    <section class="hero">
-        <div class="hero-bg"></div>
-        <div class="hero-gradient"></div>
-        <div class="hero-content">
-            <img src="smileberta.png" alt="SmileBERTa" style="height:180px;width:auto;margin-bottom:28px;">
-            <p class="eyebrow">AI-Powered Drug Discovery</p>
-            <h1>The Future of Molecular Research</h1>
-            <p>SmileBERTa uses transformer models trained on SMILES notation to fragment, classify, and combine drug-like molecules — accelerating every step of your discovery pipeline.</p>
-            <a href="fragmentation.html" class="btn">Get Started</a>
-            <a href="#fragmentation" class="btn btn-ghost">Learn More</a>
+        <div class="hero-meta reveal" data-delay="4">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Free &amp; open</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>No install</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Save work to your account</span>
         </div>
-        <div class="scroll-cue">
-            <span>Scroll</span>
-            <svg width="14" height="18" viewBox="0 0 14 18" fill="none">
-                <path d="M7 0v15M1 10l6 7 6-7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+      </div>
+      <div class="reveal" data-delay="2" style="position:relative">
+        <div class="window">
+          <div class="window-bar"><i></i><i></i><i></i><span class="addr">smileberta / classify / imatinib</span></div>
+          <div id="hero-mol"></div>
+          <div class="smiles-ticker"><span id="ticker"></span><span class="caret"></span></div>
         </div>
-    </section>
+        <div class="float-chip fc1"><div class="k">Predicted class</div><div class="v grad-text">Antineoplastic</div></div>
+        <div class="float-chip fc2"><div class="k">Mol. weight</div><div class="v">493.6 Da</div></div>
+        <div class="float-chip fc3"><div class="k">Lipinski</div><div class="v" style="color:var(--green)">0 violations</div></div>
+      </div>
+    </div>
+  </header>
 
-    <!-- FRAGMENTATION -->
-    <section class="feature" id="fragmentation">
-        <div class="feature-bg" style="background-image: url('https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=1920&q=80');"></div>
-        <div class="feature-overlay"></div>
-        <div class="feature-content">
-            <p class="feature-tag">Fragment-Based Discovery</p>
-            <h2>Fragmentation Generator</h2>
-            <p>Decompose complex drug-like molecules into optimal fragments. Our model predicts which pieces bind best to your target protein — so you can focus on what matters.</p>
-            <a href="fragmentation.html" class="btn">Explore Fragmentation</a>
+  <section class="section-sm" style="padding-top:10px">
+    <div class="container">
+      <p class="center muted reveal" style="font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:22px">Built on proven open science</p>
+      <div class="logos reveal" data-delay="1"><span>RDKit</span><span>PyTorch</span><span>Hugging Face</span><span>AutoDock Vina</span><span>Open Babel</span><span>3Dmol.js</span><span>RCSB PDB</span></div>
+    </div>
+  </section>
+
+  <section class="section" id="tools">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="eyebrow">The toolkit</div>
+        <h2>Six tools. One discovery pipeline.</h2>
+        <p>From a SMILES string to a docked lead candidate. Every tool shares one workspace, so results flow from one step to the next.</p>
+      </div>
+      <div class="tools-grid" id="tool-cards"></div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:20px">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="eyebrow">Under the hood</div>
+        <h2>Chemistry, read like language.</h2>
+        <p>SmileBERTa models read a molecule's SMILES string the way a language model reads a sentence. Each string is split into tokens and passed through six transformer layers, which predict a fragment or a therapeutic class.</p>
+      </div>
+      <div class="card card-glow pipeline reveal" id="pipeline">
+        <div class="pipe-row">
+          <div class="pipe-step"><div class="label">1 · Input SMILES</div><div class="pipe-smiles">CC(=O)Oc1ccccc1C(=O)O</div><div class="muted" style="font-size:.78rem;margin-top:8px">Aspirin</div></div>
+          <div class="pipe-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+          <div class="pipe-step"><div class="label">2 · Tokenize (BPE)</div><div class="tokens" id="tokens"></div></div>
+          <div class="pipe-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+          <div class="pipe-step"><div class="label">3 · RoBERTa × 6 layers</div><div class="layers"><div class="layer"></div><div class="layer"></div><div class="layer"></div><div class="layer"></div><div class="layer"></div><div class="layer"></div></div><div class="muted" style="font-size:.74rem;margin-top:8px">768-d · 12 attention heads</div></div>
+          <div class="pipe-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+          <div class="pipe-step pipe-out"><div class="label">4 · Decode</div><div class="o">Class<b>hematologic</b></div><div class="o">Validated by<b>RDKit</b></div></div>
         </div>
-    </section>
+      </div>
+      <p class="center" style="margin-top:22px"><a href="learn-fragmentation.html">Read the full technical walkthrough →</a></p>
+    </div>
+  </section>
 
-    <!-- DRUG CLASS -->
-    <section class="feature" id="drug-class">
-        <div class="feature-bg" style="background-image: url('https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1920&q=80');"></div>
-        <div class="feature-overlay"></div>
-        <div class="feature-content">
-            <p class="feature-tag">Predictive Classification</p>
-            <h2>Drug Classification</h2>
-            <p>Input a SMILES string and our fine-tuned RoBERTa model instantly classifies the compound by drug type. Data-driven decisions at molecular speed.</p>
-            <a href="drug_class.html" class="btn">Classify a Compound</a>
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="eyebrow">Workflow</div>
+        <h2>From hit to lead in one place.</h2>
+      </div>
+      <div class="flow reveal" id="flow">
+        <div class="flow-step"><div class="n">1</div><h4>Classify</h4><p>Profile a compound's likely therapeutic class and drug-likeness.</p></div>
+        <div class="flow-step"><div class="n">2</div><h4>Fragment</h4><p>Predict the fragment most likely to matter for binding.</p></div>
+        <div class="flow-step"><div class="n">3</div><h4>Build &amp; link</h4><p>Combine fragments and refine geometry with MMFF94.</p></div>
+        <div class="flow-step"><div class="n">4</div><h4>Dock</h4><p>Score poses against your target with AutoDock Vina.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-sm">
+    <div class="container">
+      <div class="stats reveal">
+        <div><div class="n grad-text" data-count="8336">0</div><div class="l">Labelled compounds behind the classifier</div></div>
+        <div><div class="n grad-text" data-count="25364">0</div><div class="l">Reference fragments for SMILES correction</div></div>
+        <div><div class="n grad-text" data-count="12">0</div><div class="l">Therapeutic categories recognised</div></div>
+        <div><div class="n grad-text" data-count="200000" data-suffix="+">0</div><div class="l">Protein structures one click away via RCSB</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="row-between reveal" style="margin-bottom:34px;align-items:flex-end">
+        <div><div class="eyebrow">Learn</div><h2 style="margin:0">The science, explained.</h2></div>
+        <a class="btn" href="learn.html">All guides</a>
+      </div>
+      <div class="learn-grid" id="learn-cards"></div>
+    </div>
+  </section>
+
+  <section class="section" id="about">
+    <div class="container">
+      <div class="card about-card reveal" style="padding:44px">
+        <div>
+          <div class="eyebrow">About</div>
+          <h2>Built to make drug discovery accessible.</h2>
+          <p class="text-2">SmileBERTa started as a research project on fragment-based drug discovery with chemical language models. It has grown into an open platform where students, researchers and anyone curious can use computational chemistry tools that usually require expensive software and specialised setups.</p>
+          <p class="text-2">Built by Nisarg Shah. Questions or collaborations: <a href="mailto:nisargs2018@gmail.com">nisargs2018@gmail.com</a></p>
         </div>
-    </section>
-
-    <!-- COMBINE -->
-    <section class="feature" id="combine">
-        <div class="feature-bg" style="background-image: url('https://images.unsplash.com/photo-1576086213369-97a306d36557?w=1920&q=80');"></div>
-        <div class="feature-overlay"></div>
-        <div class="feature-content">
-            <p class="feature-tag">Fragment Combination</p>
-            <h2>Combine Fragments</h2>
-            <p>Select two fragments from your library and intelligently merge them into novel drug candidates. Preview results in interactive 2D and 3D molecular views.</p>
-            <a href="combine.html" class="btn">Combine Fragments</a>
+        <div class="stack">
+          <div class="list-item"><div class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/></svg></div><div><b>Transformer models</b><div class="muted" style="font-size:.86rem">ChemBERTa-initialised RoBERTa models fine-tuned for fragments and classes</div></div></div>
+          <div class="list-item"><div class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><div><b>Physics-based validation</b><div class="muted" style="font-size:.86rem">MMFF94 force fields and AutoDock Vina scoring</div></div></div>
+          <div class="list-item"><div class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div><b>Your private workspace</b><div class="muted" style="font-size:.86rem">Save molecules, docking runs and structures to your account</div></div></div>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <!-- ABOUT -->
-    <section class="about" id="about">
-        <div class="about-inner">
-            <h2>About SmileBERTa</h2>
-            <p>SmileBERTa is an AI-driven research platform built to accelerate fragment-based drug discovery. Powered by transformer models trained on SMILES chemical notation, it brings modern machine learning into your molecular pipeline.</p>
-            <p>Built by Nisarg Shah · Del Norte High School<br>
-            <a href="mailto:nisargs2018@gmail.com">nisargs2018@gmail.com</a></p>
-        </div>
-    </section>
+  <section class="section-sm">
+    <div class="container">
+      <div class="cta reveal">
+        <h2>Start your next discovery today.</h2>
+        <p>Create a free account to save molecules, docking runs and annotated structures to your personal workspace.</p>
+        <div class="row" style="justify-content:center"><a class="btn btn-primary btn-lg" href="login.html?mode=register">Create free account</a><a class="btn btn-lg" href="builder.html">Open the builder</a></div>
+      </div>
+    </div>
+  </section>
 
-    <footer>
-        <p>© 2025 SmileBERTa · Built for drug discovery research</p>
-    </footer>
-
-    <script src="auth.js"></script>
-    <script>renderNavAuth('nav-auth');</script>
+  <div id="site-footer"></div>
 </body>
 </html>

@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How fragment prediction works — SmileBERTa</title>
+  <meta name="description" content="A technical walkthrough of SmileBERTa's fragment prediction: SMILES, BPE tokenization, the RoBERTa encoder, decoding and validation.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    .figure .tk { opacity: 0; transform: translateY(6px); transition: opacity .4s, transform .4s; }
+    .figure.in .tk { opacity: 1; transform: none; }
+    .figure .grow-bar { transform-origin: left; transform: scaleX(0); transition: transform 1s var(--ease); }
+    .figure.in .grow-bar { transform: scaleX(1); }
+    .figure .attn rect { transition: opacity .6s; }
+  </style>
+  <script src="assets/js/core.js" defer></script>
+  <script src="assets/js/learn.js" defer></script>
+</head>
+<body>
+  <div id="site-nav"></div>
+  <main class="container">
+    <div class="page-head">
+      <div class="crumbs"><a href="index.html">Home</a><span>/</span><a href="learn.html">Learn</a><span>/</span><span>Fragment prediction</span></div>
+      <div class="eyebrow">Technical guide · 12 min read</div>
+      <h1>How SmileBERTa predicts fragments</h1>
+      <p class="lead">From a SMILES string to a validated, binding-relevant fragment: the chemistry, the transformer, and every step of the inference pipeline.</p>
+    </div>
+    <div class="doc-layout">
+      <nav class="doc-toc" aria-label="On this page"></nav>
+      <article class="doc">
+
+        <h2 id="fbdd">Why fragments?</h2>
+        <p><strong>Fragment-based drug discovery (FBDD)</strong> starts small. Instead of screening millions of large, drug-sized molecules, chemists look for small molecular <em>fragments</em>, usually under 300 Da, that bind weakly but efficiently to a "hot spot" on the target protein. Those fragments are then <strong>grown</strong>, <strong>linked</strong> or <strong>merged</strong> into potent leads. Several approved drugs began this way, including vemurafenib and venetoclax.</p>
+        <p>Fragments work because they sample chemical space efficiently. A small fragment that binds at all usually makes high-quality interactions, measured as <em>ligand efficiency</em>: binding energy per heavy atom. SmileBERTa's fragment model learns which part of a larger drug-like molecule is the fragment worth keeping.</p>
+        <figure class="figure">
+          <svg viewBox="0 0 760 230" role="img" aria-label="Fragment-based discovery: screen fragments, find binders, then grow or link them into a lead">
+            <defs><linearGradient id="gF" x1="0" x2="1"><stop offset="0" stop-color="#3b82f6"/><stop offset="1" stop-color="#2dd4bf"/></linearGradient></defs>
+            <g transform="translate(20,20)">
+              <text class="dg-t" x="90" y="0" text-anchor="middle">1 · Fragment library</text>
+              <g fill="none" stroke="#60a5fa" stroke-width="2">
+                <polygon points="40,40 55,31 70,40 70,57 55,66 40,57"/><polygon points="110,45 125,36 140,45 140,62 125,71 110,62"/>
+                <polygon points="45,110 60,101 75,110 75,127 60,136 45,127"/><polygon points="115,115 130,106 145,115 145,132 130,141 115,132"/>
+                <path d="M70 40 l14 -8" /><path d="M140 62 l14 8"/><path d="M75 127 l14 8 l14 -8"/>
+              </g>
+              <text class="dg-s" x="90" y="175" text-anchor="middle">small (&lt; 300 Da), simple molecules</text>
+            </g>
+            <path class="dg-flow" d="M200 100 H260"/>
+            <g transform="translate(270,20)">
+              <text class="dg-t" x="110" y="0" text-anchor="middle">2 · Bind a hot spot</text>
+              <path d="M20 40 Q20 150 110 150 Q200 150 200 40" fill="rgba(59,130,246,.08)" stroke="#475569" stroke-width="2"/>
+              <circle cx="110" cy="128" r="20" fill="rgba(45,212,191,.15)" stroke="#2dd4bf" stroke-dasharray="4 3"/>
+              <polygon points="96,118 110,110 124,118 124,134 110,142 96,134" fill="none" stroke="url(#gF)" stroke-width="2.5"/>
+              <text class="dg-s" x="110" y="175" text-anchor="middle">weak but efficient binding</text>
+            </g>
+            <path class="dg-flow" d="M490 100 H550"/>
+            <g transform="translate(560,20)">
+              <text class="dg-t" x="90" y="0" text-anchor="middle">3 · Grow / link → lead</text>
+              <path d="M0 40 Q0 150 90 150 Q180 150 180 40" fill="rgba(59,130,246,.08)" stroke="#475569" stroke-width="2"/>
+              <g fill="none" stroke="url(#gF)" stroke-width="2.5"><polygon points="50,118 64,110 78,118 78,134 64,142 50,134"/><polygon points="104,104 118,96 132,104 132,120 118,128 104,120"/><path d="M78 118 L104 112"/></g>
+              <text class="dg-s" x="90" y="175" text-anchor="middle">potent, drug-like candidate</text>
+            </g>
+          </svg>
+          <figcaption>Figure 1. The fragment-based discovery workflow. SmileBERTa covers step 2 computationally (predicting the fragment), and the Fragment Linking and Docking tools cover step 3.</figcaption>
+        </figure>
+        <h3>The Rule of Three</h3>
+        <p>Good fragments usually satisfy the <strong>Rule of Three</strong> (Congreve et al., 2003), the fragment counterpart of Lipinski's Rule of Five. SmileBERTa checks every predicted fragment against it:</p>
+        <div class="table-wrap spec-table"><table class="table"><thead><tr><th>Property</th><th>Rule of Three</th><th>Why it matters</th></tr></thead><tbody>
+          <tr><td>Molecular weight</td><td class="mono">≤ 300 Da</td><td>Leaves room to grow into a drug-sized lead</td></tr>
+          <tr><td>cLogP</td><td class="mono">≤ 3</td><td>Keeps the fragment soluble at screening concentrations</td></tr>
+          <tr><td>H-bond donors / acceptors</td><td class="mono">≤ 3 each</td><td>Limits desolvation penalties</td></tr>
+          <tr><td>Rotatable bonds</td><td class="mono">≤ 3</td><td>Rigid fragments lose less entropy on binding</td></tr>
+          <tr><td>Polar surface area</td><td class="mono">≤ 60 Å²</td><td>Supports permeability once elaborated</td></tr>
+        </tbody></table></div>
+
+        <h2 id="smiles">Molecules as text: SMILES</h2>
+        <p>A <strong>SMILES</strong> string (Simplified Molecular-Input Line-Entry System) writes a molecule as a line of characters. Atoms are element symbols (lower-case means aromatic), branches go in parentheses, <code>=</code> and <code>#</code> mark double and triple bonds, and matching digits close rings. Because a molecule becomes a sentence, methods from natural-language processing can be applied directly to chemistry.</p>
+        <figure class="figure">
+          <svg viewBox="0 0 760 190" role="img" aria-label="Aspirin SMILES annotated by functional group">
+            <text x="380" y="70" text-anchor="middle" style="font:500 34px 'JetBrains Mono',monospace" fill="#e9edf5"><tspan fill="#f472b6">CC(=O)</tspan><tspan fill="#94a3b8">O</tspan><tspan fill="#60a5fa">c1ccccc1</tspan><tspan fill="#34d399">C(=O)O</tspan></text>
+            <path d="M142 85 v12 h120 v-12" class="dg-line" stroke="#f472b6"/><text class="dg-s" x="202" y="118" text-anchor="middle" style="fill:#f9a8d4">acetyl group</text>
+            <text class="dg-s" x="292" y="118" text-anchor="middle">ester O</text>
+            <path d="M318 85 v12 h196 v-12" class="dg-line" stroke="#60a5fa"/><text class="dg-s" x="416" y="118" text-anchor="middle" style="fill:#93c5fd">benzene ring: aromatic c, ring closed by “1 … 1”</text>
+            <path d="M520 85 v12 h118 v-12" class="dg-line" stroke="#34d399"/><text class="dg-s" x="579" y="118" text-anchor="middle" style="fill:#6ee7b7">carboxylic acid</text>
+            <text class="dg-s" x="380" y="160" text-anchor="middle">Aspirin, C9H8O4: 13 heavy atoms written as 21 characters</text>
+          </svg>
+          <figcaption>Figure 2. Reading a SMILES string. Branches <code>( )</code> hang off the previous atom, and the ring-closure digits pair up to close the benzene ring.</figcaption>
+        </figure>
+
+        <h2 id="tokens">Tokenization</h2>
+        <p>Before the model sees a molecule, the SMILES string is split into <strong>tokens</strong> using a byte-pair encoding (BPE) vocabulary of <strong>767 tokens</strong> learned from chemical data. Frequent substrings such as <code>CC</code>, <code>(=</code> or <code>ccccc</code> become single tokens, so the model works with meaningful chemical "words" rather than individual characters. Below is the actual tokenization SmileBERTa produces for aspirin, with each token's vocabulary ID:</p>
+        <figure class="figure">
+          <svg viewBox="0 0 760 150" role="img" aria-label="Aspirin split into BPE tokens with IDs">
+            <g id="tok-row"></g>
+            <text class="dg-s" x="20" y="130">Sequences start with &lt;s&gt; (0), end with &lt;/s&gt; (2), and are padded with &lt;pad&gt; (1) to a fixed length of 128 tokens.</text>
+          </svg>
+          <figcaption>Figure 3. The real BPE tokens and IDs for <code>CC(=O)Oc1ccccc1C(=O)O</code>, produced by the SmileBERTa tokenizer.</figcaption>
+        </figure>
+
+        <h2 id="architecture">The transformer</h2>
+        <p>SmileBERTa's models start from <strong>ChemBERTa</strong> (<code>seyonec/ChemBERTa-zinc-base-v1</code>), a RoBERTa encoder pre-trained on molecules from the ZINC database with masked-language modelling. Pre-training teaches the model SMILES grammar and common chemical patterns before it ever sees a fragment task. The fragment model is then fine-tuned from that checkpoint.</p>
+        <figure class="figure">
+          <svg viewBox="0 0 760 420" role="img" aria-label="RoBERTa encoder architecture">
+            <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#64748b"/></marker></defs>
+            <rect class="dg-box" x="230" y="370" width="300" height="38" rx="9"/><text class="dg-t" x="380" y="394" text-anchor="middle">128 token IDs</text>
+            <path d="M380 370 V350" class="dg-line" marker-end="url(#ar)"/>
+            <rect class="dg-box-hi" x="230" y="306" width="300" height="42" rx="9"/><text class="dg-t" x="380" y="325" text-anchor="middle">Token + position embeddings</text><text class="dg-s" x="380" y="340" text-anchor="middle">each token → 768-dimensional vector</text>
+            <path d="M380 306 V286" class="dg-line" marker-end="url(#ar)"/>
+            <rect x="190" y="96" width="380" height="188" rx="14" fill="rgba(34,211,238,.04)" stroke="#22d3ee" stroke-dasharray="5 4"/>
+            <text x="582" y="112" style="font:700 22px 'Space Grotesk'" fill="#22d3ee">× 6</text>
+            <rect class="dg-box" x="230" y="230" width="300" height="40" rx="9"/><text class="dg-t" x="380" y="248" text-anchor="middle">Multi-head self-attention</text><text class="dg-s" x="380" y="262" text-anchor="middle">12 heads · every token attends to every other</text>
+            <rect class="dg-box" x="230" y="190" width="300" height="28" rx="7"/><text class="dg-s" x="380" y="208" text-anchor="middle">Add &amp; LayerNorm (residual)</text>
+            <rect class="dg-box" x="230" y="138" width="300" height="40" rx="9"/><text class="dg-t" x="380" y="156" text-anchor="middle">Feed-forward network</text><text class="dg-s" x="380" y="170" text-anchor="middle">768 → 3072 → 768 · GELU</text>
+            <rect class="dg-box" x="230" y="104" width="300" height="26" rx="7"/><text class="dg-s" x="380" y="121" text-anchor="middle">Add &amp; LayerNorm (residual)</text>
+            <path d="M380 96 V76" class="dg-line" marker-end="url(#ar)"/>
+            <rect class="dg-box-gr" x="230" y="30" width="300" height="44" rx="9"/><text class="dg-t" x="380" y="50" text-anchor="middle">Language-model head</text><text class="dg-s" x="380" y="65" text-anchor="middle">768 → 767 logits at every position → argmax</text>
+            <text class="dg-s" x="40" y="250">Context mixing:</text><text class="dg-s" x="40" y="266">ring closures, branches,</text><text class="dg-s" x="40" y="282">functional groups</text>
+            <text class="dg-s" x="600" y="160">Per-token</text><text class="dg-s" x="600" y="176">transformation</text>
+          </svg>
+          <figcaption>Figure 4. The 6-layer RoBERTa encoder behind both SmileBERTa models (about 44M parameters, 176 MB in float32).</figcaption>
+        </figure>
+        <div class="table-wrap spec-table"><table class="table"><tbody>
+          <tr><td>Base checkpoint</td><td class="mono">seyonec/ChemBERTa-zinc-base-v1</td></tr>
+          <tr><td>Encoder layers / attention heads</td><td class="mono">6 / 12</td></tr>
+          <tr><td>Hidden size / feed-forward size</td><td class="mono">768 / 3072</td></tr>
+          <tr><td>Vocabulary</td><td class="mono">767 BPE tokens</td></tr>
+          <tr><td>Input length used</td><td class="mono">128 tokens (truncated / padded)</td></tr>
+          <tr><td>Fine-tuned weights</td><td class="mono"><a href="https://huggingface.co/NisargRhino/protein-models" target="_blank" rel="noopener">NisargRhino/protein-models</a></td></tr>
+        </tbody></table></div>
+        <h3>What self-attention captures</h3>
+        <p>Self-attention lets every token look at every other token and decide how much each one matters. In SMILES this is essential: a ring-closure digit at the end of a string refers back to an atom many characters earlier, and whether a group is part of a ring changes what it means chemically. Each of the 12 heads can specialise in a different relationship, such as bond partners, ring membership or nearby polar groups.</p>
+        <figure class="figure">
+          <svg viewBox="0 0 760 330" role="img" aria-label="Illustrative attention heatmap"><g id="attn" class="attn"></g></svg>
+          <figcaption>Figure 5. Illustration of an attention pattern over aspirin's tokens (darker = more attention). Note how each ring-closure “1” attends to its partner. This is a schematic example, not weights extracted from the model.</figcaption>
+        </figure>
+
+        <h2 id="training">Fine-tuning for fragments</h2>
+        <p>Fragment training data in the SmileBERTa project pairs a drug molecule with its fragments. The fragments come from RDKit's <strong>BRICS</strong> rules, which cut molecules at chemically sensible, synthetically accessible bonds. During fine-tuning the encoder learns to emit, position by position, the tokens of the fragment associated with the input drug. The masked-language-model head that ChemBERTa used during pre-training is reused as the output layer.</p>
+        <div class="eq">loss = − Σ<sub>positions t</sub> log p<sub>θ</sub>( fragment_token<sub>t</sub> | drug_tokens<sub>1..128</sub> )</div>
+        <p>Because the model rewrites the whole sequence at once rather than generating one token at a time, inference is a single forward pass. That makes it fast, but the output is not guaranteed to be a valid molecule, which is why the validation steps below exist.</p>
+
+        <h2 id="pipeline">The inference pipeline</h2>
+        <p>Here is exactly what happens when you press <em>Predict fragment</em>:</p>
+        <figure class="figure">
+          <svg viewBox="0 0 760 360" role="img" aria-label="Inference pipeline flowchart">
+            <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#22d3ee"/></marker></defs>
+            <rect class="dg-box" x="10" y="20" width="130" height="50" rx="9"/><text class="dg-t" x="75" y="42" text-anchor="middle">Input SMILES</text><text class="dg-s" x="75" y="58" text-anchor="middle">validated by RDKit</text>
+            <rect class="dg-box-hi" x="170" y="20" width="130" height="50" rx="9"/><text class="dg-t" x="235" y="42" text-anchor="middle">Tokenize</text><text class="dg-s" x="235" y="58" text-anchor="middle">BPE · pad to 128</text>
+            <rect class="dg-box-hi" x="330" y="20" width="130" height="50" rx="9"/><text class="dg-t" x="395" y="42" text-anchor="middle">Encoder</text><text class="dg-s" x="395" y="58" text-anchor="middle">6 layers, 1 pass</text>
+            <rect class="dg-box-hi" x="490" y="20" width="130" height="50" rx="9"/><text class="dg-t" x="555" y="42" text-anchor="middle">Decode</text><text class="dg-s" x="555" y="58" text-anchor="middle">argmax per position</text>
+            <path class="dg-flow" d="M140 45H168M300 45H328M460 45H488" marker-end="url(#ar2)"/>
+            <path class="dg-flow" d="M620 45 H690 V110" marker-end="url(#ar2)"/>
+            <polygon points="690,112 750,150 690,188 630,150" class="dg-box-am"/><text class="dg-t" x="690" y="147" text-anchor="middle">Valid</text><text class="dg-t" x="690" y="162" text-anchor="middle">SMILES?</text>
+            <path class="dg-flow" d="M630 150 H560" marker-end="url(#ar2)"/><text class="dg-s" x="600" y="142" text-anchor="middle">no</text>
+            <rect class="dg-box-vi" x="380" y="122" width="178" height="56" rx="9"/><text class="dg-t" x="469" y="145" text-anchor="middle">SMILES corrector</text><text class="dg-s" x="469" y="162" text-anchor="middle">repairs the invalid string</text>
+            <path class="dg-flow" d="M380 150 H300" marker-end="url(#ar2)"/><text class="dg-s" x="340" y="142" text-anchor="middle">fails</text>
+            <rect class="dg-box-vi" x="100" y="122" width="198" height="56" rx="9"/><text class="dg-t" x="199" y="145" text-anchor="middle">Nearest reference</text><text class="dg-s" x="199" y="162" text-anchor="middle">closest of 25,364 fragments</text>
+            <path class="dg-flow" d="M690 188 V250" marker-end="url(#ar2)"/><text class="dg-s" x="704" y="222">yes</text>
+            <path class="dg-flow" d="M469 178 V230 H620" marker-end="url(#ar2)"/><path class="dg-flow" d="M199 178 V230 H460"/>
+            <rect class="dg-box-gr" x="560" y="252" width="190" height="50" rx="9"/><text class="dg-t" x="655" y="274" text-anchor="middle">Sanitize &amp; canonicalize</text><text class="dg-s" x="655" y="290" text-anchor="middle">RDKit</text>
+            <path class="dg-flow" d="M560 277 H470" marker-end="url(#ar2)"/>
+            <rect class="dg-box-gr" x="290" y="252" width="178" height="50" rx="9"/><text class="dg-t" x="379" y="274" text-anchor="middle">3D conformer</text><text class="dg-s" x="379" y="290" text-anchor="middle">ETKDG + MMFF94</text>
+            <path class="dg-flow" d="M290 277 H210" marker-end="url(#ar2)"/>
+            <rect class="dg-box-cy" x="20" y="252" width="188" height="50" rx="9"/><text class="dg-t" x="114" y="274" text-anchor="middle">Properties + Ro3</text><text class="dg-s" x="114" y="290" text-anchor="middle">shown in the tool</text>
+            <text class="dg-s" x="380" y="340" text-anchor="middle">The Provenance panel in the tool shows which branch your prediction took.</text>
+          </svg>
+          <figcaption>Figure 6. End-to-end inference. Raw model output is never shown unchecked: it either passes RDKit validation or is repaired first.</figcaption>
+        </figure>
+        <ol>
+          <li><strong>Validate the input</strong> with RDKit so malformed SMILES are rejected before reaching the model.</li>
+          <li><strong>Tokenize and encode.</strong> The cached model runs one forward pass, typically well under a second on CPU.</li>
+          <li><strong>Decode</strong> the highest-scoring token at each position and join them into a candidate SMILES string.</li>
+          <li><strong>Validate and repair.</strong> Valid outputs are used directly. Invalid outputs go to a dedicated SMILES-corrector service, and if that fails, the closest of 25,364 reference fragments (by normalised edit distance) is used instead.</li>
+          <li><strong>Canonicalize, embed in 3D</strong> (ETKDG v3 + MMFF94), and compute properties: MW, cLogP, HBD/HBA, TPSA, rotatable bonds, QED, InChIKey.</li>
+        </ol>
+
+        <h2 id="reading">Reading your results</h2>
+        <ul>
+          <li><strong>Highlighted atoms</strong> in the input structure show where the fragment occurs in the parent molecule, when it is an exact substructure.</li>
+          <li><strong>“Direct model output”</strong> means the transformer's answer was valid as generated. <strong>“Corrected output”</strong> means it was repaired, so treat it as a suggestion rather than a strong prediction.</li>
+          <li><strong>The Rule-of-Three badges</strong> tell you whether the fragment is a good starting point for growing or linking.</li>
+        </ul>
+        <div class="callout warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><div><b>Limitations.</b> The target selector (KRAS, mTOR, AKT1, ERK2) is recorded with each run, but the current public checkpoint is a single shared fragment model, so predictions do not yet change with the target. The model has no 3D information about the protein. Validate promising fragments with docking and, ultimately, experiments.</div></div>
+
+        <h2 id="next">Next steps</h2>
+        <p>Add good fragments to your library, then <a href="combine.html">link two of them</a> into a lead-like molecule, refine it in the <a href="builder.html">Molecule Builder</a>, and <a href="docking.html">dock it</a> into your target. Read <a href="learn-docking.html">how docking works</a> to interpret the scores.</p>
+        <div class="row" style="margin-top:28px"><a class="btn btn-primary" href="fragmentation.html">Try fragment prediction</a><a class="btn" href="learn-classification.html">Next: classification →</a></div>
+      </article>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Token chips (real tokenizer output for aspirin)
+      const toks = [['<s>', 0], ['CC', 262], ['(=', 263], ['O', 51], [')', 13], ['Oc', 312], ['1', 21], ['ccccc', 269], ['1', 21], ['C', 39], ['(=', 263], ['O', 51], [')', 13], ['O', 51], ['</s>', 2]];
+      let x = 20; const g = document.getElementById('tok-row'); let html = '';
+      toks.forEach(([t, id], i) => {
+        const w = Math.max(30, t.length * 9 + 16); const special = id <= 2;
+        html += `<g class="tk" style="transition-delay:${i * 70}ms"><rect x="${x}" y="30" width="${w}" height="34" rx="7" fill="${special ? 'rgba(167,139,250,.12)' : 'rgba(59,130,246,.12)'}" stroke="${special ? '#a78bfa' : '#3b82f6'}"/><text x="${x + w / 2}" y="52" text-anchor="middle" class="dg-m" style="fill:${special ? '#c4b5fd' : '#bfdbfe'}">${t.replace('<', '&lt;').replace('>', '&gt;')}</text><text x="${x + w / 2}" y="84" text-anchor="middle" class="dg-s">${id}</text></g>`;
+        x += w + 6;
+      });
+      g.innerHTML = html;
+      // Illustrative attention map
+      const labels = ['CC', '(=', 'O', ')', 'Oc', '1', 'ccccc', '1', 'C', '(=', 'O', ')', 'O'];
+      const n = labels.length, cell = 19, ox = 250, oy = 30;
+      const a = document.getElementById('attn'); let s = '';
+      for (let i = 0; i < n; i++) {
+        s += `<text x="${ox - 8}" y="${oy + i * cell + 14}" text-anchor="end" class="dg-m" style="font-size:11px">${labels[i]}</text>`;
+        s += `<text x="${ox + i * cell + 10}" y="${oy + n * cell + 16}" text-anchor="middle" class="dg-m" style="font-size:10px">${labels[i]}</text>`;
+        for (let j = 0; j < n; j++) {
+          let w = 0.08 + 0.5 * Math.exp(-Math.abs(i - j)) + (i === j ? 0.2 : 0);
+          if ((i === 5 && j === 7) || (i === 7 && j === 5)) w = 0.95;
+          if ((labels[i] === 'O' && labels[j] === '(=') && Math.abs(i - j) === 1) w = 0.8;
+          s += `<rect x="${ox + i * 0 + j * cell}" y="${oy + i * cell}" width="${cell - 2}" height="${cell - 2}" rx="3" fill="#22d3ee" opacity="${Math.min(1, w).toFixed(2)}"/>`;
+        }
+      }
+      a.innerHTML = s;
+    });
+  </script>
+</body>
+</html>

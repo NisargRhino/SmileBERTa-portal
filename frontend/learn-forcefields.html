@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Force fields & geometry optimisation — SmileBERTa</title>
+  <meta name="description" content="How molecular mechanics force fields like MMFF94 and UFF compute energies, and how geometry optimisation and conformer search work.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    .term-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 24px 0; }
+    .term { padding: 16px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--panel); }
+    .term h4 { margin: 0 0 4px; } .term p { font-size: .86rem !important; margin: 0 0 8px; }
+    .term svg { width: 100%; height: 120px; display: block; }
+    .figure .curve { stroke-dasharray: 1400; stroke-dashoffset: 1400; transition: stroke-dashoffset 1.6s var(--ease); } .figure.in .curve, .term.in .curve { stroke-dashoffset: 0; }
+    .ball { transition: transform 2.4s cubic-bezier(.5,0,.3,1); } .figure.in .ball { transform: translate(var(--tx), var(--ty)); }
+    @media (max-width: 700px) { .term-grid { grid-template-columns: 1fr; } }
+  </style>
+  <script src="assets/js/core.js" defer></script>
+  <script src="assets/js/learn.js" defer></script>
+</head>
+<body>
+  <div id="site-nav"></div>
+  <main class="container">
+    <div class="page-head">
+      <div class="crumbs"><a href="index.html">Home</a><span>/</span><a href="learn.html">Learn</a><span>/</span><span>Force fields</span></div>
+      <div class="eyebrow">Technical guide · 10 min read</div>
+      <h1>Force fields and geometry optimisation</h1>
+      <p class="lead">What happens when you press <em>Optimise geometry</em> in the Molecule Builder: molecular mechanics, the MMFF94 and UFF force fields, energy minimisation and conformer search.</p>
+    </div>
+    <div class="doc-layout">
+      <nav class="doc-toc" aria-label="On this page"></nav>
+      <article class="doc">
+        <h2 id="mm">Molecules as balls and springs</h2>
+        <p>Quantum chemistry gives the most accurate molecular energies but is expensive. <strong>Molecular mechanics</strong> trades some accuracy for enormous speed: atoms are treated as balls, bonds as springs, and the energy of a geometry is a sum of simple, parameterised terms. A <strong>force field</strong> is that functional form plus thousands of parameters (ideal bond lengths, angles, force constants, atomic charges) fitted to experiments and quantum calculations.</p>
+        <div class="eq">E<sub>total</sub> = E<sub>bond</sub> + E<sub>angle</sub> + E<sub>torsion</sub> + E<sub>out-of-plane</sub> + E<sub>van der Waals</sub> + E<sub>electrostatic</sub></div>
+        <p>The first four are <em>bonded</em> terms between atoms connected by 1–3 bonds. The last two are <em>non-bonded</em> terms between atoms further apart, and they dominate how a molecule folds onto itself and how it interacts with a protein.</p>
+
+        <h2 id="terms">The energy terms</h2>
+        <div class="term-grid">
+          <div class="term figure"><h4>Bond stretching</h4><p>Springs around an ideal length r₀. MMFF94 adds cubic and quartic corrections so very stretched bonds behave realistically.</p><svg id="p-bond" viewBox="0 0 320 120"></svg><div class="eq" style="margin:6px 0 0;font-size:.78rem">E = ½·k<sub>b</sub>(r − r₀)²</div></div>
+          <div class="term figure"><h4>Angle bending</h4><p>Keeps bond angles near their ideal values, about 109.5° for sp³, 120° for sp² and 180° for sp atoms.</p><svg id="p-angle" viewBox="0 0 320 120"></svg><div class="eq" style="margin:6px 0 0;font-size:.78rem">E = ½·k<sub>θ</sub>(θ − θ₀)²</div></div>
+          <div class="term figure"><h4>Torsion</h4><p>A periodic cosine series that sets rotational barriers, for example the staggered-versus-eclipsed preference of ethane.</p><svg id="p-tors" viewBox="0 0 320 120"></svg><div class="eq" style="margin:6px 0 0;font-size:.78rem">E = ½[V₁(1+cos φ) + V₂(1−cos 2φ) + V₃(1+cos 3φ)]</div></div>
+          <div class="term figure"><h4>Van der Waals</h4><p>Strong repulsion at short range and weak dispersion attraction further out. MMFF94 uses a "buffered 14-7" form, softer than Lennard-Jones.</p><svg id="p-vdw" viewBox="0 0 320 120"></svg><div class="eq" style="margin:6px 0 0;font-size:.78rem">E = ε(1.07R*/(R+0.07R*))⁷ · (1.12R*⁷/(R⁷+0.12R*⁷) − 2)</div></div>
+        </div>
+        <p><strong>Electrostatics</strong> uses Coulomb's law between partial atomic charges, screened with a distance-dependent dielectric to mimic solvent. <strong>Out-of-plane</strong> terms keep sp² centres such as carbonyl carbons and aromatic rings flat.</p>
+
+        <h2 id="mmff">MMFF94, MMFF94s and UFF</h2>
+        <div class="table-wrap spec-table"><table class="table"><thead><tr><th>Force field</th><th>Best for</th><th>Notes</th></tr></thead><tbody>
+          <tr><td><b>MMFF94</b></td><td>Drug-like organic molecules</td><td>Merck Molecular Force Field (Halgren, 1996). Parameterised against high-level quantum data for exactly the chemistry found in medicines. The default in the builder.</td></tr>
+          <tr><td><b>MMFF94s</b></td><td>Crystal-like conformations</td><td>The “static” variant: modified out-of-plane and torsion terms make delocalised nitrogens (anilines, amides) more planar, matching time-averaged crystal structures.</td></tr>
+          <tr><td><b>UFF</b></td><td>Anything on the periodic table</td><td>Universal Force Field (Rappé et al., 1992). Parameters come from element rules, so it handles metals and unusual atoms that MMFF lacks, but it is less accurate for organic molecules. The builder falls back to UFF automatically when MMFF has no parameters.</td></tr>
+        </tbody></table></div>
+        <div class="callout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><div>Energies from different force fields are on different scales and <b>cannot be compared</b> with each other. Even within one force field, only energy <em>differences</em> between conformations of the same molecule are meaningful.</div></div>
+
+        <h2 id="minimise">Energy minimisation</h2>
+        <p>A hand-built molecule usually has strained bond lengths and angles. <strong>Geometry optimisation</strong> moves the atoms downhill on the energy surface until the forces (the negative gradient of the energy) are close to zero. SmileBERTa runs RDKit's implementation, a quasi-Newton <strong>BFGS</strong> minimiser that builds an approximation of the energy surface's curvature as it goes, so it converges in far fewer steps than plain steepest descent.</p>
+        <figure class="figure">
+          <svg viewBox="0 0 760 260" role="img" aria-label="Energy landscape with local and global minima">
+            <path id="landscape" class="curve" fill="none" stroke="url(#gL)" stroke-width="3"/>
+            <defs><linearGradient id="gL" x1="0" x2="1"><stop offset="0" stop-color="#3b82f6"/><stop offset="1" stop-color="#2dd4bf"/></linearGradient></defs>
+            <circle class="ball" cx="120" cy="84" r="10" fill="#fbbf24" style="--tx:95px;--ty:65px"/>
+            <text class="dg-s" x="80" y="62">built geometry</text>
+            <text class="dg-s" x="215" y="190" text-anchor="middle" style="fill:#fde68a">local minimum</text>
+            <text class="dg-s" x="540" y="236" text-anchor="middle" style="fill:#6ee7b7">global minimum (lowest-energy conformer)</text>
+            <text class="dg-s" x="380" y="36" text-anchor="middle">energy barrier</text>
+            <text class="dg-s" x="20" y="130" transform="rotate(-90 20 130)" text-anchor="middle">energy</text>
+            <text class="dg-s" x="700" y="258" text-anchor="end">conformational coordinate →</text>
+          </svg>
+          <figcaption>Figure 1. Minimisation only goes downhill, so it finds the nearest minimum, not necessarily the lowest one. The builder animates exactly this descent and plots the energy at each step.</figcaption>
+        </figure>
+
+        <h2 id="conformers">Conformer search</h2>
+        <p>To find low-energy shapes beyond the nearest minimum, the builder's <strong>Conformer search</strong> generates many diverse starting geometries with <strong>ETKDG v3</strong>, a distance-geometry method that adds torsion preferences learned from crystal structures. It minimises each one with MMFF94, removes duplicates (RMSD &lt; 0.25 Å), and ranks the rest by energy relative to the best. Conformers within about 3 kcal/mol of the minimum are typically populated at room temperature, and the binding conformation is often among them.</p>
+
+        <h2 id="builder">What the builder does</h2>
+        <ol>
+          <li><strong>While you draw</strong>, hydrogens are added automatically to satisfy each atom's valence, and a lightweight in-browser spring model (bonds plus 1–3 angle springs plus soft repulsion) cleans the geometry instantly. It is not a real force field and only produces a sensible starting point.</li>
+          <li><strong>Optimise geometry</strong> sends the atoms and bonds to the server, which builds an RDKit molecule, sets up MMFF94, MMFF94s or UFF, and minimises it with BFGS. Snapshots are recorded along the way and played back in the viewer, with the energy trace plotted live.</li>
+          <li><strong>Search (ETKDG)</strong> runs the conformer search described above on the current molecule.</li>
+        </ol>
+        <div class="row" style="margin-top:28px"><a class="btn btn-primary" href="builder.html">Open the builder</a><a class="btn" href="learn.html">All guides</a></div>
+      </article>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      function plot(id, f, xmin, xmax, ymin, ymax, color, xlabel) {
+        const W = 320, H = 120, L = 14, Rr = 10, T = 8, B = 20;
+        const X = (x) => L + (x - xmin) / (xmax - xmin) * (W - L - Rr), Y = (y) => T + (1 - (Math.min(ymax, Math.max(ymin, y)) - ymin) / (ymax - ymin)) * (H - T - B);
+        let p = ''; for (let k = 0; k <= 200; k++) { const x = xmin + k / 200 * (xmax - xmin); p += (k ? 'L' : 'M') + X(x).toFixed(1) + ' ' + Y(f(x)).toFixed(1); }
+        document.getElementById(id).innerHTML = `<line x1="${L}" y1="${Y(0)}" x2="${W - Rr}" y2="${Y(0)}" class="dg-line"/><path class="curve" d="${p}" fill="none" stroke="${color}" stroke-width="2.4"/><text x="${W - Rr}" y="${H - 4}" text-anchor="end" class="dg-s">${xlabel}</text>`;
+      }
+      plot('p-bond', (r) => 0.5 * 4 * (r - 1.53) ** 2, 1.0, 2.1, -0.05, 0.7, '#3b82f6', 'C–C distance (Å) · r₀ = 1.53');
+      plot('p-angle', (t) => 0.5 * 0.002 * (t - 109.5) ** 2, 80, 140, -0.05, 1, '#22d3ee', 'angle θ (°) · θ₀ = 109.5');
+      plot('p-tors', (p) => 0.5 * 2.9 * (1 + Math.cos(3 * p * Math.PI / 180)) / 2.9, 0, 360, -0.05, 1.1, '#a78bfa', 'H–C–C–H dihedral φ (°)');
+      plot('p-vdw', (R) => { const Rs = 3.8, e = 1; return e * (1.07 * Rs / (R + 0.07 * Rs)) ** 7 * (1.12 * Rs ** 7 / (R ** 7 + 0.12 * Rs ** 7) - 2); }, 3.0, 8, -1.2, 1.5, '#34d399', 'separation R (Å)');
+      // Energy landscape
+      const f = (x) => 150 - 70 * Math.exp(-(((x - 215) / 60) ** 2)) - 120 * Math.exp(-(((x - 540) / 80) ** 2)) + 40 * Math.exp(-(((x - 380) / 50) ** 2)) - 0.0006 * (x - 380) ** 2 * 0 + (x < 100 ? (100 - x) * 0.9 : 0) + (x > 700 ? (x - 700) * 0.9 : 0);
+      let p = ''; for (let x = 40; x <= 740; x += 4) p += (x === 40 ? 'M' : 'L') + x + ' ' + (40 + (200 - f(x))).toFixed(1);
+      document.getElementById('landscape').setAttribute('d', p);
+    });
+  </script>
+</body>
+</html>

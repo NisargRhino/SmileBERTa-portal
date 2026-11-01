@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How docking works — SmileBERTa</title>
+  <meta name="description" content="Molecular docking with AutoDock Vina explained: receptor and ligand preparation, search boxes, the Vina scoring function and reading results.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>.figure .curve { stroke-dasharray: 1200; stroke-dashoffset: 1200; transition: stroke-dashoffset 1.8s var(--ease); } .figure.in .curve { stroke-dashoffset: 0; }</style>
+  <script src="assets/js/core.js" defer></script>
+  <script src="assets/js/learn.js" defer></script>
+</head>
+<body>
+  <div id="site-nav"></div>
+  <main class="container">
+    <div class="page-head">
+      <div class="crumbs"><a href="index.html">Home</a><span>/</span><a href="learn.html">Learn</a><span>/</span><span>Docking</span></div>
+      <div class="eyebrow">Technical guide · 11 min read</div>
+      <h1>Docking and scoring with AutoDock Vina</h1>
+      <p class="lead">How SmileBERTa prepares a protein and a ligand, searches for binding poses, and estimates binding affinity, plus how to read the results critically.</p>
+    </div>
+    <div class="doc-layout">
+      <nav class="doc-toc" aria-label="On this page"></nav>
+      <article class="doc">
+        <h2 id="what">What docking answers</h2>
+        <p><strong>Molecular docking</strong> predicts <em>how</em> a small molecule sits in a protein's binding site (its <strong>pose</strong>) and estimates <em>how strongly</em> it binds (a <strong>score</strong>, in kcal/mol). It is a search problem: the ligand can translate, rotate and flex its rotatable bonds, which gives an enormous number of configurations. A scoring function judges each one, and a search algorithm hunts for the best.</p>
+        <p>SmileBERTa uses <strong>AutoDock Vina</strong> (Trott &amp; Olson, 2010; Eberhardt et al., 2021), one of the most widely used and cited docking engines.</p>
+
+        <h2 id="prep">Preparing the inputs</h2>
+        <figure class="figure">
+          <svg viewBox="0 0 760 250" role="img" aria-label="Receptor and ligand preparation pipelines">
+            <defs><marker id="a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#22d3ee"/></marker></defs>
+            <text class="dg-t" x="10" y="24">Receptor</text>
+            <rect class="dg-box" x="10" y="36" width="140" height="56" rx="9"/><text class="dg-t" x="80" y="60" text-anchor="middle">PDB file</text><text class="dg-s" x="80" y="77" text-anchor="middle">RCSB or upload</text>
+            <rect class="dg-box-hi" x="190" y="36" width="160" height="56" rx="9"/><text class="dg-t" x="270" y="60" text-anchor="middle">Clean</text><text class="dg-s" x="270" y="77" text-anchor="middle">keep chains · drop water, ligands</text>
+            <rect class="dg-box-hi" x="390" y="36" width="160" height="56" rx="9"/><text class="dg-t" x="470" y="60" text-anchor="middle">Protonate</text><text class="dg-s" x="470" y="77" text-anchor="middle">polar H at pH 7.4</text>
+            <rect class="dg-box-gr" x="590" y="36" width="160" height="56" rx="9"/><text class="dg-t" x="670" y="60" text-anchor="middle">receptor.pdbqt</text><text class="dg-s" x="670" y="77" text-anchor="middle">AutoDock atom types</text>
+            <path class="dg-flow" d="M150 64H188M350 64H388M550 64H588" marker-end="url(#a4)"/>
+            <text class="dg-t" x="10" y="144">Ligand</text>
+            <rect class="dg-box" x="10" y="156" width="140" height="56" rx="9"/><text class="dg-t" x="80" y="180" text-anchor="middle">SMILES</text><text class="dg-s" x="80" y="197" text-anchor="middle">or Builder 3D model</text>
+            <rect class="dg-box-hi" x="190" y="156" width="160" height="56" rx="9"/><text class="dg-t" x="270" y="180" text-anchor="middle">Embed in 3D</text><text class="dg-s" x="270" y="197" text-anchor="middle">RDKit ETKDG v3</text>
+            <rect class="dg-box-hi" x="390" y="156" width="160" height="56" rx="9"/><text class="dg-t" x="470" y="180" text-anchor="middle">Relax</text><text class="dg-s" x="470" y="197" text-anchor="middle">MMFF94 minimisation</text>
+            <rect class="dg-box-gr" x="590" y="156" width="160" height="56" rx="9"/><text class="dg-t" x="670" y="180" text-anchor="middle">ligand.pdbqt</text><text class="dg-s" x="670" y="197" text-anchor="middle">torsion tree (Open Babel)</text>
+            <path class="dg-flow" d="M150 184H188M350 184H388M550 184H588" marker-end="url(#a4)"/>
+          </svg>
+          <figcaption>Figure 1. Preparation pipelines. PDBQT is PDB plus partial charges and AutoDock atom types. For ligands it also stores a torsion tree that tells Vina which bonds may rotate.</figcaption>
+        </figure>
+        <ul>
+          <li><strong>Receptor cleaning</strong> keeps the protein atoms of the chains you select (plus structural metal ions), uses the first model and first alternate location, and discards waters, buffer molecules and co-crystallised ligands so they don't block the pocket.</li>
+          <li><strong>Protonation.</strong> X-ray structures rarely include hydrogens. Vina needs <em>polar</em> hydrogens to recognise H-bond donors, so they are added at physiological pH.</li>
+          <li><strong>Ligand 3D generation</strong> uses distance-geometry embedding (ETKDG) followed by MMFF94 minimisation, so the starting geometry has realistic bond lengths and ring shapes. Vina keeps those fixed and explores only the torsions.</li>
+        </ul>
+
+        <h2 id="box">The search box</h2>
+        <p>Vina only searches inside a rectangular <strong>box</strong> that you place over the binding site. A good box covers the whole pocket plus a few ångströms of margin. Too small and the correct pose may not fit. Too large and the search gets slower and less reliable. When a structure contains a co-crystallised ligand, SmileBERTa offers to centre the box on it and sizes it to the ligand's extent plus 10 Å (minimum 18 Å per side).</p>
+        <figure class="figure">
+          <svg viewBox="0 0 760 240" role="img" aria-label="Search box over a binding pocket">
+            <path d="M160 40 Q90 120 160 210 L600 210 Q670 120 600 40 Q470 120 380 120 Q290 120 160 40Z" fill="rgba(59,130,246,.08)" stroke="#475569" stroke-width="2"/>
+            <text class="dg-s" x="200" y="195">protein surface</text>
+            <g transform="translate(300,70)"><rect width="160" height="110" fill="rgba(34,211,238,.06)" stroke="#22d3ee" stroke-width="2"/><path d="M0 0 l26 -18 h160 l-26 18 M160 0 l26 -18 v110 l-26 18" fill="none" stroke="#22d3ee" stroke-width="1.5" opacity=".6"/>
+              <g fill="none" stroke="#a5f3fc" stroke-width="2.2"><polygon points="52,56 66,48 80,56 80,72 66,80 52,72"/><path d="M80 56 l18 -8 l14 10"/></g>
+              <circle cx="80" cy="55" r="3" fill="#fbbf24"/><text class="dg-s" x="88" y="44" style="fill:#fde68a">center (x, y, z)</text></g>
+            <path d="M300 196 H460" class="dg-line"/><text class="dg-s" x="380" y="230" text-anchor="middle">size_x … size_z (Å)</text>
+            <text class="dg-s" x="560" y="80">Exhaustiveness = number of</text><text class="dg-s" x="560" y="96">independent searches inside the box</text>
+          </svg>
+          <figcaption>Figure 2. The search space. Everything outside the box is invisible to Vina, so the box decides which site you are testing.</figcaption>
+        </figure>
+
+        <h2 id="scoring">The Vina scoring function</h2>
+        <p>Vina's score is an empirical function fitted to experimental binding data. For every pair of ligand–receptor heavy atoms <em>i, j</em>, it works with the <strong>surface distance</strong> <code>d = r<sub>ij</sub> − R<sub>i</sub> − R<sub>j</sub></code> (the centre-to-centre distance minus both van der Waals radii) and sums five terms:</p>
+        <div class="eq">E<sub>inter</sub> = Σ<sub>i,j</sub> [ −0.0356·gauss1(d) − 0.00516·gauss2(d) + 0.840·repulsion(d) − 0.0351·hydrophobic(d) − 0.587·hbond(d) ]</div>
+        <figure class="figure">
+          <svg viewBox="0 0 760 300" role="img" aria-label="Plots of the Vina scoring terms versus surface distance"><g id="vina-plot"></g></svg>
+          <figcaption>Figure 3. The five Vina terms as functions of surface distance d (Å), unweighted. The Gaussians reward close contact, repulsion penalises overlap, and the hydrophobic and H-bond terms apply only to matching atom types (C/halogen pairs, and donor–acceptor pairs).</figcaption>
+        </figure>
+        <p>The total is then divided by a penalty for ligand flexibility, because rotatable bonds lose freedom when a ligand binds:</p>
+        <div class="eq">affinity (kcal/mol) = E<sub>inter</sub> / (1 + 0.0585 · N<sub>rot</sub>)</div>
+
+        <h2 id="search">How poses are found</h2>
+        <p>Vina uses an <strong>iterated local search</strong>. Each run starts from a random pose and repeats: randomly perturb the position, orientation or one torsion (a Monte-Carlo step), then refine with a quasi-Newton (BFGS) local optimisation that uses gradients of the score. Improvements are accepted by a Metropolis criterion. <strong>Exhaustiveness</strong> sets how many such runs execute. Higher values explore more thoroughly but take proportionally longer. The best distinct poses are clustered and returned.</p>
+        <p>To keep this fast, Vina pre-computes the receptor's contribution on a 3D grid (spacing 0.375 Å) before searching, so scoring a pose becomes a cheap lookup. That is the "computing grid maps" step you see in the log.</p>
+
+        <h2 id="results">Reading the results</h2>
+        <div class="table-wrap spec-table"><table class="table"><thead><tr><th>Column</th><th>Meaning</th></tr></thead><tbody>
+          <tr><td>Affinity (kcal/mol)</td><td>Predicted binding free energy ΔG. More negative is better. Drug-like binders typically score −7 to −12.</td></tr>
+          <tr><td>RMSD l.b. / u.b.</td><td>Distance of each pose from the best pose. Lower bound matches atoms by symmetry; upper bound matches atom by atom. Poses within about 2 Å are essentially the same binding mode.</td></tr>
+          <tr><td>H-bonds</td><td>Ligand–protein N/O pairs within 3.5 Å, computed by SmileBERTa from the pose geometry.</td></tr>
+          <tr><td>Contact residues</td><td>Residues with any heavy atom within 4 Å of the ligand, which together define the binding site.</td></tr>
+        </tbody></table></div>
+        <p>The estimated inhibition constant shown in the tool comes from the thermodynamic relation:</p>
+        <div class="eq">ΔG = RT · ln K<sub>i</sub>  ⇒  K<sub>i</sub> = exp(ΔG / RT),  RT ≈ 0.593 kcal/mol at 298 K</div>
+        <p>So −7 kcal/mol corresponds to roughly 7 µM, and −10 kcal/mol to roughly 50 nM. Treat these numbers as rough orders of magnitude only.</p>
+
+        <h2 id="limits">Good practice and limitations</h2>
+        <ul>
+          <li><strong>Validate with redocking.</strong> Dock the co-crystallised ligand back into its own structure. If the top pose is within 2 Å RMSD of the crystal pose, your box and settings are reasonable.</li>
+          <li><strong>Compare, don't trust absolutes.</strong> Vina scores rank related compounds better than they predict exact affinities. The typical error is about 2 kcal/mol.</li>
+          <li><strong>The protein is rigid.</strong> Induced fit, waters that mediate binding, and entropy are largely ignored.</li>
+          <li><strong>Look at the pose.</strong> A good score with no sensible H-bonds, or a ligand half outside the pocket, is a warning sign.</li>
+        </ul>
+        <div class="row" style="margin-top:28px"><a class="btn btn-primary" href="docking.html">Open the docking tool</a><a class="btn" href="learn-forcefields.html">Next: force fields →</a></div>
+      </article>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const W = 760, H = 300, L = 60, R = 200, T = 20, B = 40;
+      const xmin = -1.5, xmax = 6, ymin = -0.2, ymax = 1.05;
+      const X = (x) => L + (x - xmin) / (xmax - xmin) * (W - L - R), Y = (y) => T + (1 - (y - ymin) / (ymax - ymin)) * (H - T - B);
+      const terms = [
+        ['gauss1', (d) => Math.exp(-((d / 0.5) ** 2)), '#3b82f6'],
+        ['gauss2', (d) => Math.exp(-(((d - 3) / 2) ** 2)), '#22d3ee'],
+        ['repulsion', (d) => (d < 0 ? d * d : 0), '#f87171'],
+        ['hydrophobic', (d) => (d < 0.5 ? 1 : d < 1.5 ? 1.5 - d : 0), '#fbbf24'],
+        ['hbond', (d) => (d < -0.7 ? 1 : d < 0 ? -d / 0.7 : 0), '#34d399'],
+      ];
+      let s = `<line x1="${L}" y1="${Y(0)}" x2="${W - R}" y2="${Y(0)}" class="dg-line"/><line x1="${X(0)}" y1="${T}" x2="${X(0)}" y2="${H - B}" class="dg-line" stroke-dasharray="3 3"/>`;
+      for (let x = -1; x <= 6; x++) s += `<text x="${X(x)}" y="${H - B + 18}" text-anchor="middle" class="dg-s">${x}</text>`;
+      s += `<text x="${(L + W - R) / 2}" y="${H - 4}" text-anchor="middle" class="dg-s">surface distance d (Å)</text><text x="${L - 10}" y="${Y(1) + 4}" text-anchor="end" class="dg-s">1</text><text x="${L - 10}" y="${Y(0) + 4}" text-anchor="end" class="dg-s">0</text>`;
+      terms.forEach(([n, f, c], i) => {
+        let p = ''; for (let k = 0; k <= 300; k++) { const x = xmin + k / 300 * (xmax - xmin); const y = Math.min(ymax, f(x)); p += (k ? 'L' : 'M') + X(x).toFixed(1) + ' ' + Y(y).toFixed(1); }
+        s += `<path class="curve" d="${p}" fill="none" stroke="${c}" stroke-width="2.4" style="transition-delay:${i * 200}ms"/>`;
+        s += `<rect x="${W - R + 24}" y="${T + 20 + i * 26}" width="14" height="4" rx="2" fill="${c}"/><text x="${W - R + 46}" y="${T + 26 + i * 26}" class="dg-m" style="font-size:12px">${n}</text>`;
+      });
+      document.getElementById('vina-plot').innerHTML = s;
+    });
+  </script>
+</body>
+</html>

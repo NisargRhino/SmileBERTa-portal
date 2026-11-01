@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Learn — SmileBERTa</title>
+  <meta name="description" content="The science behind SmileBERTa: chemical language models, drug classification, molecular docking and force fields.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    .guide-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .guide { display: grid; grid-template-columns: 150px 1fr; gap: 22px; align-items: center; color: var(--text); padding: 22px; }
+    .guide:hover { color: var(--text); }
+    .guide .art { height: 120px; border-radius: 14px; background: radial-gradient(circle at 30% 30%, rgba(59,130,246,.3), transparent 70%), rgba(0,0,0,.3); border: 1px solid var(--border); display: grid; place-items: center; }
+    .guide .art svg { width: 64px; height: 64px; color: var(--cyan); }
+    .guide h3 { margin: 6px 0; } .guide p { color: var(--muted); font-size: .9rem; margin: 0 0 10px; }
+    .glossary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .glossary div { padding: 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel); font-size: .86rem; color: var(--text-2); }
+    .glossary b { display: block; color: #fff; margin-bottom: 4px; font-family: var(--display); }
+    @media (max-width: 900px) { .guide-grid, .glossary { grid-template-columns: 1fr; } .guide { grid-template-columns: 1fr; } }
+  </style>
+  <script src="assets/js/core.js" defer></script>
+</head>
+<body>
+  <div id="site-nav"></div>
+  <main class="container" style="padding-bottom:60px">
+    <div class="page-head center" style="padding-top:72px">
+      <div class="eyebrow">Learn</div>
+      <h1>The science behind the tools</h1>
+      <p class="lead" style="margin:0 auto">In-depth, illustrated guides to how every SmileBERTa tool works, written for students, researchers and the curious.</p>
+    </div>
+    <div class="guide-grid" id="guides"></div>
+    <section class="section-sm">
+      <h2 class="reveal">Glossary</h2>
+      <div class="glossary reveal">
+        <div><b>SMILES</b>A line notation that writes a molecule's atoms, bonds, branches and rings as a text string.</div>
+        <div><b>Fragment</b>A small (&lt; 300 Da) piece of a molecule that binds a target efficiently and can be grown into a lead.</div>
+        <div><b>Transformer</b>A neural network that uses self-attention to model relationships between all tokens in a sequence.</div>
+        <div><b>Tokenizer</b>Splits text into vocabulary units (tokens). SmileBERTa uses a 767-token BPE vocabulary for SMILES.</div>
+        <div><b>Docking</b>Computationally placing a ligand in a protein binding site and scoring how well it fits.</div>
+        <div><b>Binding affinity</b>The strength of ligand–protein binding, expressed as ΔG (kcal/mol) or K<sub>i</sub>/K<sub>d</sub>.</div>
+        <div><b>Force field</b>A parameterised energy function (bonds, angles, torsions, non-bonded terms) used to model molecular geometry.</div>
+        <div><b>Conformer</b>One 3D shape of a molecule, reached by rotating single bonds without breaking any.</div>
+        <div><b>QED</b>Quantitative Estimate of Drug-likeness: a 0–1 score of how closely a molecule resembles approved oral drugs.</div>
+        <div><b>Lipinski's Rule of Five</b>MW ≤ 500, cLogP ≤ 5, ≤ 5 H-bond donors and ≤ 10 acceptors: a heuristic for oral bioavailability.</div>
+        <div><b>B-factor</b>A crystallographic measure of how much each atom vibrates or is disordered. High values mean flexible regions.</div>
+        <div><b>Secondary structure</b>Local protein folding patterns: α-helices, β-sheets and the coils between them.</div>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const meta = { 'learn-fragmentation.html': ['12 min', 'SMILES, BPE tokenization, the RoBERTa encoder, decoding, and how invalid outputs are repaired.'], 'learn-classification.html': ['9 min', 'The 8,336-compound dataset, text-generation classification, and edit-distance label matching.'], 'learn-docking.html': ['11 min', 'Receptor and ligand preparation, search boxes, the Vina scoring function, and reading poses.'], 'learn-forcefields.html': ['10 min', 'MMFF94 and UFF energy terms, BFGS minimisation, and ETKDG conformer search.'] };
+      document.getElementById('guides').innerHTML = SB.LEARN.map((g, i) => `<a class="card card-hover guide reveal" data-delay="${i}" href="${g.href}"><div class="art">${SB.icon(g.icon)}</div><div><span class="badge cyan">${meta[g.href][0]} read</span><h3>${g.title}</h3><p>${meta[g.href][1]}</p><span style="color:var(--cyan);font-weight:600;font-size:.86rem">Read guide →</span></div></a>`).join('');
+      SB.initReveal();
+    });
+  </script>
+</body>
+</html>
