@@ -126,6 +126,8 @@ code, .mono { font-family: var(--mono); font-size: .88em; }
   box-shadow: var(--shadow); opacity: 0; transform: translateY(-6px); pointer-events: none; transition: opacity .18s, transform .18s var(--ease);
 }
 .nav-drop.open .nav-menu { opacity: 1; transform: none; pointer-events: auto; }
+/* Invisible bridge over the gap between the button and the menu so hover isn't lost */
+.nav-menu::before { content: ''; position: absolute; left: 0; right: 0; top: -14px; height: 14px; }
 .nav-menu a { display: flex; gap: 12px; padding: 10px 12px; border-radius: 10px; color: var(--text); align-items: flex-start; }
 .nav-menu a:hover { background: rgba(255,255,255,.05); color: #fff; }
 .nav-menu .mi-icon { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; background: var(--grad-soft); border: 1px solid rgba(59,130,246,.25); flex-shrink: 0; color: var(--cyan); }
@@ -325,7 +327,7 @@ table.table { width: 100%; border-collapse: collapse; font-size: .84rem; }
 .app-main { position: relative; min-width: 0; display: flex; flex-direction: column; }
 .app-stage { position: relative; flex: 1; min-height: 0; background: radial-gradient(ellipse at 50% 30%, #0c1428 0%, #05070d 75%); }
 .app-stage .viewer-host { position: absolute; inset: 0; }
-.app-topbar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--border); background: var(--bg-2); flex-wrap: wrap; min-height: 52px; }
+.app-topbar { position: relative; z-index: 20; display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--border); background: var(--bg-2); flex-wrap: wrap; min-height: 52px; }
 .app-topbar .sep { width: 1px; height: 22px; background: var(--border); margin: 0 4px; }
 .hud { position: absolute; z-index: 6; pointer-events: none; }
 .hud > * { pointer-events: auto; }

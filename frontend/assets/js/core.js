@@ -220,12 +220,22 @@
       <h6>Learn</h6>${LEARN.map((t) => `<a href="${t.href}">${t.title}</a>`).join('')}
       <h6>Account</h6><a href="workspace.html">Workspace</a>${auth.isAdmin() ? '<a href="admin.html">Admin dashboard</a>' : ''}${user ? '<a href="#" data-signout>Sign out</a>' : '<a href="login.html">Sign in</a>'}
     </div>`;
-    $$('[data-drop]').forEach((d) => {
+    const canHover = () => matchMedia('(hover: hover)').matches;
+    $$('#site-nav [data-drop]').forEach((d) => {
       const btn = d.querySelector('button');
-      btn.addEventListener('click', (e) => { e.stopPropagation(); const o = d.classList.contains('open'); $$('[data-drop]').forEach((x) => x.classList.remove('open')); if (!o) d.classList.add('open'); });
-      if (!d.classList.contains('user-menu')) {
-        d.addEventListener('mouseenter', () => { if (matchMedia('(hover: hover)').matches) { $$('[data-drop]').forEach((x) => x.classList.remove('open')); d.classList.add('open'); } });
-        d.addEventListener('mouseleave', () => { if (matchMedia('(hover: hover)').matches) d.classList.remove('open'); });
+      const hoverMenu = !d.classList.contains('user-menu');
+      let closeTimer = null;
+      const open = () => { clearTimeout(closeTimer); $$('[data-drop]').forEach((x) => x !== d && x.classList.remove('open')); d.classList.add('open'); };
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // With hover menus the click should never close what hovering just opened.
+        if (hoverMenu && canHover()) { open(); return; }
+        if (d.classList.contains('open')) d.classList.remove('open'); else open();
+      });
+      d.querySelector('.nav-menu').addEventListener('click', (e) => e.stopPropagation());
+      if (hoverMenu) {
+        d.addEventListener('mouseenter', () => { if (canHover()) open(); });
+        d.addEventListener('mouseleave', () => { if (canHover()) { clearTimeout(closeTimer); closeTimer = setTimeout(() => d.classList.remove('open'), 250); } });
       }
     });
     document.addEventListener('click', () => $$('[data-drop]').forEach((x) => x.classList.remove('open')));
