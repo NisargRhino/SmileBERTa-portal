@@ -125,7 +125,7 @@
       const t = auth.token();
       if (t) fetch(API + '/logout', { method: 'POST', headers: { Authorization: 'Bearer ' + t } }).catch(() => {});
       auth.clear();
-      location.href = 'index.html';
+      location.href = './';
     },
     loginUrl() { return 'login.html?next=' + encodeURIComponent(location.pathname.split('/').pop() + location.search); },
   };
@@ -196,12 +196,12 @@
     const user = auth.username();
     host.outerHTML = `
     <nav class="nav" id="site-nav"><div class="container container-wide nav-inner">
-      <a class="brand" href="index.html" aria-label="SmileBERTa home">${LOGO}<span>Smile<b>BERT</b>a</span></a>
+      <a class="brand" href="./" aria-label="SmileBERTa home">${LOGO}<span>Smile<b>BERT</b>a</span></a>
       <div class="nav-links">
         <div class="nav-drop" data-drop><button type="button" aria-haspopup="true">Tools ${icon('chevron')}</button><div class="nav-menu">${menuItems(TOOLS)}</div></div>
         <div class="nav-drop" data-drop><button type="button" aria-haspopup="true">Learn ${icon('chevron')}</button><div class="nav-menu">${menuItems(LEARN)}<a href="learn.html"><span class="mi-icon">${icon('book')}</span><span><span class="mi-title">All guides</span><span class="mi-desc">The science behind every tool</span></span></a></div></div>
         <a class="nav-link ${page === 'workspace.html' ? 'active' : ''}" href="workspace.html">Workspace</a>
-        <a class="nav-link" href="index.html#about">About</a>
+        <a class="nav-link" href="./#about">About</a>
       </div>
       <div class="nav-right">
         <span class="api-pill unknown" title="${esc(API)}"><span class="api-dot"></span><span class="api-label">Connecting…</span></span>
@@ -251,11 +251,11 @@
     if (!host) return;
     host.outerHTML = `<footer class="footer"><div class="container">
       <div class="footer-grid">
-        <div><a class="brand" href="index.html">${LOGO}<span>Smile<b>BERT</b>a</span></a>
+        <div><a class="brand" href="./">${LOGO}<span>Smile<b>BERT</b>a</span></a>
           <p class="muted" style="margin-top:14px;max-width:320px;font-size:.88rem">Open, AI-powered drug discovery tools — transformer models, physics-based docking and interactive 3D chemistry in the browser.</p></div>
         <div><h6>Tools</h6>${TOOLS.map((t) => `<a href="${t.href}">${t.title}</a>`).join('')}</div>
         <div><h6>Learn</h6>${LEARN.map((t) => `<a href="${t.href}">${t.title}</a>`).join('')}</div>
-        <div><h6>Platform</h6><a href="workspace.html">Workspace</a><a href="login.html">Sign in</a><a href="index.html#about">About</a><a href="https://huggingface.co/NisargRhino" target="_blank" rel="noopener">Models on Hugging Face</a></div>
+        <div><h6>Platform</h6><a href="workspace.html">Workspace</a><a href="login.html">Sign in</a><a href="./#about">About</a><a href="https://huggingface.co/NisargRhino" target="_blank" rel="noopener">Models on Hugging Face</a></div>
       </div>
       <div class="footer-bottom"><span>© ${new Date().getFullYear()} SmileBERTa. For research and education — not for clinical use.</span><span>Built with RDKit · PyTorch · AutoDock Vina · 3Dmol.js</span></div>
     </div></footer>`;
@@ -504,6 +504,10 @@
 
   // ── Boot ──────────────────────────────────────────────────────────────────
   function boot() {
+    // Show "/" instead of "/index.html" in the address bar (keeps any #section or ?query).
+    if (/\/index\.html$/.test(location.pathname) && history.replaceState) {
+      history.replaceState(null, '', location.pathname.replace(/index\.html$/, '') + location.search + location.hash);
+    }
     addBackground();
     renderNav();
     renderFooter();

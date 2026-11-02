@@ -50,7 +50,7 @@
       return;
     }
     $('#items').innerHTML = list.map((i) => {
-      const k = KINDS[i.kind] || ['Item', 'file', 'index.html'];
+      const k = KINDS[i.kind] || ['Item', 'file', './'];
       return `<div class="card card-hover item-card fade-in"><div class="row-between"><span class="badge cyan"><span style="width:12px;height:12px;display:inline-block">${icon(k[1])}</span>${k[0].replace(/s$/, '')}</span><span class="muted" style="font-size:.74rem">${ago(i.updated_at)}</span></div>
         <div class="name">${esc(i.name)}</div><div class="summary">${esc(i.summary || '')}</div>
         <div class="foot"><a class="btn btn-sm btn-primary" href="${k[2]}?item=${i.id}">Open</a><div class="row" style="gap:2px"><button class="btn btn-xs btn-ghost" data-ren="${i.id}" title="Rename">${icon('edit')}</button><button class="btn btn-xs btn-ghost" data-exp="${i.id}" title="Export JSON">${icon('download')}</button><button class="btn btn-xs btn-ghost" data-del="${i.id}" title="Delete">${icon('trash')}</button></div></div></div>`;
