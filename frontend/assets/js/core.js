@@ -118,8 +118,9 @@
     token: () => store.get('auth_token'),
     username: () => store.get('auth_username'),
     loggedIn: () => !!store.get('auth_token'),
-    set(token, username) { store.set('auth_token', token); store.set('auth_username', username); },
-    clear() { store.del('auth_token'); store.del('auth_username'); },
+    isAdmin: () => store.get('auth_admin') === '1',
+    set(token, username, isAdmin) { store.set('auth_token', token); store.set('auth_username', username); store.set('auth_admin', isAdmin ? '1' : '0'); },
+    clear() { store.del('auth_token'); store.del('auth_username'); store.del('auth_admin'); },
     async signOut() {
       const t = auth.token();
       if (t) fetch(API + '/logout', { method: 'POST', headers: { Authorization: 'Bearer ' + t } }).catch(() => {});
@@ -208,6 +209,7 @@
           ? `<div class="user-menu nav-drop" data-drop><button type="button" class="avatar" aria-label="Account">${esc(user[0].toUpperCase())}</button>
               <div class="nav-menu"><div style="padding:10px 12px 6px"><div class="muted" style="font-size:.74rem">Signed in as</div><div style="font-weight:600">${esc(user)}</div></div>
               <a href="workspace.html"><span class="mi-icon">${icon('folder')}</span><span><span class="mi-title">My workspace</span><span class="mi-desc">Saved molecules, runs and structures</span></span></a>
+              ${auth.isAdmin() ? `<a href="admin.html"><span class="mi-icon">${icon('lock')}</span><span><span class="mi-title">Admin dashboard</span><span class="mi-desc">Users, activity and server health</span></span></a>` : ''}
               <a href="#" data-signout><span class="mi-icon">${icon('logout')}</span><span><span class="mi-title">Sign out</span></span></a></div></div>`
           : `<a class="btn btn-ghost btn-sm" href="${auth.loginUrl()}">Sign in</a><a class="btn btn-primary btn-sm" href="login.html?mode=register">Get started</a>`}
         <button class="nav-burger" type="button" aria-label="Menu">${icon('menu')}</button>
@@ -216,7 +218,7 @@
     <div class="mobile-menu" id="mobile-menu">
       <h6>Tools</h6>${TOOLS.map((t) => `<a href="${t.href}">${t.title}</a>`).join('')}
       <h6>Learn</h6>${LEARN.map((t) => `<a href="${t.href}">${t.title}</a>`).join('')}
-      <h6>Account</h6><a href="workspace.html">Workspace</a>${user ? '<a href="#" data-signout>Sign out</a>' : '<a href="login.html">Sign in</a>'}
+      <h6>Account</h6><a href="workspace.html">Workspace</a>${auth.isAdmin() ? '<a href="admin.html">Admin dashboard</a>' : ''}${user ? '<a href="#" data-signout>Sign out</a>' : '<a href="login.html">Sign in</a>'}
     </div>`;
     $$('[data-drop]').forEach((d) => {
       const btn = d.querySelector('button');
@@ -497,6 +499,8 @@
     renderFooter();
     initReveal();
     pingHealth();
+    // Keep the admin flag in sync with the server (it is controlled by ADMIN_USERNAMES on the API).
+    if (auth.loggedIn()) api('/me').then((me) => { if (!!me.is_admin !== auth.isAdmin()) { store.set('auth_admin', me.is_admin ? '1' : '0'); renderNav(); } }).catch(() => {});
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 

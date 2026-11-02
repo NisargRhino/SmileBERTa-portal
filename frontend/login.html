@@ -114,7 +114,7 @@
         btn.classList.add('loading'); btn.innerHTML = '<span class="spinner"></span> Please wait…';
         try {
           const data = await api(mode === 'register' ? '/register' : '/login', { body: { username, password }, auth: false, timeout: 90000 });
-          auth.set(data.token, data.username);
+          auth.set(data.token, data.username, data.is_admin);
           msg.className = 'form-msg ok'; msg.textContent = mode === 'register' ? 'Account created. Redirecting…' : 'Signed in. Redirecting…';
           setTimeout(() => (location.href = safeNext), 500);
         } catch (err) {

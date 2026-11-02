@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin — SmileBERTa</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 26px; } @media (max-width: 800px) { .kpis { grid-template-columns: 1fr 1fr; } }</style>
+  <script src="assets/js/core.js" defer></script>
+  <script src="assets/js/admin.js" defer></script>
+</head>
+<body>
+  <div id="site-nav"></div>
+  <main class="container" style="padding-bottom:80px">
+    <div class="page-head">
+      <div class="row-between" style="align-items:flex-end">
+        <div><div class="eyebrow">Master account</div><h1>Admin dashboard</h1><p class="lead">Every account, what people are saving, and the health of the API server.</p></div>
+        <button class="btn" id="refresh">Refresh</button>
+      </div>
+    </div>
+    <div id="gate" class="hidden card center" style="padding:56px 24px"><h2>Admin access required</h2><p class="text-2" id="gate-msg">Sign in with the admin account to view this page.</p></div>
+    <div id="admin" class="hidden">
+      <div id="persist"></div>
+      <div class="kpis" id="kpis"></div>
+      <div class="two-col" style="align-items:start">
+        <div class="card"><div class="row-between" style="margin-bottom:12px"><h3 style="margin:0">Users</h3><input class="input input-sm" id="q" placeholder="Search users…" style="max-width:200px"></div>
+          <div class="table-wrap"><table class="table"><thead><tr><th>User</th><th>Joined</th><th class="num">Items</th><th class="num">Frags</th><th></th></tr></thead><tbody id="users"></tbody></table></div></div>
+        <div class="stack">
+          <div class="card"><h3>Saved items by type</h3><div id="kinds"></div></div>
+          <div class="card"><h3>Recent activity</h3><div id="recent"></div></div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+</body>
+</html>

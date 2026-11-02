@@ -36,6 +36,12 @@ TOKEN_TTL_DAYS = 30
 MAX_ITEM_BYTES = 6 * 1024 * 1024
 ITEM_KINDS = {'molecule', 'fragment', 'classification', 'docking', 'structure', 'combination', 'note'}
 STARTED_AT = time.time()
+# Accounts with admin ("master") rights, e.g. ADMIN_USERNAMES=nisarg.shah@emory.edu
+ADMIN_USERNAMES = {u.strip().lower() for u in os.environ.get('ADMIN_USERNAMES', '').split(',') if u.strip()}
+
+
+def is_admin_name(username):
+    return bool(username) and username.lower() in ADMIN_USERNAMES
 
 db.init_db()
 
@@ -165,7 +171,7 @@ def register():
         if db.is_integrity_error(e):
             return err('That username is already taken', 409)
         raise
-    return jsonify({'success': True, 'token': token, 'username': username})
+    return jsonify({'success': True, 'token': token, 'username': username, 'is_admin': is_admin_name(username)})
 
 
 @app.route('/login', methods=['POST'])
@@ -178,7 +184,7 @@ def login():
         if not user or not check_password_hash(user['password_hash'], password):
             return err('Invalid username or password', 401)
         token = _issue_token(conn, user['id'])
-    return jsonify({'token': token, 'username': username})
+    return jsonify({'token': token, 'username': username, 'is_admin': is_admin_name(username)})
 
 
 @app.route('/logout', methods=['POST'])
@@ -198,7 +204,7 @@ def me(user):
         frags = conn.one('SELECT COUNT(*) AS n FROM fragment_library WHERE user_id = ?', (user['id'],))
     stats = {r['kind']: r['n'] for r in counts}
     stats['library'] = frags['n'] if frags else 0
-    return jsonify({'username': user['username'], 'created_at': _iso(user.get('created_at')), 'stats': stats,
+    return jsonify({'username': user['username'], 'is_admin': is_admin_name(user['username']), 'created_at': _iso(user.get('created_at')), 'stats': stats,
                     'persistent_storage': db.IS_POSTGRES})
 
 
@@ -214,6 +220,57 @@ def change_password(user):
         if len(new) < 8:
             return err('New password must be at least 8 characters')
         conn.execute('UPDATE users SET password_hash = ? WHERE id = ?', (generate_password_hash(new), user['id']))
+    return jsonify({'success': True})
+
+
+# ── Admin ("master" account) ────────────────────────────────────────────────
+
+def admin_required(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        user = current_user()
+        if not user:
+            return err('Not authenticated', 401)
+        if not is_admin_name(user['username']):
+            return err('Admin access required', 403)
+        return fn(user, *args, **kwargs)
+    return wrapper
+
+
+@app.route('/admin/overview', methods=['GET'])
+@admin_required
+def admin_overview(user):
+    with db.connect() as conn:
+        users = conn.all('SELECT u.id, u.username, u.created_at, '
+                         '(SELECT COUNT(*) FROM items i WHERE i.user_id = u.id) AS items, '
+                         '(SELECT COUNT(*) FROM fragment_library f WHERE f.user_id = u.id) AS fragments '
+                         'FROM users u ORDER BY u.created_at DESC, u.id DESC')
+        kinds = conn.all('SELECT kind, COUNT(*) AS n FROM items GROUP BY kind')
+        recent = conn.all('SELECT i.id, i.kind, i.name, i.created_at, u.username FROM items i '
+                          'JOIN users u ON u.id = i.user_id ORDER BY i.created_at DESC, i.id DESC LIMIT 25')
+    return jsonify({
+        'users': [{**u, 'created_at': _iso(u['created_at']), 'is_admin': is_admin_name(u['username'])} for u in users],
+        'items_by_kind': {k['kind']: k['n'] for k in kinds},
+        'recent_items': [{**r, 'created_at': _iso(r['created_at'])} for r in recent],
+        'server': {'uptime': round(time.time() - STARTED_AT), 'database': 'postgres' if db.IS_POSTGRES else 'sqlite',
+                   'persistent_storage': db.IS_POSTGRES, 'models_in_memory': models.loaded(), 'rss_mb': models.rss_mb()},
+    })
+
+
+@app.route('/admin/users/<int:user_id>', methods=['DELETE'])
+@admin_required
+def admin_delete_user(user, user_id):
+    if user_id == user['id']:
+        return err('You cannot delete your own admin account')
+    with db.connect() as conn:
+        target = conn.one('SELECT username FROM users WHERE id = ?', (user_id,))
+        if not target:
+            return err('User not found', 404)
+        if is_admin_name(target['username']):
+            return err('Admin accounts cannot be deleted here')
+        for table in ('tokens', 'items', 'fragment_library'):
+            conn.execute(f'DELETE FROM {table} WHERE user_id = ?', (user_id,))
+        conn.execute('DELETE FROM users WHERE id = ?', (user_id,))
     return jsonify({'success': True})
 
 

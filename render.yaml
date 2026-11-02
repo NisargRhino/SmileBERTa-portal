@@ -13,6 +13,9 @@ services:
         sync: false
       - key: MODEL_CACHE_SIZE
         value: "1"
+      # Usernames with admin ("master") rights, comma separated
+      - key: ADMIN_USERNAMES
+        value: nisarg.shah@emory.edu
 
   # ── Docking API (AutoDock Vina, no PyTorch → fits in 512 MB) ───────────
   - type: web
