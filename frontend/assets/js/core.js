@@ -89,18 +89,18 @@
     <g fill="url(#lg-sb)"><circle cx="44" cy="10" r="3.6"/><circle cx="44" cy="22" r="3.6"/><circle cx="44" cy="34" r="3.6"/><circle cx="54" cy="22" r="3.6"/><circle cx="14" cy="45" r="2.6"/><circle cx="50" cy="45" r="2.6"/></g></svg>`;
 
   const TOOLS = [
-    { href: 'fragmentation.html', icon: 'split', title: 'Fragment Prediction', desc: 'Predict binding fragments with SmileBERTa' },
-    { href: 'drug_class.html', icon: 'tag', title: 'Drug Classification', desc: 'Therapeutic class from structure' },
-    { href: 'combine.html', icon: 'merge', title: 'Fragment Linking', desc: 'Merge fragments into drug-like leads' },
-    { href: 'builder.html', icon: 'atom', title: 'Molecule Builder', desc: 'Build in 3D, optimise with MMFF94' },
-    { href: 'docking.html', icon: 'target', title: 'Docking', desc: 'Protein–ligand docking with AutoDock Vina' },
-    { href: 'studio.html', icon: 'helix', title: 'Structure Studio', desc: 'Explore chains, backbones, surfaces' },
+    { href: 'fragmentation', icon: 'split', title: 'Fragment Prediction', desc: 'Predict binding fragments with SmileBERTa' },
+    { href: 'drug_class', icon: 'tag', title: 'Drug Classification', desc: 'Therapeutic class from structure' },
+    { href: 'combine', icon: 'merge', title: 'Fragment Linking', desc: 'Merge fragments into drug-like leads' },
+    { href: 'builder', icon: 'atom', title: 'Molecule Builder', desc: 'Build in 3D, optimise with MMFF94' },
+    { href: 'docking', icon: 'target', title: 'Docking', desc: 'Protein–ligand docking with AutoDock Vina' },
+    { href: 'studio', icon: 'helix', title: 'Structure Studio', desc: 'Explore chains, backbones, surfaces' },
   ];
   const LEARN = [
-    { href: 'learn-fragmentation.html', icon: 'split', title: 'How fragmentation works', desc: 'Tokenizers, transformers, decoding' },
-    { href: 'learn-classification.html', icon: 'tag', title: 'How classification works', desc: 'From SMILES to therapeutic class' },
-    { href: 'learn-docking.html', icon: 'target', title: 'Docking & scoring', desc: 'Search boxes, Vina scoring, poses' },
-    { href: 'learn-forcefields.html', icon: 'activity', title: 'Force fields', desc: 'MMFF94, UFF and energy minimisation' },
+    { href: 'learn-fragmentation', icon: 'split', title: 'How fragmentation works', desc: 'Tokenizers, transformers, decoding' },
+    { href: 'learn-classification', icon: 'tag', title: 'How classification works', desc: 'From SMILES to therapeutic class' },
+    { href: 'learn-docking', icon: 'target', title: 'Docking & scoring', desc: 'Search boxes, Vina scoring, poses' },
+    { href: 'learn-forcefields', icon: 'activity', title: 'Force fields', desc: 'MMFF94, UFF and energy minimisation' },
   ];
 
   // ── HTML helpers ──────────────────────────────────────────────────────────
@@ -127,7 +127,7 @@
       auth.clear();
       location.href = './';
     },
-    loginUrl() { return 'login.html?next=' + encodeURIComponent(location.pathname.split('/').pop() + location.search); },
+    loginUrl() { return 'login?next=' + encodeURIComponent(location.pathname.split('/').pop() + location.search); },
   };
 
   // ── API client ────────────────────────────────────────────────────────────
@@ -192,15 +192,15 @@
   function renderNav() {
     const host = document.getElementById('site-nav');
     if (!host) return;
-    const page = location.pathname.split('/').pop() || 'index.html';
+    const page = location.pathname.split('/').pop() || 'index';
     const user = auth.username();
     host.outerHTML = `
     <nav class="nav" id="site-nav"><div class="container container-wide nav-inner">
       <a class="brand" href="./" aria-label="SmileBERTa home">${LOGO}<span>Smile<b>BERT</b>a</span></a>
       <div class="nav-links">
         <div class="nav-drop" data-drop><button type="button" aria-haspopup="true">Tools ${icon('chevron')}</button><div class="nav-menu">${menuItems(TOOLS)}</div></div>
-        <div class="nav-drop" data-drop><button type="button" aria-haspopup="true">Learn ${icon('chevron')}</button><div class="nav-menu">${menuItems(LEARN)}<a href="learn.html"><span class="mi-icon">${icon('book')}</span><span><span class="mi-title">All guides</span><span class="mi-desc">The science behind every tool</span></span></a></div></div>
-        <a class="nav-link ${page === 'workspace.html' ? 'active' : ''}" href="workspace.html">Workspace</a>
+        <div class="nav-drop" data-drop><button type="button" aria-haspopup="true">Learn ${icon('chevron')}</button><div class="nav-menu">${menuItems(LEARN)}<a href="learn"><span class="mi-icon">${icon('book')}</span><span><span class="mi-title">All guides</span><span class="mi-desc">The science behind every tool</span></span></a></div></div>
+        <a class="nav-link ${page === 'workspace' ? 'active' : ''}" href="workspace">Workspace</a>
         <a class="nav-link" href="./#about">About</a>
       </div>
       <div class="nav-right">
@@ -208,17 +208,17 @@
         ${user
           ? `<div class="user-menu nav-drop" data-drop><button type="button" class="avatar" aria-label="Account">${esc(user[0].toUpperCase())}</button>
               <div class="nav-menu"><div style="padding:10px 12px 6px"><div class="muted" style="font-size:.74rem">Signed in as</div><div style="font-weight:600">${esc(user)}</div></div>
-              <a href="workspace.html"><span class="mi-icon">${icon('folder')}</span><span><span class="mi-title">My workspace</span><span class="mi-desc">Saved molecules, runs and structures</span></span></a>
-              ${auth.isAdmin() ? `<a href="admin.html"><span class="mi-icon">${icon('lock')}</span><span><span class="mi-title">Admin dashboard</span><span class="mi-desc">Users, activity and server health</span></span></a>` : ''}
+              <a href="workspace"><span class="mi-icon">${icon('folder')}</span><span><span class="mi-title">My workspace</span><span class="mi-desc">Saved molecules, runs and structures</span></span></a>
+              ${auth.isAdmin() ? `<a href="admin"><span class="mi-icon">${icon('lock')}</span><span><span class="mi-title">Admin dashboard</span><span class="mi-desc">Users, activity and server health</span></span></a>` : ''}
               <a href="#" data-signout><span class="mi-icon">${icon('logout')}</span><span><span class="mi-title">Sign out</span></span></a></div></div>`
-          : `<a class="btn btn-ghost btn-sm" href="${auth.loginUrl()}">Sign in</a><a class="btn btn-primary btn-sm" href="login.html?mode=register">Get started</a>`}
+          : `<a class="btn btn-ghost btn-sm" href="${auth.loginUrl()}">Sign in</a><a class="btn btn-primary btn-sm" href="login?mode=register">Get started</a>`}
         <button class="nav-burger" type="button" aria-label="Menu">${icon('menu')}</button>
       </div>
     </div></nav>
     <div class="mobile-menu" id="mobile-menu">
       <h6>Tools</h6>${TOOLS.map((t) => `<a href="${t.href}">${t.title}</a>`).join('')}
       <h6>Learn</h6>${LEARN.map((t) => `<a href="${t.href}">${t.title}</a>`).join('')}
-      <h6>Account</h6><a href="workspace.html">Workspace</a>${auth.isAdmin() ? '<a href="admin.html">Admin dashboard</a>' : ''}${user ? '<a href="#" data-signout>Sign out</a>' : '<a href="login.html">Sign in</a>'}
+      <h6>Account</h6><a href="workspace">Workspace</a>${auth.isAdmin() ? '<a href="admin">Admin dashboard</a>' : ''}${user ? '<a href="#" data-signout>Sign out</a>' : '<a href="login">Sign in</a>'}
     </div>`;
     const canHover = () => matchMedia('(hover: hover)').matches;
     $$('#site-nav [data-drop]').forEach((d) => {
@@ -255,7 +255,7 @@
           <p class="muted" style="margin-top:14px;max-width:320px;font-size:.88rem">Open, AI-powered drug discovery tools — transformer models, physics-based docking and interactive 3D chemistry in the browser.</p></div>
         <div><h6>Tools</h6>${TOOLS.map((t) => `<a href="${t.href}">${t.title}</a>`).join('')}</div>
         <div><h6>Learn</h6>${LEARN.map((t) => `<a href="${t.href}">${t.title}</a>`).join('')}</div>
-        <div><h6>Platform</h6><a href="workspace.html">Workspace</a><a href="login.html">Sign in</a><a href="./#about">About</a><a href="https://huggingface.co/NisargRhino" target="_blank" rel="noopener">Models on Hugging Face</a></div>
+        <div><h6>Platform</h6><a href="workspace">Workspace</a><a href="login">Sign in</a><a href="./#about">About</a><a href="https://huggingface.co/NisargRhino" target="_blank" rel="noopener">Models on Hugging Face</a></div>
       </div>
       <div class="footer-bottom"><span>© ${new Date().getFullYear()} SmileBERTa. For research and education — not for clinical use.</span><span>Built with RDKit · PyTorch · AutoDock Vina · 3Dmol.js</span></div>
     </div></footer>`;
@@ -399,7 +399,7 @@
   // ── Hand-off between tools (e.g. "Dock this molecule") ────────────────────
   function handoff(target, payload) {
     try { sessionStorage.setItem('sb_handoff_' + target, JSON.stringify(payload)); } catch (e) { /* ignore */ }
-    location.href = target + '.html';
+    location.href = target;
   }
   function takeHandoff(target) {
     try { const v = sessionStorage.getItem('sb_handoff_' + target); sessionStorage.removeItem('sb_handoff_' + target); return v ? JSON.parse(v) : null; } catch (e) { return null; }
@@ -504,9 +504,11 @@
 
   // ── Boot ──────────────────────────────────────────────────────────────────
   function boot() {
-    // Show "/" instead of "/index.html" in the address bar (keeps any #section or ?query).
-    if (/\/index\.html$/.test(location.pathname) && history.replaceState) {
-      history.replaceState(null, '', location.pathname.replace(/index\.html$/, '') + location.search + location.hash);
+    // Clean addresses: "/builder" instead of "/builder.html", "/" instead of "/index.html"
+    // (keeps any ?query and #section). The static host serves both forms.
+    if (/\.html$/.test(location.pathname) && history.replaceState) {
+      const clean = location.pathname.replace(/index\.html$/, '').replace(/\.html$/, '');
+      history.replaceState(null, '', clean + location.search + location.hash);
     }
     addBackground();
     renderNav();

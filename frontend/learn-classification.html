@@ -17,7 +17,7 @@
   <div id="site-nav"></div>
   <main class="container">
     <div class="page-head">
-      <div class="crumbs"><a href="./">Home</a><span>/</span><a href="learn.html">Learn</a><span>/</span><span>Drug classification</span></div>
+      <div class="crumbs"><a href="./">Home</a><span>/</span><a href="learn">Learn</a><span>/</span><span>Drug classification</span></div>
       <div class="eyebrow">Technical guide · 9 min read</div>
       <h1>How SmileBERTa classifies drugs</h1>
       <p class="lead">Predicting what a molecule is <em>for</em> from what it <em>is</em>: the data, the model, and the matching step that turns text into a therapeutic class.</p>
@@ -37,7 +37,7 @@
         </figure>
 
         <h2 id="model">The model</h2>
-        <p>The classifier uses the same architecture as the fragment model: a 6-layer RoBERTa encoder initialised from <strong>ChemBERTa-zinc-base-v1</strong> (see <a href="learn-fragmentation.html#architecture">the architecture section</a> of the fragmentation guide). It is fine-tuned on a different objective. Instead of rewriting the input as a fragment, it writes out the <em>name of the class</em>, token by token, using the same 767-token vocabulary.</p>
+        <p>The classifier uses the same architecture as the fragment model: a 6-layer RoBERTa encoder initialised from <strong>ChemBERTa-zinc-base-v1</strong> (see <a href="learn-fragmentation#architecture">the architecture section</a> of the fragmentation guide). It is fine-tuned on a different objective. Instead of rewriting the input as a fragment, it writes out the <em>name of the class</em>, token by token, using the same 767-token vocabulary.</p>
         <figure class="figure">
           <svg viewBox="0 0 760 170" role="img" aria-label="Classification as text generation">
             <defs><marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#22d3ee"/></marker></defs>
@@ -76,7 +76,7 @@
 
         <h2 id="limits">Limitations</h2>
         <div class="callout warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><div>The classifier learns statistical associations, not mechanisms. It can be confidently wrong. For example, it labels the antibiotic ciprofloxacin as <em>antineoplastic</em>, probably because quinolone-like scaffolds are common in kinase inhibitors. Rare classes (urological, lipid-regulating) are predicted less reliably. Use predictions for prioritisation and hypothesis generation, never as a substitute for biological assays.</div></div>
-        <div class="row" style="margin-top:28px"><a class="btn btn-primary" href="drug_class.html">Try drug classification</a><a class="btn" href="learn-docking.html">Next: docking →</a></div>
+        <div class="row" style="margin-top:28px"><a class="btn btn-primary" href="drug_class">Try drug classification</a><a class="btn" href="learn-docking">Next: docking →</a></div>
       </article>
     </div>
   </main>

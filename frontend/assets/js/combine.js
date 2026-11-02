@@ -17,7 +17,7 @@
   async function renderLibrary() {
     const lib = await library.list();
     const el = $('#library');
-    if (!lib.length) { el.innerHTML = `<p class="muted" style="font-size:.86rem;margin:0">Your library is empty. Predict fragments on the <a href="fragmentation.html">Fragment Prediction</a> page and add them here, or type SMILES directly.</p>`; return; }
+    if (!lib.length) { el.innerHTML = `<p class="muted" style="font-size:.86rem;margin:0">Your library is empty. Predict fragments on the <a href="fragmentation">Fragment Prediction</a> page and add them here, or type SMILES directly.</p>`; return; }
     el.innerHTML = '<p class="kbd-hint" style="margin:0">Click a fragment to place it in the next empty slot.</p>' + lib.map((f, i) => `<div class="list-item lib-item" data-s="${esc(f.smiles)}"><div class="thumb" id="l${i}"></div><div class="grow mono" style="font-size:.72rem;word-break:break-all">${esc(f.smiles)}</div></div>`).join('');
     lib.forEach((f, i) => depictSVG(f.smiles, { width: 140, height: 110 }).then((s) => { const t = $('#l' + i); if (t) t.innerHTML = s; }).catch(() => {}));
     $$('.lib-item', el).forEach((it) => it.addEventListener('click', () => {

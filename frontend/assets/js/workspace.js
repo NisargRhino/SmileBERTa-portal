@@ -2,8 +2,8 @@
 (function () {
   const { $, $$, api, auth, esc, icon, toast, modal, promptText, download, depictSVG, library } = SB;
   const KINDS = {
-    molecule: ['Molecules', 'atom', 'builder.html'], fragment: ['Fragments', 'split', 'fragmentation.html'], classification: ['Classifications', 'tag', 'drug_class.html'],
-    combination: ['Linked leads', 'merge', 'combine.html'], docking: ['Docking runs', 'target', 'docking.html'], structure: ['Structures', 'helix', 'studio.html'],
+    molecule: ['Molecules', 'atom', 'builder'], fragment: ['Fragments', 'split', 'fragmentation'], classification: ['Classifications', 'tag', 'drug_class'],
+    combination: ['Linked leads', 'merge', 'combine'], docking: ['Docking runs', 'target', 'docking'], structure: ['Structures', 'helix', 'studio'],
   };
   let items = [], filter = 'all';
 
@@ -46,7 +46,7 @@
     const q = $('#search').value.trim().toLowerCase();
     const list = items.filter((i) => (filter === 'all' || i.kind === filter) && (!q || (i.name + ' ' + (i.summary || '')).toLowerCase().includes(q)));
     if (!list.length) {
-      $('#items').innerHTML = `<div class="card empty" style="grid-column:1/-1;min-height:220px"><div>${icon('folder')}<h3 style="color:var(--text)">${items.length ? 'No matching items' : 'Nothing saved yet'}</h3><p>${items.length ? 'Try a different search or filter.' : 'Use the <b>Save</b> button in any tool to keep results here.'}</p>${items.length ? '' : '<div class="row" style="justify-content:center;margin-top:10px"><a class="btn btn-sm" href="builder.html">Build a molecule</a><a class="btn btn-sm" href="docking.html">Run a docking</a></div>'}</div></div>`;
+      $('#items').innerHTML = `<div class="card empty" style="grid-column:1/-1;min-height:220px"><div>${icon('folder')}<h3 style="color:var(--text)">${items.length ? 'No matching items' : 'Nothing saved yet'}</h3><p>${items.length ? 'Try a different search or filter.' : 'Use the <b>Save</b> button in any tool to keep results here.'}</p>${items.length ? '' : '<div class="row" style="justify-content:center;margin-top:10px"><a class="btn btn-sm" href="builder">Build a molecule</a><a class="btn btn-sm" href="docking">Run a docking</a></div>'}</div></div>`;
       return;
     }
     $('#items').innerHTML = list.map((i) => {
@@ -74,7 +74,7 @@
 
   async function renderLibrary() {
     const lib = await library.list();
-    if (!lib.length) { $('#library').innerHTML = '<p class="muted">No fragments yet. Add them from <a href="fragmentation.html">Fragment Prediction</a>.</p>'; return; }
+    if (!lib.length) { $('#library').innerHTML = '<p class="muted">No fragments yet. Add them from <a href="fragmentation">Fragment Prediction</a>.</p>'; return; }
     $('#library').innerHTML = lib.map((f, i) => `<div class="card item-card"><div class="mol-2d" id="lf${i}" style="min-height:150px"></div><div class="summary">${esc(f.smiles)}</div><div class="foot"><button class="btn btn-xs" data-dock="${esc(f.smiles)}">${icon('target')} Dock</button><button class="btn btn-xs btn-ghost" data-rm="${esc(f.smiles)}">${icon('trash')}</button></div></div>`).join('');
     lib.forEach((f, i) => depictSVG(f.smiles, { width: 280, height: 150 }).then((s) => { const el = $('#lf' + i); if (el) el.innerHTML = s; }).catch(() => {}));
     $$('[data-rm]', $('#library')).forEach((b) => b.addEventListener('click', async () => { await library.remove(b.dataset.rm); renderLibrary(); }));

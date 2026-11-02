@@ -53,7 +53,7 @@
   <div id="site-footer"></div>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const meta = { 'learn-fragmentation.html': ['12 min', 'SMILES, BPE tokenization, the RoBERTa encoder, decoding, and how invalid outputs are repaired.'], 'learn-classification.html': ['9 min', 'The 8,336-compound dataset, text-generation classification, and edit-distance label matching.'], 'learn-docking.html': ['11 min', 'Receptor and ligand preparation, search boxes, the Vina scoring function, and reading poses.'], 'learn-forcefields.html': ['10 min', 'MMFF94 and UFF energy terms, BFGS minimisation, and ETKDG conformer search.'] };
+      const meta = { 'learn-fragmentation': ['12 min', 'SMILES, BPE tokenization, the RoBERTa encoder, decoding, and how invalid outputs are repaired.'], 'learn-classification': ['9 min', 'The 8,336-compound dataset, text-generation classification, and edit-distance label matching.'], 'learn-docking': ['11 min', 'Receptor and ligand preparation, search boxes, the Vina scoring function, and reading poses.'], 'learn-forcefields': ['10 min', 'MMFF94 and UFF energy terms, BFGS minimisation, and ETKDG conformer search.'] };
       document.getElementById('guides').innerHTML = SB.LEARN.map((g, i) => `<a class="card card-hover guide reveal" data-delay="${i}" href="${g.href}"><div class="art">${SB.icon(g.icon)}</div><div><span class="badge cyan">${meta[g.href][0]} read</span><h3>${g.title}</h3><p>${meta[g.href][1]}</p><span style="color:var(--cyan);font-weight:600;font-size:.86rem">Read guide →</span></div></a>`).join('');
       SB.initReveal();
     });

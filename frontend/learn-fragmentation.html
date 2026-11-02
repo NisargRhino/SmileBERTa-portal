@@ -23,7 +23,7 @@
   <div id="site-nav"></div>
   <main class="container">
     <div class="page-head">
-      <div class="crumbs"><a href="./">Home</a><span>/</span><a href="learn.html">Learn</a><span>/</span><span>Fragment prediction</span></div>
+      <div class="crumbs"><a href="./">Home</a><span>/</span><a href="learn">Learn</a><span>/</span><span>Fragment prediction</span></div>
       <div class="eyebrow">Technical guide · 12 min read</div>
       <h1>How SmileBERTa predicts fragments</h1>
       <p class="lead">From a SMILES string to a validated, binding-relevant fragment: the chemistry, the transformer, and every step of the inference pipeline.</p>
@@ -185,8 +185,8 @@
         <div class="callout warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><div><b>Limitations.</b> The target selector (KRAS, mTOR, AKT1, ERK2) is recorded with each run, but the current public checkpoint is a single shared fragment model, so predictions do not yet change with the target. The model has no 3D information about the protein. Validate promising fragments with docking and, ultimately, experiments.</div></div>
 
         <h2 id="next">Next steps</h2>
-        <p>Add good fragments to your library, then <a href="combine.html">link two of them</a> into a lead-like molecule, refine it in the <a href="builder.html">Molecule Builder</a>, and <a href="docking.html">dock it</a> into your target. Read <a href="learn-docking.html">how docking works</a> to interpret the scores.</p>
-        <div class="row" style="margin-top:28px"><a class="btn btn-primary" href="fragmentation.html">Try fragment prediction</a><a class="btn" href="learn-classification.html">Next: classification →</a></div>
+        <p>Add good fragments to your library, then <a href="combine">link two of them</a> into a lead-like molecule, refine it in the <a href="builder">Molecule Builder</a>, and <a href="docking">dock it</a> into your target. Read <a href="learn-docking">how docking works</a> to interpret the scores.</p>
+        <div class="row" style="margin-top:28px"><a class="btn btn-primary" href="fragmentation">Try fragment prediction</a><a class="btn" href="learn-classification">Next: classification →</a></div>
       </article>
     </div>
   </main>

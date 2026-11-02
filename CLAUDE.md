@@ -11,7 +11,7 @@ pip install -r requirements-render.txt
 python app.py                      # docking needs a `vina` binary on PATH (or VINA_BIN)
 
 # Frontend (no build step)
-cd frontend && python3 -m http.server 8080
+python3 serve_frontend.py            # http://localhost:8080 (serves /builder as builder.html, like Render)
 ```
 
 `frontend/assets/js/core.js` points at `http://localhost:5001` automatically when served from localhost, otherwise at `https://smileberta-api.onrender.com`. Override with `localStorage.sb_api`.

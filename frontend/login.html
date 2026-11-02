@@ -71,7 +71,7 @@
       const { $, $$, api, auth, icon, param } = SB;
       let mode = param('mode') === 'register' ? 'register' : 'login';
       const next = param('next');
-      const safeNext = next && /^[\w.-]+\.html(\?.*)?$/.test(next) ? next : 'workspace.html';
+      const safeNext = next && /^[\w-]+(\.html)?(\?[^#]*)?$/.test(next) ? next.replace(/\.html/, '') : 'workspace';
       if (auth.loggedIn()) { location.href = safeNext; return; }
 
       $('.pw-toggle').innerHTML = icon('eye');

@@ -1,14 +1,14 @@
 /* Landing page interactions. */
 (function () {
   const { icon, TOOLS, LEARN, $, $$ } = SB;
-  const TAGS = { 'fragmentation.html': ['AI model', 'blue'], 'drug_class.html': ['AI model', 'blue'], 'combine.html': ['Chemistry', 'violet'], 'builder.html': ['Force field', 'cyan'], 'docking.html': ['Physics', 'green'], 'studio.html': ['Visualization', 'amber'] };
+  const TAGS = { 'fragmentation': ['AI model', 'blue'], 'drug_class': ['AI model', 'blue'], 'combine': ['Chemistry', 'violet'], 'builder': ['Force field', 'cyan'], 'docking': ['Physics', 'green'], 'studio': ['Visualization', 'amber'] };
   const LONG = {
-    'fragmentation.html': 'Give it a drug-like molecule and SmileBERTa predicts the fragment most relevant to binding. You get Rule-of-Three checks, a 3D conformer and a side-by-side property comparison.',
-    'drug_class.html': 'Predict the therapeutic class of any compound (anti-infective, antineoplastic, CNS, cardiovascular and more), shown with ranked alternatives and a drug-likeness profile.',
-    'combine.html': 'Link two fragments through amide or ester bridges. Only candidates that pass Lipinski and QED filters are kept.',
-    'builder.html': 'An Avogadro-style 3D builder. Click to grow molecules atom by atom, then relax them with the MMFF94 or UFF force fields and search for conformers.',
-    'docking.html': 'Load any PDB target, define a search box around the pocket, and dock ligands with AutoDock Vina. Inspect poses, affinities and H-bonds.',
-    'studio.html': 'A Chimera-style viewer. Isolate chains, show backbones and surfaces, colour by secondary structure or B-factor, and measure distances and angles.',
+    'fragmentation': 'Give it a drug-like molecule and SmileBERTa predicts the fragment most relevant to binding. You get Rule-of-Three checks, a 3D conformer and a side-by-side property comparison.',
+    'drug_class': 'Predict the therapeutic class of any compound (anti-infective, antineoplastic, CNS, cardiovascular and more), shown with ranked alternatives and a drug-likeness profile.',
+    'combine': 'Link two fragments through amide or ester bridges. Only candidates that pass Lipinski and QED filters are kept.',
+    'builder': 'An Avogadro-style 3D builder. Click to grow molecules atom by atom, then relax them with the MMFF94 or UFF force fields and search for conformers.',
+    'docking': 'Load any PDB target, define a search box around the pocket, and dock ligands with AutoDock Vina. Inspect poses, affinities and H-bonds.',
+    'studio': 'A Chimera-style viewer. Isolate chains, show backbones and surfaces, colour by secondary structure or B-factor, and measure distances and angles.',
   };
 
   $('#tool-cards').innerHTML = TOOLS.map((t, i) => `
