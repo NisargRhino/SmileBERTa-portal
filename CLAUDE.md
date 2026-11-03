@@ -22,7 +22,7 @@ python3 serve_frontend.py            # http://localhost:8080 (serves /builder as
 
 **Backend modules:**
 - `app.py` — all routes: auth (`/register`, `/login`, `/me`, `/account/password`), workspace items (`/items` CRUD, kinds: molecule, fragment, classification, combination, docking, structure), fragment library, `/analyze`, `/depict`, builder (`/builder/*`), ML (`/predict_fragment`, `/classify_smiles`, batch variants, `/combine`), docking (`/dock`, `/dock/<job_id>`).
-- `db.py` — SQLite by default; Postgres when `DATABASE_URL` is set (falls back to SQLite if unreachable). SQLite resets on every Render redeploy.
+- `db.py` — Postgres when `DATABASE_URL` is set (production: Neon, set on `smileberta-api` in Render), SQLite otherwise (local dev only — Render's free disk is wiped on every sleep/redeploy). One fresh Postgres connection per request; never falls back to SQLite when `DATABASE_URL` is set (returns 503 until the DB is reachable). Usernames are stored lowercase.
 - `models.py` — LRU cache for the two RoBERTa models. `MODEL_CACHE_SIZE=1` on the free tier (512 MB RAM) keeps one model resident. Do not int8-quantize: it changes ~15% of fragment outputs.
 - `fragpred.py` / `predict_drug_classification.py` — inference. Invalid fragment SMILES → external corrector → nearest of `unique_smile5.csv`. Class text → nearest label in `drugclassoptions_final1.csv` by Levenshtein.
 - `chem_tools.py` — RDKit analysis, depiction, MMFF94/UFF optimisation with animation frames, ETKDG conformer search.
