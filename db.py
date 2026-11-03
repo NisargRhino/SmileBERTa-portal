@@ -6,7 +6,7 @@ Neon, Supabase, ...) to make accounts and saved work persistent.
 """
 import os
 import sqlite3
-import threading
+import time
 
 DATABASE_URL = os.environ.get('DATABASE_URL', '').strip()
 if DATABASE_URL.startswith('postgres://'):
@@ -19,21 +19,31 @@ if IS_POSTGRES:
     try:
         import psycopg2
         import psycopg2.extras
-        import psycopg2.pool
     except ImportError:
         print('[db] psycopg2 not installed, falling back to SQLite')
         IS_POSTGRES = False
 
-_pool = None
-_pool_lock = threading.Lock()
+
+class DatabaseUnavailable(RuntimeError):
+    """Raised when the database cannot be reached (mapped to HTTP 503 by the app)."""
 
 
-def _pg_pool():
-    global _pool
-    with _pool_lock:
-        if _pool is None:
-            _pool = psycopg2.pool.ThreadedConnectionPool(1, 5, DATABASE_URL)
-    return _pool
+def _pg_connect():
+    """A fresh connection per request.
+
+    Hosted Postgres (Neon, Supabase, Render) closes idle connections and may
+    suspend when idle; pooled connections then fail at random. A new connection
+    costs ~50 ms and is always healthy. One retry covers a cold-starting database.
+    """
+    last = None
+    for attempt in range(3):
+        try:
+            return psycopg2.connect(DATABASE_URL, connect_timeout=15, keepalives=1,
+                                    keepalives_idle=30, keepalives_interval=10, keepalives_count=3)
+        except psycopg2.OperationalError as e:
+            last = e
+            time.sleep(1.5 * (attempt + 1))
+    raise DatabaseUnavailable(str(last).split('\n')[0])
 
 
 class _Conn:
@@ -41,7 +51,7 @@ class _Conn:
 
     def __init__(self):
         if IS_POSTGRES:
-            self._raw = _pg_pool().getconn()
+            self._raw = _pg_connect()
         else:
             self._raw = sqlite3.connect(SQLITE_PATH, timeout=15)
             self._raw.row_factory = sqlite3.Row
@@ -75,14 +85,15 @@ class _Conn:
         self._raw.commit()
 
     def close(self):
-        if IS_POSTGRES:
-            try:
+        try:
+            if IS_POSTGRES:
                 self._raw.rollback()
-            except Exception:
-                pass
-            _pg_pool().putconn(self._raw)
-        else:
+        except Exception:
+            pass
+        try:
             self._raw.close()
+        except Exception:
+            pass
 
     def __enter__(self):
         return self
@@ -91,10 +102,6 @@ class _Conn:
         if exc_type is None:
             self.commit()
         self.close()
-
-
-def connect():
-    return _Conn()
 
 
 def is_integrity_error(exc):
@@ -134,6 +141,7 @@ CREATE TABLE IF NOT EXISTS items (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_items_user ON items(user_id, kind);
+CREATE INDEX IF NOT EXISTS idx_tokens_user ON tokens(user_id);
 '''
 
 _SCHEMA_PG = '''
@@ -167,18 +175,17 @@ CREATE TABLE IF NOT EXISTS items (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_items_user ON items(user_id, kind);
+CREATE INDEX IF NOT EXISTS idx_tokens_user ON tokens(user_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_lower ON users (lower(username));
 '''
 
 
-def init_db():
-    global IS_POSTGRES
-    if IS_POSTGRES:
-        try:
-            connect().close()
-        except Exception as e:  # never let a bad DATABASE_URL take the whole API down
-            print('[db] Postgres unavailable, falling back to SQLite:', str(e).split('\n')[0])
-            IS_POSTGRES = False
-    conn = connect()
+_schema_ready = False
+_schema_lock = __import__('threading').Lock()
+
+
+def _create_schema():
+    conn = _Conn()
     try:
         if IS_POSTGRES:
             for stmt in _SCHEMA_PG.split(';'):
@@ -191,6 +198,37 @@ def init_db():
             if 'created_at' not in cols:
                 conn.execute('ALTER TABLE tokens ADD COLUMN created_at TIMESTAMP')
                 conn.execute('UPDATE tokens SET created_at = CURRENT_TIMESTAMP')
+            try:
+                conn.execute('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_lower ON users (lower(username))')
+            except sqlite3.IntegrityError:
+                pass  # legacy local DB with case-duplicate usernames
         conn.commit()
     finally:
         conn.close()
+
+
+def ensure_schema():
+    """Create tables once. Retried on later requests if the database was unreachable at boot.
+
+    When DATABASE_URL is set we never fall back to SQLite: silently switching to an
+    ephemeral file is exactly what made accounts disappear.
+    """
+    global _schema_ready
+    if _schema_ready:
+        return
+    with _schema_lock:
+        if not _schema_ready:
+            _create_schema()
+            _schema_ready = True
+
+
+def connect():
+    ensure_schema()
+    return _Conn()
+
+
+def init_db():
+    try:
+        ensure_schema()
+    except DatabaseUnavailable as e:
+        print('[db] Database not reachable yet, will retry on first request:', e)

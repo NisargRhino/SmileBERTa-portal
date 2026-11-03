@@ -1,4 +1,5 @@
 """SmileBERTa API — accounts, saved workspace, ML models, molecule builder and docking."""
+import calendar
 import json
 import os
 import secrets
@@ -32,7 +33,7 @@ app.config['MAX_CONTENT_LENGTH'] = 25 * 1024 * 1024
 CORS(app, origins='*', supports_credentials=False,
      allow_headers=['Content-Type', 'Authorization'], methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
 
-TOKEN_TTL_DAYS = 30
+TOKEN_TTL_DAYS = 90
 MAX_ITEM_BYTES = 6 * 1024 * 1024
 ITEM_KINDS = {'molecule', 'fragment', 'classification', 'docking', 'structure', 'combination', 'note'}
 STARTED_AT = time.time()
@@ -89,7 +90,8 @@ def current_user():
         return None
     created = row.get('token_created')
     if created is not None:
-        ts = created.timestamp() if hasattr(created, 'timestamp') else _parse_ts(created)
+        # DB timestamps are UTC without tz info; interpret them as UTC on any host.
+        ts = calendar.timegm(created.timetuple()) if hasattr(created, 'timetuple') else _parse_ts(created)
         if ts and time.time() - ts > TOKEN_TTL_DAYS * 86400:
             return None
     return row
@@ -97,7 +99,7 @@ def current_user():
 
 def _parse_ts(s):
     try:
-        return time.mktime(time.strptime(str(s)[:19], '%Y-%m-%d %H:%M:%S')) - time.timezone
+        return calendar.timegm(time.strptime(str(s)[:19], '%Y-%m-%d %H:%M:%S'))
     except Exception:
         return None
 
@@ -114,6 +116,11 @@ def login_required(fn):
 
 def _iso(v):
     return v.isoformat() if hasattr(v, 'isoformat') else (str(v) if v is not None else None)
+
+
+@app.errorhandler(db.DatabaseUnavailable)
+def db_unavailable(e):
+    return err('The account database is temporarily unreachable. Please try again in a few seconds.', 503)
 
 
 @app.errorhandler(413)
@@ -154,16 +161,18 @@ def _issue_token(conn, user_id):
 @app.route('/register', methods=['POST'])
 def register():
     data = body()
-    username = str(data.get('username', '')).strip()
+    username = str(data.get('username', '')).strip().lower()
     password = str(data.get('password', ''))
-    if len(username) < 3 or len(username) > 40:
-        return err('Username must be 3–40 characters')
+    if len(username) < 3 or len(username) > 60:
+        return err('Username must be 3–60 characters')
     if not all(c.isalnum() or c in '._-@' for c in username):
         return err('Username may only contain letters, numbers and . _ - @')
     if len(password) < 8:
         return err('Password must be at least 8 characters')
     try:
         with db.connect() as conn:
+            if conn.one('SELECT id FROM users WHERE lower(username) = ?', (username,)):
+                return err('That username is already taken', 409)
             uid = conn.insert('INSERT INTO users (username, password_hash) VALUES (?, ?)',
                               (username, generate_password_hash(password)))
             token = _issue_token(conn, uid)
@@ -177,13 +186,14 @@ def register():
 @app.route('/login', methods=['POST'])
 def login():
     data = body()
-    username = str(data.get('username', '')).strip()
+    username = str(data.get('username', '')).strip().lower()
     password = str(data.get('password', ''))
     with db.connect() as conn:
-        user = conn.one('SELECT id, password_hash FROM users WHERE username = ?', (username,))
+        user = conn.one('SELECT id, username, password_hash FROM users WHERE lower(username) = ?', (username,))
         if not user or not check_password_hash(user['password_hash'], password):
             return err('Invalid username or password', 401)
         token = _issue_token(conn, user['id'])
+    username = user['username']
     return jsonify({'token': token, 'username': username, 'is_admin': is_admin_name(username)})
 
 
