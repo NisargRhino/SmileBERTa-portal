@@ -233,6 +233,21 @@ def change_password(user):
     return jsonify({'success': True})
 
 
+@app.route('/account', methods=['DELETE'])
+@login_required
+def delete_account(user):
+    """Permanently delete the signed-in account and all of its data (password required)."""
+    data = body()
+    with db.connect() as conn:
+        row = conn.one('SELECT password_hash FROM users WHERE id = ?', (user['id'],))
+        if not row or not check_password_hash(row['password_hash'], str(data.get('password', ''))):
+            return err('Password is incorrect', 403)
+        for table in ('tokens', 'items', 'fragment_library'):
+            conn.execute(f'DELETE FROM {table} WHERE user_id = ?', (user['id'],))
+        conn.execute('DELETE FROM users WHERE id = ?', (user['id'],))
+    return jsonify({'success': True})
+
+
 # ── Admin ("master" account) ────────────────────────────────────────────────
 
 def admin_required(fn):

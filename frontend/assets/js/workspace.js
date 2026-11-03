@@ -8,7 +8,7 @@
   let items = [], filter = 'all';
 
   if (!auth.loggedIn()) {
-    $('#gate').classList.remove('hidden'); $('#pw').classList.add('hidden'); $('#signout').classList.add('hidden');
+    $('#gate').classList.remove('hidden'); $('#pw').classList.add('hidden'); $('#signout').classList.add('hidden'); $('#delacct').classList.add('hidden');
     $('#gate .icon-tile').innerHTML = icon('lock');
     return;
   }
@@ -86,6 +86,14 @@
       actions: [{ label: 'Cancel', value: null }, { label: 'Update password', primary: true, value: (m) => ({ current: m.querySelector('#pw-cur').value, new: m.querySelector('#pw-new').value }) }] });
     if (!vals) return;
     try { await api('/account/password', { body: vals }); toast('Password updated', 'ok'); } catch (e) { toast(e.message, 'error'); }
+  });
+
+  $('#delacct').addEventListener('click', async () => {
+    const pw = await modal({ title: 'Delete your account?', body: `<p class="text-2">This permanently deletes your account, every saved item and your fragment library. It cannot be undone.</p><label class="field"><span>Confirm with your password</span><input class="input" type="password" id="del-pw" autocomplete="current-password"></label>`,
+      actions: [{ label: 'Cancel', value: null }, { label: 'Delete account', danger: true, value: (m) => m.querySelector('#del-pw').value || null }] });
+    if (!pw) return;
+    try { await api('/account', { method: 'DELETE', body: { password: pw } }); auth.clear(); toast('Your account has been deleted', 'ok'); setTimeout(() => (location.href = './'), 900); }
+    catch (e) { toast(e.message, 'error'); }
   });
 
   loadAll();
