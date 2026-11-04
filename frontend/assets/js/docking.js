@@ -50,13 +50,14 @@
     recModel.setStyle({}, {});
     const chains = selectedChains();
     const sel = { chain: chains, hetflag: false };
-    if (st === 'cartoon') recModel.setStyle(sel, { cartoon: { colorscheme: 'chain', opacity: 0.92, thickness: 0.4 } });
+    // Fade the ribbon once a pose is shown so it never hides the ligand.
+    if (st === 'cartoon') recModel.setStyle(sel, { cartoon: { colorscheme: 'chain', opacity: poseModel ? 0.45 : 0.92, thickness: 0.4 } });
     if (st === 'lines') recModel.setStyle(sel, { line: { colorscheme: 'Jmol' } });
     if (st === 'surface') { recModel.setStyle(sel, { cartoon: { color: '#334155', opacity: 0.4 } }); viewer.addSurface($3Dmol.SurfaceType.MS, { opacity: 0.75, colorscheme: { prop: 'b', gradient: 'rwb' } }, { model: recModel, chain: chains, hetflag: false }); }
     if ($('#show-het').checked) recModel.setStyle({ hetflag: true, not: { resn: [...SKIP_HET] } }, { stick: { radius: 0.18, colorscheme: 'grayCarbon' } });
     if (poseModel && $('#show-site').checked && result) {
       const res = (result.poses[currentPose].interactions.residues || []).map((r) => r.residue.split(' ')[1]);
-      res.forEach((cr) => recModel.setStyle({ chain: cr[0], resi: cr.slice(1), hetflag: false }, { stick: { radius: 0.14, colorscheme: 'whiteCarbon' }, cartoon: st === 'cartoon' ? { colorscheme: 'chain', opacity: 0.92 } : undefined }));
+      res.forEach((cr) => recModel.setStyle({ chain: cr[0], resi: cr.slice(1), hetflag: false }, { stick: { radius: 0.14, colorscheme: 'whiteCarbon' }, cartoon: st === 'cartoon' ? { colorscheme: 'chain', opacity: 0.45 } : undefined }));
     }
     drawOverlays();
   }
@@ -196,7 +197,7 @@
     poseModel.setStyle({}, { stick: { radius: 0.22, colorscheme: 'cyanCarbon' }, sphere: { scale: 0.22, colorscheme: 'cyanCarbon' } });
     poseModel.setStyle({ elem: 'H' }, {});
     styleReceptor();
-    if (zoom) viewer.zoomTo({ within: { distance: 7, sel: { model: poseModel } } }, 700);
+    if (zoom) viewer.zoomTo({ within: { distance: 11, sel: { model: poseModel } } }, 700);
     viewer.render();
     const it = p.interactions;
     $('#contacts-panel').classList.remove('hidden');
