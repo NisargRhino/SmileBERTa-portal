@@ -43,7 +43,7 @@
     try {
       const d = await api('/combine', { body: { smiles1: s1, smiles2: s2 } });
       const list = (d.combined_smiles || []).sort((a, b) => ((b.analysis || {}).qed || 0) - ((a.analysis || {}).qed || 0));
-      if (!list.length) { $('#results').innerHTML = `<div class="card empty"><div>${icon('info')}<h3 style="color:var(--text)">No drug-like products</h3><p>None of the amide/ester linkages passed the Lipinski + QED filters. Try smaller fragments.</p></div></div>`; return; }
+      if (!list.length) { $('#results').innerHTML = `<div class="card empty"><div>${icon('info')}<h3 style="color:var(--text)">No drug-like products</h3><p>None of the amine/ester linkages passed the Lipinski + QED filters. Try smaller fragments.</p></div></div>`; return; }
       $('#results').innerHTML = `<div class="row-between" style="margin:8px 0 14px"><h3 style="margin:0">${list.length} linked candidate${list.length > 1 ? 's' : ''}</h3><span class="muted" style="font-size:.84rem">Sorted by QED</span></div>
         <div class="result-grid">${list.map((c, i) => `<div class="card res-card fade-in" style="padding:16px;animation-delay:${i * 60}ms">
           <div class="row-between" style="margin-bottom:8px"><b>Candidate ${i + 1}</b>${c.analysis ? `<span class="badge ${c.analysis.qed >= 0.5 ? 'cyan' : 'amber'}">QED ${fmt(c.analysis.qed, 2)}</span>` : ''}</div>
