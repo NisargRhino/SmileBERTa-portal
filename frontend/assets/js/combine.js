@@ -3,12 +3,15 @@
   const { $, $$, api, esc, icon, fmt, toast, depict, depictSVG, library, saveItem, handoff, copy, modal, viewer3d, applyMolStyle, download, druglikeBadges } = SB;
   let target = 'a';
 
-  const showSlot = SB.debounce(async (which) => {
+  async function renderSlot(which) {
     const s = $('#s' + which).value.trim();
     const slot = $('#slot-' + which), pv = $('#p' + which);
     if (s && (await SB.validSmiles(s))) { slot.classList.add('filled'); depict(pv, s, { width: 360, height: 180 }); }
     else { slot.classList.remove('filled'); pv.innerHTML = s ? '<span style="color:var(--red);font-size:.84rem">Invalid SMILES</span>' : '<span class="muted" style="font-size:.84rem">Pick a fragment</span>'; }
-  }, 300);
+  }
+  // One debounce timer per slot: a shared one dropped slot A when both were filled at once.
+  const slotRenderers = { a: SB.debounce(() => renderSlot('a'), 300), b: SB.debounce(() => renderSlot('b'), 300) };
+  const showSlot = (which) => slotRenderers[which]();
   ['a', 'b'].forEach((w) => { $('#s' + w).addEventListener('input', () => showSlot(w)); $('#s' + w).addEventListener('focus', () => (target = w)); showSlot(w); });
 
   $('#ex').addEventListener('click', () => { $('#sa').value = 'Cc1ccc(C)c(F)c1'; $('#sb').value = 'CC(=O)CCc1ccccc1'; showSlot('a'); showSlot('b'); });
