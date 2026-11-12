@@ -691,7 +691,9 @@ def hf_categories():
         'categories': [{'id': k, **{kk: vv for kk, vv in v.items() if kk != 'queries'}}
                        for k, v in notebooks.CATEGORIES.items()],
         'featured': notebooks.FEATURED,
-        'tasks': notebooks.TASKS,
+        # A list, not a dict: jsonify sorts dict keys, which would reorder the
+        # tasks alphabetically and bury the default ("predict") at the bottom.
+        'tasks': [{'id': k, 'label': v} for k, v in notebooks.TASKS.items()],
     })
 
 

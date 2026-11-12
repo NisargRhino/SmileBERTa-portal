@@ -25,7 +25,10 @@
       loadModels();
     }));
 
-    $('#tasks').innerHTML = Object.entries(meta.tasks).map(([id, label]) => `
+    const tasks = Array.isArray(meta.tasks)
+      ? meta.tasks
+      : Object.entries(meta.tasks).map(([id, label]) => ({ id, label }));
+    $('#tasks').innerHTML = tasks.map(({ id, label }) => `
       <label class="task-opt${id === state.task ? ' sel' : ''}" data-task="${esc(id)}">
         <input type="radio" name="task" value="${esc(id)}"${id === state.task ? ' checked' : ''}>
         <span>${esc(label)}</span>
