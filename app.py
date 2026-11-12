@@ -16,6 +16,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import db
 import docking
 import models
+import notebooks
 from chem_tools import (ChemError, analyze, builder_export, conformer_search, depict_svg, embed_3d,
                         mol_from_atoms, mol_from_smiles, mol_to_builder_json, optimize_geometry)
 from combine_frag import combine_fragments
@@ -680,6 +681,49 @@ def dock_status(job_id):
     if not job:
         return err('Job not found (it may have expired or the server restarted)', 404)
     return jsonify(job)
+
+
+# ── Model hub & notebooks ────────────────────────────────────────────────────
+
+@app.route('/hf/categories', methods=['GET'])
+def hf_categories():
+    return jsonify({
+        'categories': [{'id': k, **{kk: vv for kk, vv in v.items() if kk != 'queries'}}
+                       for k, v in notebooks.CATEGORIES.items()],
+        'featured': notebooks.FEATURED,
+        'tasks': notebooks.TASKS,
+    })
+
+
+@app.route('/hf/models', methods=['GET'])
+def hf_models():
+    try:
+        found = notebooks.search_models(request.args.get('q', ''),
+                                        request.args.get('category'),
+                                        request.args.get('limit', 24))
+        return jsonify({'models': found})
+    except Exception as e:
+        return err(f'Could not reach Hugging Face: {e}', 502)
+
+
+@app.route('/notebook', methods=['POST'])
+def make_notebook():
+    data = body()
+    try:
+        nb = notebooks.build_notebook(
+            model_id=data.get('model_id', ''), task=data.get('task', 'predict'),
+            smiles_col=data.get('smiles_col', 'smiles'), label_col=data.get('label_col', 'label'),
+            dataset_hint=data.get('dataset', 'your_data.csv'))
+    except notebooks.NotebookError as e:
+        return err(str(e))
+    name = (data.get('model_id') or 'smileberta').split('/')[-1]
+    filename = f"{name}_{data.get('task', 'predict')}.ipynb".replace(' ', '_')
+    if data.get('download'):
+        resp = make_response(json.dumps(nb, indent=1))
+        resp.headers['Content-Type'] = 'application/x-ipynb+json'
+        resp.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return resp
+    return jsonify({'notebook': nb, 'filename': filename})
 
 
 if __name__ == '__main__':

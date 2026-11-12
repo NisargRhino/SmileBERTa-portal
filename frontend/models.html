@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Model Hub — SmileBERTa</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    .cat-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+    .model-list { display: grid; gap: 10px; max-height: 620px; overflow-y: auto; padding-right: 4px; }
+    .model-card { border: 1.5px solid var(--border); border-radius: var(--radius); padding: 12px 14px; cursor: pointer; transition: border-color .15s, background .15s; }
+    .model-card:hover { border-color: rgba(34,211,238,.45); }
+    .model-card.sel { border-color: rgba(34,211,238,.8); background: rgba(34,211,238,.06); }
+    .model-id { font-family: 'JetBrains Mono', monospace; font-size: .85rem; font-weight: 500; word-break: break-all; }
+    .model-meta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 6px; font-size: .76rem; color: var(--muted); }
+    .tagline { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 7px; }
+    .minitag { font-size: .68rem; padding: 2px 7px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
+    .task-grid { display: grid; gap: 8px; }
+    .task-opt { display: flex; gap: 10px; align-items: flex-start; border: 1.5px solid var(--border); border-radius: var(--radius); padding: 11px 13px; cursor: pointer; }
+    .task-opt.sel { border-color: rgba(34,211,238,.8); background: rgba(34,211,238,.06); }
+    .task-opt input { margin-top: 3px; }
+    .nb-preview { max-height: 480px; overflow-y: auto; border: 1.5px solid var(--border); border-radius: var(--radius); }
+    .nb-cell { border-bottom: 1px solid var(--border); padding: 11px 13px; }
+    .nb-cell:last-child { border-bottom: 0; }
+    .nb-kind { font-size: .66rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .nb-cell pre { margin: 0; font-size: .78rem; white-space: pre-wrap; word-break: break-word; font-family: 'JetBrains Mono', monospace; }
+    .nb-cell.md { background: var(--surface-2); }
+  </style>
+  <script src="assets/js/core.js" defer></script>
+  <script src="assets/js/models.js" defer></script>
+</head>
+<body>
+  <div id="site-nav"></div>
+  <main class="container">
+    <div class="page-head">
+      <div class="crumbs"><a href="./">Home</a><span>/</span><a href="./#tools">Tools</a><span>/</span><span>Model Hub</span></div>
+      <div class="eyebrow">Hugging Face · Notebooks</div>
+      <h1>Model Hub</h1>
+      <p class="lead">Find a drug-discovery model on Hugging Face and get a notebook that already runs it on <em>your</em> data. Pick a model, tell us your CSV columns, and download a Colab-ready notebook with loading, SMILES validation, batching and export already written.</p>
+    </div>
+
+    <div class="tool-grid">
+      <aside class="stack">
+        <div class="panel"><div class="panel-body">
+          <b>1 · Find a model</b>
+          <input class="input" id="q" placeholder="Search Hugging Face…" spellcheck="false" style="margin:10px 0">
+          <div class="cat-row" id="cats"></div>
+          <div class="model-list" id="list">
+            <div class="muted" style="padding:20px;text-align:center">Loading models…</div>
+          </div>
+        </div></div>
+      </aside>
+
+      <section class="stack">
+        <div class="panel"><div class="panel-body">
+          <b>2 · What do you want to do?</b>
+          <div class="task-grid" id="tasks" style="margin-top:10px"></div>
+
+          <b style="display:block;margin-top:20px">3 · Your data</b>
+          <div class="row" style="gap:10px;margin-top:10px;flex-wrap:wrap">
+            <label style="flex:1;min-width:150px">
+              <span class="muted" style="font-size:.78rem">CSV file name</span>
+              <input class="input mono" id="dataset" value="your_data.csv" spellcheck="false">
+            </label>
+            <label style="flex:1;min-width:130px">
+              <span class="muted" style="font-size:.78rem">SMILES column</span>
+              <input class="input mono" id="smilescol" value="smiles" spellcheck="false">
+            </label>
+            <label style="flex:1;min-width:130px" id="labelwrap">
+              <span class="muted" style="font-size:.78rem">Label column</span>
+              <input class="input mono" id="labelcol" value="label" spellcheck="false">
+            </label>
+          </div>
+          <p class="muted" style="font-size:.78rem;margin-top:8px">
+            Don't have a file yet? Leave the defaults — the notebook tells you what columns it expects.
+          </p>
+
+          <div class="row" style="gap:8px;margin-top:18px;flex-wrap:wrap">
+            <button class="btn btn-primary" id="gen">Generate notebook</button>
+            <button class="btn" id="dl" disabled>Download .ipynb</button>
+            <button class="btn" id="copy" disabled>Copy JSON</button>
+          </div>
+          <p class="muted" style="font-size:.78rem;margin-top:10px" id="hint">
+            Select a model on the left to begin.
+          </p>
+        </div></div>
+
+        <div class="panel" id="previewPanel" hidden><div class="panel-body">
+          <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:10px">
+            <b>Notebook preview</b>
+            <span class="muted mono" style="font-size:.76rem" id="nbname"></span>
+          </div>
+          <div class="nb-preview" id="preview"></div>
+          <p class="muted" style="font-size:.78rem;margin-top:10px">
+            Upload this to <a href="https://colab.research.google.com/" target="_blank" rel="noopener">Google Colab</a>
+            (File → Upload notebook) or open it in Jupyter. For fine-tuning, switch Colab to a GPU runtime.
+          </p>
+        </div></div>
+      </section>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+</body>
+</html>
