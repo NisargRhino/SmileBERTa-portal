@@ -68,8 +68,9 @@
     viewer.removeAllShapes(); viewer.removeAllLabels();
     if (receptor && $('#show-box').checked) {
       const { c, s } = getBox();
+      // Wireframe only. A filled box — even at opacity 0.05 — still writes to the
+      // depth buffer, so any protein enclosed by the box was culled and vanished.
       viewer.addBox({ center: { x: c[0], y: c[1], z: c[2] }, dimensions: { w: s[0], h: s[1], d: s[2] }, wireframe: true, color: '#22d3ee' });
-      viewer.addBox({ center: { x: c[0], y: c[1], z: c[2] }, dimensions: { w: s[0], h: s[1], d: s[2] }, color: '#22d3ee', opacity: 0.05 });
     }
     if (result && poseModel) {
       const p = result.poses[currentPose];
