@@ -9,7 +9,11 @@
   try { override = localStorage.getItem('sb_api'); } catch (e) { /* ignore */ }
   const API = (override || (isLocal ? 'http://localhost:5001' : PROD_API)).replace(/\/$/, '');
   // Docking runs on its own lightweight service (no PyTorch) so Vina has enough memory.
-  const PROD_DOCK_API = 'https://smileberta-dock.onrender.com';
+  // Dedicated docking VPS, not Render: Vina is CPU-bound and the free tier's
+  // ~0.1 shared vCPU made a drug-sized dock take ~30 min (now ~35 s).
+  // Hostname is sslip.io over the server's IP — update both if the server is
+  // ever rebuilt, or point a real subdomain here. See deploy/README.md.
+  const PROD_DOCK_API = 'https://5-161-192-134.sslip.io';
   let dockOverride = null;
   try { dockOverride = localStorage.getItem('sb_dock_api'); } catch (e) { /* ignore */ }
   const DOCK_API = (dockOverride || (isLocal ? API : PROD_DOCK_API)).replace(/\/$/, '');

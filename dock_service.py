@@ -26,7 +26,8 @@ def options_handler(_routes):
 @app.route('/health', methods=['GET'])
 def health():
     return jsonify({'status': 'ok', 'service': 'docking', 'docking': docking.DOCKING_AVAILABLE, 'vina': docking.VINA_VERSION,
-                    'uptime': round(time.time() - STARTED_AT), 'rss_mb': docking.rss_mb()})
+                    'uptime': round(time.time() - STARTED_AT), 'rss_mb': docking.rss_mb(),
+                    'queue': docking.queue_stats()})
 
 
 @app.route('/dock', methods=['POST'])
