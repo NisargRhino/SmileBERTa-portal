@@ -1,7 +1,7 @@
 /* Landing page interactions. */
 (function () {
   const { icon, TOOLS, LEARN, $, $$ } = SB;
-  const TAGS = { 'fragmentation': ['AI model', 'blue'], 'drug_class': ['AI model', 'blue'], 'combine': ['Chemistry', 'violet'], 'builder': ['Force field', 'cyan'], 'docking': ['Physics', 'green'], 'studio': ['Visualization', 'amber'] };
+  const TAGS = { 'fragmentation': ['AI model', 'blue'], 'drug_class': ['AI model', 'blue'], 'combine': ['Chemistry', 'violet'], 'builder': ['Force field', 'cyan'], 'docking': ['Physics', 'green'], 'studio': ['Visualization', 'amber'], 'models': ['Notebooks', 'violet'] };
   const LONG = {
     'fragmentation': 'Give it a drug-like molecule and SmileBERTa predicts the fragment most relevant to binding. You get Rule-of-Three checks, a 3D conformer and a side-by-side property comparison.',
     'drug_class': 'Predict the therapeutic class of any compound (anti-infective, antineoplastic, CNS, cardiovascular and more), shown with ranked alternatives and a drug-likeness profile.',
@@ -9,16 +9,24 @@
     'builder': 'An Avogadro-style 3D builder. Click to grow molecules atom by atom, then relax them with the MMFF94 or UFF force fields and search for conformers.',
     'docking': 'Load any PDB target, define a search box around the pocket, and dock ligands with AutoDock Vina. Inspect poses, affinities and H-bonds.',
     'studio': 'A Chimera-style viewer. Isolate chains, show backbones and surfaces, colour by secondary structure or B-factor, and measure distances and angles.',
+    'models': 'Browse drug-discovery models on Hugging Face and generate a Colab-ready notebook wired to your own CSV, with SMILES validation, batching and export already written.',
   };
 
-  $('#tool-cards').innerHTML = TOOLS.map((t, i) => `
+  // TAGS and LONG are keyed by href and must be kept in step with SB.TOOLS.
+  // Fall back rather than throw: this block runs before the hero molecule is
+  // initialised, so one missing key used to abort the whole script and leave
+  // the hero empty.
+  $('#tool-cards').innerHTML = TOOLS.map((t, i) => {
+    const [tag, colour] = TAGS[t.href] || ['Tool', 'cyan'];
+    return `
     <a class="card card-hover tool-card reveal" data-delay="${i % 3}" href="${t.href}">
       <div class="icon-tile">${icon(t.icon)}</div>
-      <span class="badge ${TAGS[t.href][1]} corner">${TAGS[t.href][0]}</span>
+      <span class="badge ${colour} corner">${tag}</span>
       <h3>${t.title}</h3>
-      <p>${LONG[t.href]}</p>
+      <p>${LONG[t.href] || t.desc || ''}</p>
       <span class="go">Open tool ${icon('arrow')}</span>
-    </a>`).join('');
+    </a>`;
+  }).join('');
 
   $('#learn-cards').innerHTML = LEARN.map((t, i) => `
     <a class="card card-hover learn-card reveal" data-delay="${i}" href="${t.href}">
