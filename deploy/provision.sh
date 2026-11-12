@@ -8,6 +8,7 @@
 set -euo pipefail
 
 REPO="${REPO:-https://github.com/NisargRhino/SmileBERTa-portal.git}"
+BRANCH="${BRANCH:-main}"
 APP="${APP:-/opt/smileberta}"
 : "${DOCK_DOMAIN:?Set DOCK_DOMAIN first, e.g. export DOCK_DOMAIN=dock.example.com}"
 
@@ -53,20 +54,51 @@ ufw status verbose | sed 's/^/    /'
 say "Enabling automatic security updates"
 dpkg-reconfigure -f noninteractive unattended-upgrades >/dev/null 2>&1 || true
 
-say "Fetching the application into $APP"
+say "Fetching the application into $APP (branch: $BRANCH)"
 if [ -d "$APP/.git" ]; then
-	git -C "$APP" fetch --depth 1 origin main
-	git -C "$APP" reset --hard origin/main
+	git -C "$APP" fetch --depth 1 origin "$BRANCH"
+	git -C "$APP" reset --hard FETCH_HEAD
 else
-	git clone --depth 1 "$REPO" "$APP"
+	git clone --depth 1 --branch "$BRANCH" "$REPO" "$APP"
+fi
+
+say "Sizing to this host"
+cores="$(nproc)"
+ram_mb="$(free -m | awk '/^Mem:/{print $2}')"
+# concurrency x cpu should equal the core count. Two workers only pay off with
+# cores to spare, and each Vina process needs real memory (1.2.x peaks ~400 MB).
+if [ "$cores" -ge 4 ] && [ "$ram_mb" -ge 4000 ]; then
+	auto_conc=2
+	auto_cpu=$((cores / 2))
+else
+	auto_conc=1
+	auto_cpu="$cores"
+fi
+auto_memlimit="$((ram_mb * 70 / 100))m"
+auto_vinamem=$((ram_mb * 45 / 100))
+echo "    $cores cores, ${ram_mb} MB RAM"
+echo "    -> DOCK_CONCURRENCY=$auto_conc VINA_CPU=$auto_cpu DOCK_MEM_LIMIT=$auto_memlimit"
+
+say "Ensuring swap (small instances can OOM during the image build)"
+if [ "$ram_mb" -lt 4000 ] && ! swapon --show | grep -q .; then
+	fallocate -l 2G /swapfile
+	chmod 600 /swapfile
+	mkswap /swapfile >/dev/null
+	swapon /swapfile
+	grep -q '^/swapfile' /etc/fstab || echo '/swapfile none swap sw 0 0' >>/etc/fstab
+	echo "    2 GB swap enabled"
+else
+	echo "    swap already present or ample RAM; skipping"
 fi
 
 say "Writing deploy/.env"
 cat >"$APP/deploy/.env" <<EOF
 DOCK_DOMAIN=$DOCK_DOMAIN
-# Match these to the server's core count: concurrency x cpu should equal vCPUs.
-VINA_CPU=${VINA_CPU:-2}
-DOCK_CONCURRENCY=${DOCK_CONCURRENCY:-2}
+# Sized for this host: concurrency x cpu should equal the vCPU count.
+VINA_CPU=${VINA_CPU:-$auto_cpu}
+DOCK_CONCURRENCY=${DOCK_CONCURRENCY:-$auto_conc}
+VINA_MEM_MB=${VINA_MEM_MB:-$auto_vinamem}
+DOCK_MEM_LIMIT=${DOCK_MEM_LIMIT:-$auto_memlimit}
 EOF
 chmod 600 "$APP/deploy/.env"
 cat "$APP/deploy/.env" | sed 's/^/    /'

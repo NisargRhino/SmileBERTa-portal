@@ -7,8 +7,9 @@ services:
       dockerfile: Dockerfile.dock
     restart: unless-stopped
     environment:
-      # 4 dedicated cores: 2 jobs x 2 cores. One job's single-threaded prep
-      # (Open Babel, ETKDG) overlaps the other's Vina search.
+      # provision.sh sizes these to the host: concurrency x cpu = vCPU count.
+      # Two workers only pay off with cores to spare, since one job's
+      # single-threaded prep then overlaps another's Vina search.
       VINA_CPU: "${VINA_CPU:-2}"
       DOCK_CONCURRENCY: "${DOCK_CONCURRENCY:-2}"
       DOCK_NICE: "0"
@@ -25,7 +26,7 @@ services:
       retries: 3
       start_period: 40s
     # Keep Vina from ever taking the box down.
-    mem_limit: 6g
+    mem_limit: "${DOCK_MEM_LIMIT:-1400m}"
     logging:
       driver: json-file
       options: { max-size: "10m", max-file: "3" }

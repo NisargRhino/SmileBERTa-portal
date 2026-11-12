@@ -2,9 +2,10 @@
 # Pull the latest main and restart the docking service.
 set -euo pipefail
 APP="${APP:-/opt/smileberta}"
+BRANCH="${BRANCH:-$(git -C "$APP" rev-parse --abbrev-ref HEAD 2>/dev/null || echo main)}"
 
-git -C "$APP" fetch --depth 1 origin main
-git -C "$APP" reset --hard origin/main
+git -C "$APP" fetch --depth 1 origin "$BRANCH"
+git -C "$APP" reset --hard FETCH_HEAD
 
 cd "$APP/deploy"
 docker compose up -d --build
