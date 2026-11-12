@@ -1,0 +1,21 @@
+# Caddy fetches and renews a Let's Encrypt certificate for DOCK_DOMAIN automatically.
+# HTTPS is not optional here: the frontend is served over HTTPS, so a plain-HTTP
+# docking API would be blocked by the browser as mixed content.
+{$DOCK_DOMAIN} {
+	encode zstd gzip
+
+	# Docking jobs are long-lived polls; give them room.
+	reverse_proxy dock:10000 {
+		transport http {
+			read_timeout 300s
+			write_timeout 300s
+		}
+	}
+
+	log {
+		output file /data/access.log {
+			roll_size 10mb
+			roll_keep 3
+		}
+	}
+}

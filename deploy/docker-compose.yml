@@ -1,0 +1,52 @@
+# Docking host: Vina behind Caddy (automatic HTTPS).
+# Build context is the repo root so Dockerfile.dock can COPY the Python modules.
+services:
+  dock:
+    build:
+      context: ..
+      dockerfile: Dockerfile.dock
+    restart: unless-stopped
+    environment:
+      # 4 dedicated cores: 2 jobs x 2 cores. One job's single-threaded prep
+      # (Open Babel, ETKDG) overlaps the other's Vina search.
+      VINA_CPU: "${VINA_CPU:-2}"
+      DOCK_CONCURRENCY: "${DOCK_CONCURRENCY:-2}"
+      DOCK_NICE: "0"
+      VINA_TIMEOUT: "${VINA_TIMEOUT:-900}"
+      VINA_MEM_MB: "${VINA_MEM_MB:-2048}"
+      MAX_JOBS_PER_USER: "${MAX_JOBS_PER_USER:-3}"
+      RECEPTOR_CACHE_SIZE: "${RECEPTOR_CACHE_SIZE:-24}"
+    expose:
+      - "10000"
+    healthcheck:
+      test: ["CMD-SHELL", "python3 -c \"import urllib.request;urllib.request.urlopen('http://localhost:10000/health',timeout=5)\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # Keep Vina from ever taking the box down.
+    mem_limit: 6g
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+  caddy:
+    image: caddy:2.8-alpine
+    restart: unless-stopped
+    depends_on: [dock]
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOCK_DOMAIN: "${DOCK_DOMAIN:?set DOCK_DOMAIN in deploy/.env}"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+volumes:
+  caddy_data:
+  caddy_config:

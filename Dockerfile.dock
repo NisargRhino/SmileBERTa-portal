@@ -3,14 +3,18 @@ FROM python:3.11-slim
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends libxrender1 libxext6 libgomp1 ca-certificates \
     && rm -rf /var/lib/apt/lists/*
-# AutoDock Vina 1.1.2 (official static binary). 1.2.7 needed >380 MB RSS for drug-sized
-# ligands and was OOM-killed on the 512 MB free instance; 1.1.2 peaks at ~35 MB.
-ADD https://vina.scripps.edu/wp-content/uploads/sites/55/2020/12/autodock_vina_1_1_2_linux_x86.tgz /tmp/vina.tgz
-RUN tar xzf /tmp/vina.tgz -C /tmp && cp /tmp/autodock_vina_1_1_2_linux_x86/bin/vina /usr/local/bin/vina \
-    && chmod +x /usr/local/bin/vina && rm -rf /tmp/vina.tgz /tmp/autodock_vina_1_1_2_linux_x86
+# AutoDock Vina 1.2.7 (official static binary). 1.2.x is faster and better scored than
+# 1.1.2 but needs >380 MB RSS for drug-sized ligands, so it requires a host with real
+# memory — fine on the 8 GB docking VPS, OOM-killed on Render's 512 MB free instance.
+# If you ever redeploy this image somewhere with <1 GB RAM, go back to 1.1.2.
+ADD https://github.com/ccsb-scripps/AutoDock-Vina/releases/download/v1.2.7/vina_1.2.7_linux_x86_64 /usr/local/bin/vina
+RUN chmod +x /usr/local/bin/vina && vina --version
 COPY requirements-dock.txt .
 RUN pip install --no-cache-dir -r requirements-dock.txt
 COPY docking.py chem_tools.py dock_service.py ./
-ENV PYTHONUNBUFFERED=1 VINA_CPU=1
+# Defaults suit a 4-core host: two concurrent docking jobs on two cores each, so one
+# job's single-threaded prep (Open Babel, ETKDG) overlaps another job's Vina search.
+ENV PYTHONUNBUFFERED=1 VINA_CPU=2 DOCK_CONCURRENCY=2 DOCK_NICE=0 VINA_MEM_MB=2048
 EXPOSE 10000
-CMD ["gunicorn", "dock_service:app", "--workers", "1", "--worker-class", "gthread", "--threads", "4", "--timeout", "300", "--bind", "0.0.0.0:10000"]
+# Gunicorn must stay at one worker: jobs live in that process's memory.
+CMD ["gunicorn", "dock_service:app", "--workers", "1", "--worker-class", "gthread", "--threads", "8", "--timeout", "300", "--bind", "0.0.0.0:10000"]
