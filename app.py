@@ -673,7 +673,8 @@ def drug_classes():
 def dock_submit():
     user = current_user()
     try:
-        job_id = docking.submit(body(), user['id'] if user else None)
+        job_id = docking.submit(body(), user['id'] if user else None,
+                                ip=docking.client_ip(request))
         return jsonify({'job_id': job_id})
     except docking.DockingError as e:
         return err(str(e))

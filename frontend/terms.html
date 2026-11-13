@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Terms &amp; Privacy — SmileBERTa</title>
+  <meta name="description" content="SmileBERTa's terms of use and privacy policy: research-only scope, what data is stored, and what is not collected.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    .legal { max-width: 78ch; }
+    .legal h2 { font-size: 1.15rem; margin: 0 0 14px; }
+    .legal h3 { font-size: .95rem; margin: 24px 0 7px; color: var(--text); }
+    .legal h3:first-of-type { margin-top: 18px; }
+    .legal p, .legal li { font-size: .88rem; line-height: 1.7; color: var(--text-2); }
+    .legal p { margin: 0 0 12px; }
+    .legal ul { margin: 0 0 12px; padding-left: 20px; }
+    .legal li { margin-bottom: 6px; }
+    .legal a { color: var(--cyan); }
+    .legal .muted { color: var(--muted); }
+    .updated { font-size: .78rem; color: var(--muted); font-family: var(--mono); margin-bottom: 20px; }
+    .keytable { display: grid; grid-template-columns: minmax(0,190px) minmax(0,1fr); gap: 10px 16px; margin: 14px 0 18px; }
+    .keytable div { font-size: .85rem; line-height: 1.6; }
+    .keytable .k { color: var(--text); font-weight: 500; }
+    .keytable .v { color: var(--text-2); }
+    @media (max-width: 700px) { .keytable { grid-template-columns: 1fr; gap: 3px 0; } .keytable .k { margin-top: 10px; } }
+    .toc { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+  </style>
+  <script src="assets/js/core.js" defer></script>
+</head>
+<body>
+  <div id="site-nav"></div>
+  <main class="container">
+    <div class="page-head">
+      <div class="crumbs"><a href="./">Home</a><span>/</span><span>Terms &amp; Privacy</span></div>
+      <div class="eyebrow">Legal</div>
+      <h1>Terms &amp; Privacy</h1>
+      <p class="lead">Written in plain language, because you should be able to read it. The short version: SmileBERTa is a free research tool, its predictions are hypotheses rather than evidence, it is not for clinical use, and it collects as little about you as it can.</p>
+    </div>
+
+    <div class="toc">
+      <a class="chip" href="#terms">Terms of use</a>
+      <a class="chip" href="#privacy">Privacy policy</a>
+      <a class="chip" href="#data">What we store</a>
+      <a class="chip" href="#third-parties">Third parties</a>
+    </div>
+
+    <div class="panel" style="margin-bottom:18px"><div class="panel-body">
+      <div class="callout warn" style="margin:0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div>
+          <b>Not for clinical, diagnostic or therapeutic use.</b>
+          <p style="margin:6px 0 0;font-size:.86rem;line-height:1.6">
+            SmileBERTa is for research and education. Model predictions, docking scores and ADMET
+            estimates are computational hypotheses for prioritising experiments. They are not
+            evidence of safety, efficacy or activity, and they are not a substitute for laboratory
+            or clinical work. Do not use this site to make decisions about anyone's health.
+          </p>
+        </div>
+      </div>
+    </div></div>
+
+    <!-- ── Terms ─────────────────────────────────────────────────────────── -->
+    <div class="panel" id="terms" style="margin-bottom:18px"><div class="panel-body legal">
+      <h2>Terms of use</h2>
+      <div class="updated">Effective 12 November 2026</div>
+
+      <p>SmileBERTa ("the service") is an open research tool built and operated by Nisarg Shah at
+      Emory University. By using it you agree to what follows. If you do not, please do not use it.</p>
+
+      <h3>1. What the service is</h3>
+      <p>A set of computational chemistry and machine-learning tools: fragment prediction, drug
+      classification, fragment linking, a 3D molecule builder, protein–ligand docking, a structure
+      viewer, an ADMET profiler and a Hugging Face model browser. It is provided free of charge,
+      for research and education.</p>
+
+      <h3>2. Research use only</h3>
+      <p>Every output is a prediction from a model or a published heuristic. Predictions can be
+      confidently wrong. Nothing here is medical, clinical, diagnostic, regulatory or safety advice,
+      and nothing here has been validated for any clinical purpose. You are responsible for
+      independently verifying any result you act on.</p>
+
+      <h3>3. No warranty</h3>
+      <p>The service is provided "as is", without warranty of any kind, express or implied,
+      including fitness for a particular purpose and accuracy of results. To the fullest extent
+      permitted by law, the operator is not liable for any loss or damage arising from your use of
+      the service or reliance on its outputs.</p>
+
+      <h3>4. Availability and your data</h3>
+      <p>This is a free service running on modest infrastructure. It may be slow, unavailable, or
+      changed or discontinued without notice. Saved work is stored on a managed database and backed
+      up by that provider, but <b>no guarantee of durability is offered</b> — export anything you
+      cannot afford to lose. Docking jobs are held in server memory and are lost if the docking
+      service restarts.</p>
+
+      <h3>5. Acceptable use</h3>
+      <p>Please do not:</p>
+      <ul>
+        <li>attempt to circumvent rate limits, or submit automated workloads large enough to
+          degrade the service for others;</li>
+        <li>use the service to design, optimise or obtain compounds intended to cause harm,
+          including chemical weapons, toxins or controlled substances for illicit purposes;</li>
+        <li>attempt to gain access to other users' accounts or data, or to the underlying
+          infrastructure;</li>
+        <li>upload content you do not have the right to upload;</li>
+        <li>re-publish the service as your own, or remove attribution to the underlying tools
+          (see <a href="credits">Credits &amp; Citations</a>).</li>
+      </ul>
+      <p>Rate limits apply to docking so that one user cannot monopolise a shared queue. They are
+      deliberately generous; if you have a legitimate workload that exceeds them, get in touch
+      rather than working around them.</p>
+
+      <h3>6. Your accounts and content</h3>
+      <p>You are responsible for keeping your password confidential. Please use a password you do
+      not use anywhere else. You keep all rights in the structures, molecules and data you upload or
+      save; you grant only the permission needed to store and process them in order to run the
+      service for you. Your content is not used to train any model.</p>
+
+      <h3>7. Third-party tools and licences</h3>
+      <p>SmileBERTa runs other people's software and models, each under its own licence, and
+      fetches data from third-party services. These are listed in full on the
+      <a href="credits">Credits &amp; Citations</a> page. Models you access through the Model Hub
+      carry their own licences and terms, which are between you and the model's publisher.</p>
+
+      <h3>8. Citation</h3>
+      <p>If the service contributes to published work, please cite the primary methods it used, as
+      described on the <a href="credits">Credits</a> page. This is a request, not a condition of use.</p>
+
+      <h3>9. Changes and termination</h3>
+      <p>These terms may change; the effective date above will be updated when they do. Accounts
+      that abuse the service may be suspended or removed. You may delete your account at any time
+      from your <a href="workspace">Workspace</a>, which permanently deletes your saved work.</p>
+    </div></div>
+
+    <!-- ── Privacy ───────────────────────────────────────────────────────── -->
+    <div class="panel" id="privacy" style="margin-bottom:18px"><div class="panel-body legal">
+      <h2>Privacy policy</h2>
+      <div class="updated">Effective 12 November 2026</div>
+
+      <p>SmileBERTa collects as little as it can get away with. There are no analytics scripts, no
+      advertising, no tracking cookies and no third-party trackers of any kind on this site. Nothing
+      about you is sold or shared for marketing, because none of it is collected in the first place.</p>
+
+      <h3 id="data">What is stored</h3>
+      <div class="keytable">
+        <div class="k">Account</div>
+        <div class="v">The username you register with — usually an email address — and your password,
+          stored only as a salted PBKDF2 hash. The plain password is never stored and cannot be
+          recovered, only reset.</div>
+        <div class="k">Saved work</div>
+        <div class="v">Anything you explicitly save to your Workspace: molecules, fragments,
+          classifications, linked leads, docking runs, structures and ADMET profiles, with the name
+          you gave them.</div>
+        <div class="k">Fragment library</div>
+        <div class="v">Fragments you choose to save, with their depiction and computed properties.</div>
+        <div class="k">Session token</div>
+        <div class="v">A random token identifying your signed-in session, valid for 90 days. It is
+          kept in your browser's local storage, not in a cookie.</div>
+      </div>
+      <p>That is the complete list. No name, institution, phone number, location or payment
+      information is requested or stored.</p>
+
+      <h3>What is not stored</h3>
+      <ul>
+        <li><b>Your IP address is not logged to the database.</b> It is held briefly in server memory
+          to enforce docking rate limits, and is discarded. It is never written to a record you or
+          anyone else can read back, and the job-status API deliberately omits it.</li>
+        <li><b>Molecules you work on but do not save.</b> If you profile, dock or classify something
+          without saving it, it is processed and discarded.</li>
+        <li>No browsing history, device fingerprint, or behavioural profile.</li>
+      </ul>
+      <p class="muted">Ordinary web-server request logs kept by the hosting providers below may
+      include IP addresses, as they do for any website.</p>
+
+      <h3 id="third-parties">Where your data goes</h3>
+      <p>Running the service necessarily involves these third parties. Each sees only what is
+      described:</p>
+      <div class="keytable">
+        <div class="k">Render</div>
+        <div class="v">Hosts the website and the main API. Sees all requests to them.</div>
+        <div class="k">Neon</div>
+        <div class="v">Managed PostgreSQL. Stores the account and saved-work data listed above.</div>
+        <div class="k">Hetzner</div>
+        <div class="v">Hosts the docking service. Receives the protein structure and ligand of any
+          docking job you run. Jobs live in memory and are not written to a database.</div>
+        <div class="k">RCSB PDB</div>
+        <div class="v">Protein structures are downloaded from RCSB by the server when you load a
+          PDB ID, so RCSB sees the request.</div>
+        <div class="k">Hugging Face</div>
+        <div class="v">The Model Hub queries the public Hugging Face model API with your search
+          terms. Notebooks you generate download models directly from Hugging Face when you run them.</div>
+        <div class="k">SMILES corrector</div>
+        <div class="v">When a predicted fragment is not a valid structure, the predicted SMILES
+          string is sent to a separate correction service to be repaired.</div>
+        <div class="k">Google Fonts, cdnjs, unpkg</div>
+        <div class="v">Serve fonts and the 3Dmol.js and RDKit.js libraries to your browser. As with
+          any CDN, your browser's request reveals your IP address to them.</div>
+      </div>
+
+      <h3>Deleting your data</h3>
+      <p>You can delete any saved item from your Workspace at any time. Deleting your account from
+      the Workspace page permanently removes your account, every saved item and your fragment
+      library; this cascades in the database and cannot be undone.</p>
+
+      <h3>Security</h3>
+      <p>Passwords are hashed with Werkzeug's PBKDF2 implementation. All traffic is served over
+      HTTPS. That said, this is a research project run by one person, not a hardened commercial
+      platform — <b>do not store confidential or commercially sensitive structures here</b>. If your
+      work is proprietary, run the tools locally; the code is open.</p>
+
+      <h3>Children</h3>
+      <p>The service is intended for university-level researchers, educators and students, and is
+      not directed at children under 13.</p>
+
+      <h3>Contact</h3>
+      <p>Questions about these terms, this policy, or a request to delete data can be raised at the
+      project's repository:
+      <a href="https://github.com/NisargRhino/SmileBERTa-portal/issues" target="_blank" rel="noopener">github.com/NisargRhino/SmileBERTa-portal</a>.</p>
+    </div></div>
+
+    <div class="panel" style="margin-bottom:60px"><div class="panel-body legal">
+      <p class="muted" style="margin:0;font-size:.82rem">
+        These documents describe how SmileBERTa actually behaves, written in good faith and kept in
+        step with the code. They are not drafted by a lawyer. If the service ever takes payment or
+        handles data from outside the research setting it was built for, they should be reviewed by
+        one first.
+      </p>
+    </div></div>
+  </main>
+  <div id="site-footer"></div>
+</body>
+</html>

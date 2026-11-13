@@ -33,7 +33,10 @@ def health():
 @app.route('/dock', methods=['POST'])
 def dock_submit():
     try:
-        return jsonify({'job_id': docking.submit(request.get_json(silent=True) or {})})
+        # No database here, so nobody can be authenticated: every caller is
+        # rate-limited by client IP.
+        return jsonify({'job_id': docking.submit(request.get_json(silent=True) or {},
+                                                 ip=docking.client_ip(request))})
     except docking.DockingError as e:
         return jsonify({'error': str(e)}), 400
 
