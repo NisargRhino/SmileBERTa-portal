@@ -2,7 +2,10 @@
 # Pull the latest main and restart the docking service.
 set -euo pipefail
 APP="${APP:-/opt/smileberta}"
-BRANCH="${BRANCH:-$(git -C "$APP" rev-parse --abbrev-ref HEAD 2>/dev/null || echo main)}"
+# Default to main, NOT the checked-out branch. Deriving it from HEAD meant that
+# once the host had been provisioned from a feature branch it kept re-pulling
+# that stale branch forever, and every later redeploy silently did nothing.
+BRANCH="${BRANCH:-main}"
 
 git -C "$APP" fetch --depth 1 origin "$BRANCH"
 git -C "$APP" reset --hard FETCH_HEAD
