@@ -26,7 +26,7 @@
     {
       id: 'researcher',
       name: 'Researcher',
-      price: '$12',
+      price: '$5',
       cadence: 'per month',
       tagline: 'For people running this daily, who need it to not queue.',
       cta: 'Coming soon',
@@ -44,7 +44,7 @@
     {
       id: 'lab',
       name: 'Lab',
-      price: '$99',
+      price: '$20',
       cadence: 'per month',
       tagline: 'For a research group sharing one target and one dataset.',
       cta: 'Coming soon',
