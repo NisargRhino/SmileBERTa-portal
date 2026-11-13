@@ -64,6 +64,7 @@
               <button class="btn btn-sm" id="to-admet">${icon('gauge')} ADMET</button>
             </div>
           </div>
+          <div id="fb-mount"></div>
           <div class="two-col">
             <div>
               <div class="row-between" style="margin-bottom:8px"><span class="panel-title" style="margin:0">Input molecule</span><div class="seg" data-view="in"><button class="active" data-v="2d">2D</button><button data-v="3d">3D</button></div></div>
@@ -131,6 +132,12 @@
     $('#to-dock').addEventListener('click', () => handoff('docking', { smiles: d.fragment_smiles, name: 'Predicted fragment' }));
     $('#to-build').addEventListener('click', () => handoff('builder', { smiles: d.fragment_smiles }));
     $('#to-admet').addEventListener('click', () => handoff('admet', { smiles: d.fragment_smiles }));
+    // The fragment model is SmileBERTa's own work and the one worth improving,
+    // so this is where corrections are most valuable.
+    SB.feedbackWidget($('#fb-mount'), {
+      tool: 'fragmentation', input_smiles: inputSmiles,
+      output_smiles: d.fragment_smiles, target: d.protein, label: 'fragment',
+    });
     $('#dl-sdf').addEventListener('click', () => d.pdb ? download(d.pdb, 'fragment.pdb', 'chemical/x-pdb') : toast('No 3D structure available', 'error'));
     $('#dl-json').addEventListener('click', () => download(JSON.stringify({ input: inputSmiles, ...d }, null, 2), 'fragment_prediction.json', 'application/json'));
   }

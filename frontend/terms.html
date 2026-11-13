@@ -116,7 +116,12 @@
       <p>You are responsible for keeping your password confidential. Please use a password you do
       not use anywhere else. You keep all rights in the structures, molecules and data you upload or
       save; you grant only the permission needed to store and process them in order to run the
-      service for you. Your content is not used to train any model.</p>
+      service for you.</p>
+      <p><b>Your work is not used to train anything unless you opt in.</b> There is an optional
+      feature that lets you rate a model's prediction, or correct it, to help improve SmileBERTa's
+      own models. It is off by default. If you turn it on, only the predictions you explicitly rate
+      are recorded — never your general use of the site — and you can turn it off at any time in
+      your Workspace. Please do not turn it on for unpublished or confidential structures.</p>
 
       <h3>7. Third-party tools and licences</h3>
       <p>SmileBERTa runs other people's software and models, each under its own licence, and
@@ -158,6 +163,11 @@
         <div class="k">Session token</div>
         <div class="v">A random token identifying your signed-in session, valid for 90 days. It is
           kept in your browser's local storage, not in a cookie.</div>
+        <div class="k">Model feedback <span class="muted">(opt-in)</span></div>
+        <div class="v">Only if you switch this on: for each prediction you choose to rate, the
+          rating, the molecule you entered, the model's output, any correction you supply and the
+          target you selected. Predictions you do not rate are never recorded, and the feature is
+          off until you enable it. It is used to retrain and measure SmileBERTa's models.</div>
         <div class="k">Client identifier</div>
         <div class="v">A random string your browser generates and keeps in local storage, sent with
           requests so that docking rate limits apply per person rather than per network — otherwise

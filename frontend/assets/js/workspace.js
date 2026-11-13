@@ -32,9 +32,43 @@
       $('#sub').textContent = `Member since ${me.created_at ? new Date(me.created_at.replace(' ', 'T') + 'Z').toLocaleDateString() : 'today'} · ${items.length} saved item${items.length === 1 ? '' : 's'}`;
       if (!me.persistent_storage) $('#persist-note').innerHTML = '<div class="notice" style="margin-bottom:22px">Heads up: this server is running without a persistent database, so saved items may be cleared when the server redeploys. Export anything important as JSON.</div>';
       $('#stats').innerHTML = Object.entries(KINDS).map(([k, [n, ic]]) => `<div class="stat"><div class="row-between"><div class="v">${me.stats[k] || 0}</div><span style="color:var(--cyan);width:18px;height:18px;display:block">${icon(ic)}</span></div><div class="k">${n}</div></div>`).join('');
+      renderConsent(me.train_consent);
       renderTabs(); renderItems();
     } catch (e) { $('#items').innerHTML = `<div class="card empty">${esc(e.message)}</div>`; }
     renderLibrary();
+  }
+
+  // Opt-in control for letting rated predictions be used to retrain the models.
+  function renderConsent(on) {
+    $('#consent-note').innerHTML = `
+      <div class="card" style="margin-bottom:22px;padding:14px 16px">
+        <div class="row-between" style="gap:14px;flex-wrap:wrap;align-items:flex-start">
+          <div style="flex:1;min-width:260px">
+            <b style="font-size:.92rem">Help improve the models</b>
+            <p class="muted" style="font-size:.83rem;margin:5px 0 0;line-height:1.6">
+              When on, predictions you explicitly rate — and any corrections you give — are stored
+              and may be used to retrain SmileBERTa and report its accuracy. Predictions you don't
+              rate are never recorded. Leave this off for unpublished or confidential structures.
+            </p>
+          </div>
+          <button class="btn btn-sm ${on ? '' : 'btn-primary'}" id="consent-toggle">
+            ${on ? 'Turn off' : 'Turn on'}
+          </button>
+        </div>
+        <p class="muted" style="font-size:.78rem;margin:9px 0 0">
+          Currently <b style="color:${on ? 'var(--green)' : 'var(--muted)'}">${on ? 'on' : 'off'}</b>.
+          See the <a href="terms#privacy">privacy policy</a>.
+        </p>
+      </div>`;
+    $('#consent-toggle').addEventListener('click', async () => {
+      const want = !on;
+      try {
+        const r = await api('/account/consent', { body: { train_consent: want } });
+        try { localStorage.setItem('sb_train_consent', r.train_consent ? '1' : '0'); } catch (e) { /* ignore */ }
+        toast(r.train_consent ? 'Thanks — your ratings will help improve the models' : 'Turned off', 'ok');
+        renderConsent(r.train_consent);
+      } catch (e) { toast(e.message, 'error'); }
+    });
   }
 
   function renderTabs() {

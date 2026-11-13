@@ -90,7 +90,8 @@ def current_user():
     if not token:
         return None
     with db.connect() as conn:
-        row = conn.one('SELECT u.id, u.username, u.created_at, t.created_at AS token_created '
+        row = conn.one('SELECT u.id, u.username, u.created_at, u.train_consent, '
+                       't.created_at AS token_created '
                        'FROM users u JOIN tokens t ON u.id = t.user_id WHERE t.token = ?', (token,))
     if not row:
         return None
@@ -221,7 +222,8 @@ def me(user):
     stats = {r['kind']: r['n'] for r in counts}
     stats['library'] = frags['n'] if frags else 0
     return jsonify({'username': user['username'], 'is_admin': is_admin_name(user['username']), 'created_at': _iso(user.get('created_at')), 'stats': stats,
-                    'persistent_storage': db.IS_POSTGRES})
+                    'persistent_storage': db.IS_POSTGRES,
+                    'train_consent': bool(user.get('train_consent'))})
 
 
 @app.route('/account/password', methods=['POST'])
@@ -732,6 +734,96 @@ def make_notebook():
         resp.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
         return resp
     return jsonify({'notebook': nb, 'filename': filename})
+
+
+# ── Model feedback ───────────────────────────────────────────────────────────
+# Signal for improving the fragment model. Nothing is recorded unless the person
+# deliberately rates a prediction *and* has opted in, because the molecule they
+# were working on is the sensitive part — some of it is unpublished.
+
+FEEDBACK_TOOLS = {'fragmentation', 'drug_class', 'combine', 'admet'}
+FEEDBACK_VERDICTS = {'up', 'down', 'edit'}
+MAX_FEEDBACK_FIELD = 4000
+
+
+def _clip(v, n=MAX_FEEDBACK_FIELD):
+    if v is None:
+        return None
+    s = str(v).strip()
+    return s[:n] if s else None
+
+
+@app.route('/feedback', methods=['POST'])
+def submit_feedback():
+    data = body()
+    tool = str(data.get('tool', '')).strip()
+    verdict = str(data.get('verdict', '')).strip()
+    if tool not in FEEDBACK_TOOLS:
+        return err('Unknown tool')
+    if verdict not in FEEDBACK_VERDICTS:
+        return err('Verdict must be up, down or edit')
+
+    user = current_user()
+    # Consent: signed-in users set it on their account; anonymous users confirm
+    # it in the browser and send it with the rating. Either way it is explicit.
+    if user:
+        consented = bool(user.get('train_consent'))
+    else:
+        consented = data.get('consent') is True
+    if not consented:
+        return err('Feedback needs consent to store the molecule you were working on', 403)
+
+    corrected = _clip(data.get('corrected'))
+    if verdict == 'edit' and not corrected:
+        return err('A corrected structure is required for an edit')
+    # A correction is only useful if it is a real structure.
+    if corrected:
+        try:
+            mol_from_smiles(corrected)
+        except ChemError as e:
+            return err(f'Corrected structure is not valid: {e}')
+
+    row = (user['id'] if user else None,
+           _clip(docking.client_id(request), 64),
+           tool, verdict,
+           _clip(data.get('input_smiles')), _clip(data.get('output_smiles')),
+           corrected, _clip(data.get('target'), 200), _clip(data.get('note'), 1000),
+           json.dumps(data.get('meta'))[:MAX_FEEDBACK_FIELD] if data.get('meta') else None)
+    try:
+        with db.connect() as conn:
+            conn.execute(
+                'INSERT INTO feedback (user_id, client_id, tool, verdict, input_smiles, '
+                'output_smiles, corrected, target, note, meta) VALUES (?,?,?,?,?,?,?,?,?,?)', row)
+    except db.DatabaseUnavailable as e:
+        return err(f'Database unavailable: {e}', 503)
+    return jsonify({'ok': True})
+
+
+@app.route('/account/consent', methods=['POST'])
+@login_required
+def set_consent(user):
+    want = bool(body().get('train_consent'))
+    try:
+        with db.connect() as conn:
+            conn.execute('UPDATE users SET train_consent = ? WHERE id = ?', (1 if want else 0, user['id']))
+    except db.DatabaseUnavailable as e:
+        return err(f'Database unavailable: {e}', 503)
+    return jsonify({'train_consent': want})
+
+
+@app.route('/admin/feedback', methods=['GET'])
+@login_required
+def admin_feedback(user):
+    """Counts plus the raw rows, for building a training set later."""
+    if not is_admin_name(user['username']):
+        return err('Admins only', 403)
+    limit = max(1, min(int(request.args.get('limit', 500)), 5000))
+    with db.connect() as conn:
+        counts = conn.all('SELECT tool, verdict, COUNT(*) AS n FROM feedback GROUP BY tool, verdict')
+        rows = conn.all('SELECT * FROM feedback ORDER BY id DESC LIMIT ?', (limit,))
+    for r in rows:
+        r['created_at'] = _iso(r.get('created_at'))
+    return jsonify({'counts': counts, 'rows': rows, 'total': sum(c['n'] for c in counts)})
 
 
 # ── ADMET ────────────────────────────────────────────────────────────────────

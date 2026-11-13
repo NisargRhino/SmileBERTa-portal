@@ -464,3 +464,10 @@ kbd { font-family: var(--mono); font-size: .7rem; padding: 1px 5px; border-radiu
 .icon-tile svg { width: 22px; height: 22px; }
 .notice { padding: 10px 14px; border-radius: 10px; font-size: .82rem; border: 1px solid rgba(251,191,36,.3); background: rgba(251,191,36,.06); color: #fde68a; }
 .notice.info { border-color: rgba(34,211,238,.3); background: rgba(34,211,238,.05); color: #a5f3fc; }
+
+/* Model feedback bar */
+.fb-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  margin-top: 14px; padding: 10px 14px; border: 1px dashed var(--border-strong); border-radius: var(--radius);
+  background: rgba(255,255,255,.015); }
+.fb-q { font-size: .83rem; color: var(--muted); }
+.fb-bar .btn svg { width: 14px; height: 14px; }

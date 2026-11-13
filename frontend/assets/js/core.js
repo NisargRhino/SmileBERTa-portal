@@ -420,6 +420,106 @@
   };
 
   // ── Hand-off between tools (e.g. "Dock this molecule") ────────────────────
+  // ── Model feedback ────────────────────────────────────────────────────────
+  // Signal for improving SmileBERTa's own models. Nothing is sent unless the
+  // person rates a prediction AND has opted in — the molecule they were working
+  // on is the sensitive part, and some of it will be unpublished.
+
+  const CONSENT_KEY = 'sb_train_consent';
+
+  const CONSENT_COPY = `
+    <p class="text-2" style="font-size:.89rem;line-height:1.65;margin:0 0 12px">
+      SmileBERTa's fragment model is trained by one person on limited data. Your corrections are
+      the most useful thing that exists for making it better.
+    </p>
+    <p class="text-2" style="font-size:.89rem;line-height:1.65;margin:0 0 12px">
+      If you turn this on, then <b>each time you rate a prediction</b> we store that rating along
+      with the molecule you entered, the fragment the model produced, any correction you give, and
+      the target you chose. It may be used to retrain the model and to report accuracy.
+    </p>
+    <ul class="text-2" style="font-size:.86rem;line-height:1.6;margin:0 0 12px;padding-left:20px">
+      <li>Only ratings are stored. Predictions you don't rate are never recorded.</li>
+      <li><b>Don't turn this on for unpublished or confidential structures.</b></li>
+      <li>You can turn it off at any time in your Workspace.</li>
+    </ul>`;
+
+  async function askConsent() {
+    const ok = await modal({
+      title: 'Help improve the model?',
+      body: CONSENT_COPY,
+      actions: [{ label: 'Not now', value: false }, { label: 'Yes, use my ratings', value: true, primary: true }],
+    });
+    if (!ok) return false;
+    store.set(CONSENT_KEY, '1');
+    if (auth.loggedIn()) {
+      try { await api('/account/consent', { body: { train_consent: true } }); } catch (e) { /* local flag still applies */ }
+    }
+    return true;
+  }
+
+  function hasConsent() { return store.get(CONSENT_KEY) === '1'; }
+
+  async function sendFeedback(payload) {
+    if (!hasConsent() && !(await askConsent())) return false;
+    try {
+      await api('/feedback', { body: { ...payload, consent: true } });
+      toast('Thanks — that helps make the model better', 'ok');
+      return true;
+    } catch (e) {
+      toast(e.message || 'Could not send feedback', 'error');
+      return false;
+    }
+  }
+
+  /** Render a rate-this-prediction bar into `el`. */
+  function feedbackWidget(el, { tool, input_smiles, output_smiles, target, label = 'prediction' }) {
+    if (!el) return;
+    el.innerHTML = `
+      <div class="fb-bar">
+        <span class="fb-q">Was this ${esc(label)} useful?</span>
+        <div class="row" style="gap:6px;flex-wrap:wrap">
+          <button class="btn btn-xs" data-fb="up">${icon('check')} Good</button>
+          <button class="btn btn-xs" data-fb="down">${icon('x')} Wrong</button>
+          <button class="btn btn-xs" data-fb="edit">${icon('pen')} Fix it</button>
+        </div>
+      </div>`;
+    const done = (msg) => { el.innerHTML = `<div class="fb-bar"><span class="fb-q">${esc(msg)}</span></div>`; };
+
+    $$('[data-fb]', el).forEach((b) => b.addEventListener('click', async () => {
+      const verdict = b.dataset.fb;
+      const base = { tool, input_smiles, output_smiles, target };
+      if (verdict !== 'edit') {
+        if (await sendFeedback({ ...base, verdict })) done('Thanks — feedback recorded.');
+        return;
+      }
+      const corrected = await modal({
+        title: 'What should it have been?',
+        body: `<p class="text-2" style="font-size:.86rem;margin:0 0 12px">A correction is worth far more
+          than a thumbs-down — it tells the model what the right answer looks like.</p>
+          <label class="field"><span>Correct fragment (SMILES)</span>
+          <input class="input mono" id="fb-smi" value="${esc(output_smiles || '')}" spellcheck="false"></label>
+          <label class="field" style="margin-bottom:0"><span>Anything worth knowing? (optional)</span>
+          <input class="input" id="fb-note" maxlength="300" placeholder="e.g. missed the hinge binder"></label>`,
+        actions: [{ label: 'Cancel', value: null },
+                  { label: 'Submit correction', primary: true,
+                    value: (m) => ({ smi: m.querySelector('#fb-smi').value.trim(),
+                                     note: m.querySelector('#fb-note').value.trim() }) }],
+      });
+      if (!corrected || !corrected.smi) return;
+      if (corrected.smi === output_smiles) {
+        toast('That is the same structure the model gave', 'error');
+        return;
+      }
+      if (!(await validSmiles(corrected.smi))) {
+        toast('That does not parse as a valid SMILES', 'error');
+        return;
+      }
+      if (await sendFeedback({ ...base, verdict: 'edit', corrected: corrected.smi, note: corrected.note })) {
+        done('Thanks — correction recorded.');
+      }
+    }));
+  }
+
   function handoff(target, payload) {
     try { sessionStorage.setItem('sb_handoff_' + target, JSON.stringify(payload)); } catch (e) { /* ignore */ }
     location.href = target;
@@ -547,6 +647,7 @@
     API, DOCK_API, api, auth, store, icon, LOGO, TOOLS, LEARN, esc, $, $$, h, sleep, fmt, debounce, param,
     toast, modal, promptText, requireLoginModal, saveItem, loadItem, download, copy, readFile, parseCSV, toCSV, bindDropzone,
     library, handoff, takeHandoff, loadRDKit, depictSVG, depict, validSmiles, canonical, viewer3d, show3DFromSmiles, applyMolStyle,
+    feedbackWidget, sendFeedback, hasConsent, askConsent, clientId,
     propertyTiles, druglikeBadges, onStatus, initReveal, status,
   };
 })();

@@ -140,6 +140,21 @@ CREATE TABLE IF NOT EXISTS items (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE IF NOT EXISTS feedback (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id       INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    client_id     TEXT,
+    tool          TEXT NOT NULL,
+    verdict       TEXT NOT NULL,
+    input_smiles  TEXT,
+    output_smiles TEXT,
+    corrected     TEXT,
+    target        TEXT,
+    note          TEXT,
+    meta          TEXT,
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_feedback_tool ON feedback(tool, created_at);
 CREATE INDEX IF NOT EXISTS idx_items_user ON items(user_id, kind);
 CREATE INDEX IF NOT EXISTS idx_tokens_user ON tokens(user_id);
 '''
@@ -174,6 +189,21 @@ CREATE TABLE IF NOT EXISTS items (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE IF NOT EXISTS feedback (
+    id            SERIAL PRIMARY KEY,
+    user_id       INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    client_id     TEXT,
+    tool          TEXT NOT NULL,
+    verdict       TEXT NOT NULL,
+    input_smiles  TEXT,
+    output_smiles TEXT,
+    corrected     TEXT,
+    target        TEXT,
+    note          TEXT,
+    meta          TEXT,
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_feedback_tool ON feedback(tool, created_at);
 CREATE INDEX IF NOT EXISTS idx_items_user ON items(user_id, kind);
 CREATE INDEX IF NOT EXISTS idx_tokens_user ON tokens(user_id);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_users_lower ON users (lower(username));
@@ -191,6 +221,9 @@ def _create_schema():
             for stmt in _SCHEMA_PG.split(';'):
                 if stmt.strip():
                     conn.execute(stmt)
+            # Opt-in consent to let saved feedback be used for retraining.
+            # Defaults to 0: nobody is opted in without choosing to be.
+            conn.execute('ALTER TABLE users ADD COLUMN IF NOT EXISTS train_consent INTEGER DEFAULT 0')
         else:
             conn._raw.executescript(_SCHEMA_SQLITE)
             # Older SQLite databases had a tokens table without created_at.
@@ -198,6 +231,9 @@ def _create_schema():
             if 'created_at' not in cols:
                 conn.execute('ALTER TABLE tokens ADD COLUMN created_at TIMESTAMP')
                 conn.execute('UPDATE tokens SET created_at = CURRENT_TIMESTAMP')
+            ucols = [r['name'] for r in conn.all('PRAGMA table_info(users)')]
+            if 'train_consent' not in ucols:
+                conn.execute('ALTER TABLE users ADD COLUMN train_consent INTEGER DEFAULT 0')
             try:
                 conn.execute('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_lower ON users (lower(username))')
             except sqlite3.IntegrityError:
