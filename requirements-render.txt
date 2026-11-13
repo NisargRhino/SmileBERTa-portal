@@ -11,7 +11,7 @@ rdkit==2023.9.6
 transformers==4.43.3
 numpy==1.26.4
 pandas==2.2.2
-Levenshtein==0.25.1
+rapidfuzz==3.10.1
 requests==2.32.3
 pillow==10.3.0
 joblib==1.4.2

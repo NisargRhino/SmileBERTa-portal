@@ -261,9 +261,9 @@
           <p class="muted" style="margin-top:14px;max-width:320px;font-size:.88rem">Open, AI-powered drug discovery tools — transformer models, physics-based docking and interactive 3D chemistry in the browser.</p></div>
         <div><h6>Tools</h6>${TOOLS.map((t) => `<a href="${t.href}">${t.title}</a>`).join('')}</div>
         <div><h6>Learn</h6>${LEARN.map((t) => `<a href="${t.href}">${t.title}</a>`).join('')}</div>
-        <div><h6>Platform</h6><a href="workspace">Workspace</a><a href="login">Sign in</a><a href="./#about">About</a><a href="https://huggingface.co/NisargRhino" target="_blank" rel="noopener">Models on Hugging Face</a></div>
+        <div><h6>Platform</h6><a href="workspace">Workspace</a><a href="login">Sign in</a><a href="./#about">About</a><a href="credits">Credits &amp; citations</a><a href="https://huggingface.co/NisargRhino" target="_blank" rel="noopener">Models on Hugging Face</a></div>
       </div>
-      <div class="footer-bottom"><span>© ${new Date().getFullYear()} SmileBERTa. For research and education — not for clinical use.</span><span>Built with RDKit · PyTorch · AutoDock Vina · 3Dmol.js</span></div>
+      <div class="footer-bottom"><span>© ${new Date().getFullYear()} SmileBERTa. For research and education — not for clinical use.</span><span>Built with <a href="credits">RDKit · PyTorch · AutoDock Vina · 3Dmol.js</a></span></div>
     </div></footer>`;
   }
 

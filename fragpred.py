@@ -5,7 +5,7 @@ every output position is decoded with argmax, and the resulting token sequence i
 read back as the fragment SMILES. Invalid outputs are repaired by a SMILES
 corrector service, falling back to the closest valid reference fragment.
 """
-import Levenshtein
+from rapidfuzz.distance import Levenshtein
 import pandas as pd
 import requests
 import torch

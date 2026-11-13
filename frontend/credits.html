@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Credits &amp; Citations — SmileBERTa</title>
+  <meta name="description" content="Every tool, model, dataset and published method SmileBERTa is built on, with citations and licences.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    .toc { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+    .sec-title { font-size: 1.15rem; margin: 0 0 4px; }
+    .sec-blurb { font-size: .86rem; margin: 0; max-width: 70ch; line-height: 1.6; }
+
+    /* One consistent gap under the heading whether or not a blurb follows it. */
+    .dep-list, .cite-list { margin-top: 18px; }
+    .dep-list { display: grid; gap: 18px; }
+    .dep { border-left: 2px solid var(--border-strong); padding-left: 15px; }
+    .dep-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 5px; }
+    .dep-name { font-weight: 600; font-size: .96rem; }
+    .dep-ver { font-family: var(--mono); font-size: .78rem; color: var(--muted); font-weight: 400; }
+    .dep-used { font-size: .85rem; color: var(--text-2); margin: 0 0 8px; line-height: 1.6; max-width: 72ch; }
+    .dep-cite { font-size: .82rem; color: var(--muted); margin: 0; line-height: 1.6; max-width: 78ch; }
+    .dep-cite.also { margin-top: 7px; padding-top: 7px; border-top: 1px dashed var(--border); }
+    .dep-note { font-size: .79rem; color: #fde68a; margin: 9px 0 0; display: flex; gap: 7px; align-items: flex-start; line-height: 1.55; }
+    .dep-note svg { width: 15px; height: 15px; flex: 0 0 15px; margin-top: 2px; }
+    a.doi { color: var(--cyan); font-family: var(--mono); font-size: .76rem; white-space: nowrap; }
+
+    .cite-list { display: grid; gap: 13px; }
+    .cite-row { display: grid; grid-template-columns: minmax(0, 230px) minmax(0, 1fr); gap: 16px; align-items: baseline; }
+    .cite-what { font-size: .85rem; color: var(--text-2); font-weight: 500; }
+    .cite-ref { font-size: .81rem; color: var(--muted); line-height: 1.6; }
+    @media (max-width: 760px) { .cite-row { grid-template-columns: 1fr; gap: 3px; } }
+
+    .self-cite { font-family: var(--mono); font-size: .8rem; line-height: 1.7; background: var(--surface-2);
+      border: 1.5px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin: 12px 0 0; white-space: pre-wrap; }
+    .lic-grid { display: grid; gap: 10px; margin-top: 14px; }
+    .lic-row { display: flex; gap: 12px; align-items: flex-start; font-size: .85rem; line-height: 1.6; }
+    .lic-row .badge { flex: 0 0 auto; margin-top: 1px; }
+  </style>
+  <script src="assets/js/core.js" defer></script>
+  <script src="assets/js/credits.js" defer></script>
+</head>
+<body>
+  <div id="site-nav"></div>
+  <main class="container">
+    <div class="page-head">
+      <div class="crumbs"><a href="./">Home</a><span>/</span><span>Credits &amp; Citations</span></div>
+      <div class="eyebrow">Attribution · Licences</div>
+      <h1>Credits &amp; Citations</h1>
+      <p class="lead">SmileBERTa is a front end for decades of other people's work. Every tool, model, dataset and published method it uses is listed here with a citation and a licence — so you can check any number the site gives you, and cite the right people when you publish.</p>
+    </div>
+
+    <div class="panel" style="margin-bottom:18px"><div class="panel-body">
+      <h2 class="sec-title">If you publish work that used SmileBERTa</h2>
+      <p class="muted sec-blurb" style="margin-bottom:0">
+        Cite the primary sources for whatever you actually used — Vina if you docked, RDKit for
+        descriptors, Delaney for a solubility number — not only this site. SmileBERTa runs those
+        methods; it is not a substitute for them. The sections below say exactly which method
+        produced which result.
+      </p>
+      <p class="muted sec-blurb" style="margin:14px 0 0">You can credit the platform itself as:</p>
+      <div class="self-cite" id="self-cite">Shah, N. SmileBERTa: open, AI-powered drug discovery tools. Emory University, 2026. https://smileberta-web.onrender.com</div>
+      <div class="row" style="gap:8px;margin-top:14px;flex-wrap:wrap">
+        <button class="btn btn-sm" id="copy-self">Copy this citation</button>
+        <button class="btn btn-sm" id="copy-all">Copy every citation</button>
+        <button class="btn btn-sm" id="dl-all">Download as .txt</button>
+      </div>
+      <p class="muted" style="font-size:.78rem;margin:12px 0 0">
+        Each DOI link resolves to a page that will give you BibTeX or RIS for your reference manager.
+      </p>
+    </div></div>
+
+    <div class="toc" id="toc"></div>
+    <div class="stack" id="sections"></div>
+
+    <div class="panel" style="margin-top:18px"><div class="panel-body">
+      <h2 class="sec-title">Licensing</h2>
+      <p class="muted sec-blurb">
+        Most of the stack is permissive. Two components are copyleft, and they are called out here
+        rather than buried, because the distinction matters to anyone planning to redistribute this
+        code or build a product on it.
+      </p>
+      <div class="lic-grid">
+        <div class="lic-row"><span class="badge green">Permissive</span>
+          <span>RDKit, AutoDock Vina 1.2.x, 3Dmol.js, RDKit.js, PyTorch, Transformers, Flask, Werkzeug,
+          Gunicorn, NumPy, pandas, RapidFuzz, Requests, Pillow and Caddy are BSD, MIT or Apache-2.0.
+          No copyleft obligations.</span></div>
+        <div class="lic-row"><span class="badge amber">GPL-2.0</span>
+          <span><b>Open Babel</b>, used through its Python bindings for docking preparation, is GPL-2.0.
+          GPL obligations are triggered by <i>distributing</i> the software, not by running it on a server
+          and offering access over a network. SmileBERTa is hosted, so users receive results, not binaries.
+          If the Docker image or a desktop build were ever distributed, that calculus changes — and so
+          would the options, such as moving Open Babel behind a process boundary.</span></div>
+        <div class="lic-row"><span class="badge violet">LGPL-3.0</span>
+          <span><b>psycopg2</b>, the PostgreSQL driver, is LGPL-3.0 and is used as an unmodified
+          library.</span></div>
+        <div class="lic-row"><span class="badge">Per-model</span>
+          <span>Models pulled from Hugging Face through the Model Hub each carry their own licence.
+          SmileBERTa does not redistribute them — it links to them, and generated notebooks download
+          them directly from Hugging Face at runtime. Check a model's card before using it.</span></div>
+      </div>
+      <p class="muted" style="font-size:.79rem;margin:18px 0 0;line-height:1.6">
+        This section is a factual summary of the licences involved, compiled from each project's own
+        metadata. It is not legal advice, and it is not a substitute for a lawyer if you intend to
+        redistribute or commercialise this code.
+      </p>
+    </div></div>
+
+    <div class="panel" style="margin:18px 0 60px"><div class="panel-body">
+      <h2 class="sec-title">Something missing or wrong?</h2>
+      <p class="muted sec-blurb" style="margin-bottom:0">
+        If SmileBERTa uses your work and this page gets the citation wrong, or omits it, that is a bug
+        and worth reporting. The list is maintained alongside the dependency files in the repository,
+        so it should never drift from what the site actually runs.
+      </p>
+    </div></div>
+  </main>
+  <div id="site-footer"></div>
+</body>
+</html>

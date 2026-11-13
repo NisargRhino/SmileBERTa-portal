@@ -6,7 +6,7 @@ labels (drugclassoptions_final1.csv) by Levenshtein edit distance.
 """
 import pandas as pd
 import torch
-from Levenshtein import distance as levenshtein_distance
+from rapidfuzz.distance.Levenshtein import distance as levenshtein_distance
 from models import get_model, model_lock
 
 CLASSIFICATION_MODEL = 'NisargRhino/drug-classification'
