@@ -224,6 +224,7 @@
         <div class="nav-drop" data-drop><button type="button" aria-haspopup="true">Tools ${icon('chevron')}</button><div class="nav-menu">${menuItems(TOOLS)}</div></div>
         <div class="nav-drop" data-drop><button type="button" aria-haspopup="true">Learn ${icon('chevron')}</button><div class="nav-menu">${menuItems(LEARN)}<a href="learn"><span class="mi-icon">${icon('book')}</span><span><span class="mi-title">All guides</span><span class="mi-desc">The science behind every tool</span></span></a></div></div>
         <a class="nav-link ${page === 'workspace' ? 'active' : ''}" href="workspace">Workspace</a>
+        <a class="nav-link ${page === 'pricing' ? 'active' : ''}" href="pricing">Pricing</a>
         <a class="nav-link" href="./#about">About</a>
       </div>
       <div class="nav-right">
@@ -278,7 +279,7 @@
           <p class="muted" style="margin-top:14px;max-width:320px;font-size:.88rem">Open, AI-powered drug discovery tools — transformer models, physics-based docking and interactive 3D chemistry in the browser.</p></div>
         <div><h6>Tools</h6>${TOOLS.map((t) => `<a href="${t.href}">${t.title}</a>`).join('')}</div>
         <div><h6>Learn</h6>${LEARN.map((t) => `<a href="${t.href}">${t.title}</a>`).join('')}</div>
-        <div><h6>Platform</h6><a href="workspace">Workspace</a><a href="login">Sign in</a><a href="./#about">About</a><a href="credits">Credits &amp; citations</a><a href="terms">Terms &amp; privacy</a><a href="https://huggingface.co/NisargRhino" target="_blank" rel="noopener">Models on Hugging Face</a></div>
+        <div><h6>Platform</h6><a href="workspace">Workspace</a><a href="pricing">Pricing</a><a href="login">Sign in</a><a href="./#about">About</a><a href="credits">Credits &amp; citations</a><a href="terms">Terms &amp; privacy</a><a href="https://huggingface.co/NisargRhino" target="_blank" rel="noopener">Models on Hugging Face</a></div>
       </div>
       <div class="footer-bottom"><span>© ${new Date().getFullYear()} SmileBERTa. <a href="terms">For research and education — not for clinical use.</a></span><span>Built with <a href="credits">RDKit · PyTorch · AutoDock Vina · 3Dmol.js</a></span></div>
     </div></footer>`;

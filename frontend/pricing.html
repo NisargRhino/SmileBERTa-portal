@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pricing — SmileBERTa</title>
+  <meta name="description" content="SmileBERTa is free during beta. Here is where the paid tiers are heading.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 18px; align-items: start; margin-bottom: 40px; }
+    @media (max-width: 920px) { .plans { grid-template-columns: 1fr; max-width: 460px; margin-inline: auto; } }
+
+    .plan { position: relative; border: 1.5px solid var(--border); border-radius: var(--radius-lg, 16px);
+      padding: 24px 22px; background: var(--panel-solid); display: flex; flex-direction: column; }
+    .plan.featured { border-color: rgba(34,211,238,.5); background: linear-gradient(180deg, rgba(34,211,238,.06), transparent 55%); }
+    .plan-flag { position: absolute; top: -11px; left: 22px; font-size: .68rem; font-weight: 700; letter-spacing: .07em;
+      text-transform: uppercase; padding: 4px 10px; border-radius: 99px; background: var(--grad, linear-gradient(90deg,#3b82f6,#22d3ee)); color: #03121c; }
+    .plan h3 { margin: 0; font-size: 1.15rem; }
+    .plan-price { margin: 14px 0 0; display: flex; align-items: baseline; gap: 7px; }
+    .plan-price .amt { font-family: 'Space Grotesk', var(--font); font-size: 2.3rem; font-weight: 700; line-height: 1; }
+    .plan-price .cad { font-size: .83rem; color: var(--muted); }
+    .plan-tag { font-size: .85rem; color: var(--text-2); line-height: 1.6; margin: 12px 0 18px; min-height: 2.7em; }
+    .plan .btn-block { margin-bottom: 20px; }
+    .plan .btn[disabled] { opacity: .5; cursor: not-allowed; }
+
+    .plan-feats { list-style: none; margin: 0; padding: 0; display: grid; gap: 13px; }
+    .plan-feats li { display: flex; gap: 10px; font-size: .85rem; line-height: 1.5; align-items: flex-start; }
+    .plan-feats .fi { flex: 0 0 17px; width: 17px; height: 17px; margin-top: 1px; }
+    .plan-feats .fi svg { width: 17px; height: 17px; }
+    .plan-feats li.on .fi { color: var(--green); }
+    .plan-feats li.soon .fi { color: var(--muted); }
+    .plan-feats li.soon b { color: var(--text-2); font-weight: 500; }
+    .plan-feats .fd { display: block; color: var(--muted); font-size: .78rem; margin-top: 3px; line-height: 1.5; }
+
+    .faq-item { border-bottom: 1px solid var(--border); }
+    .faq-item:last-child { border-bottom: 0; }
+    .faq-q { width: 100%; background: none; border: 0; color: var(--text); font: inherit; font-size: .92rem;
+      font-weight: 500; text-align: left; padding: 15px 0; cursor: pointer; display: flex; justify-content: space-between;
+      align-items: center; gap: 14px; font-family: var(--font); }
+    .faq-q:hover { color: var(--cyan); }
+    .faq-chev { color: var(--muted); display: inline-flex; transition: transform .18s; flex: 0 0 auto; }
+    .faq-chev svg { width: 18px; height: 18px; }
+    .faq-item.open .faq-chev { transform: rotate(180deg); }
+    .faq-a { display: none; padding: 0 0 16px; }
+    .faq-item.open .faq-a { display: block; }
+    .faq-a p { margin: 0; font-size: .86rem; line-height: 1.7; color: var(--text-2); max-width: 76ch; }
+    .faq-a a { color: var(--cyan); }
+  </style>
+  <script src="assets/js/core.js" defer></script>
+  <script src="assets/js/pricing.js" defer></script>
+</head>
+<body>
+  <div id="site-nav"></div>
+  <main class="container">
+    <div class="page-head">
+      <div class="crumbs"><a href="./">Home</a><span>/</span><span>Pricing</span></div>
+      <div class="eyebrow">Beta</div>
+      <h1>Pricing</h1>
+      <p class="lead">SmileBERTa is free while it is in beta, and the free tier is built to stay useful rather than become a demo. The paid tiers below are where it is heading — they are not live yet, and there is nothing to buy on this page.</p>
+    </div>
+
+    <div class="panel" style="margin-bottom:26px"><div class="panel-body">
+      <div class="callout" style="margin:0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <div>
+          <b>Everything is free today.</b>
+          <p style="margin:6px 0 0;font-size:.86rem;line-height:1.6">
+            No card, no trial clock, no feature locked behind a paywall. We are in beta with a small
+            group of researchers, and paid plans will only arrive once there is something worth
+            charging for — dedicated compute and scale, not access to the science.
+          </p>
+        </div>
+      </div>
+    </div></div>
+
+    <div class="plans" id="plans"></div>
+
+    <div class="panel" style="margin-bottom:18px"><div class="panel-body">
+      <h2 style="font-size:1.1rem;margin:0 0 4px">What we would actually charge for</h2>
+      <p class="muted" style="font-size:.86rem;line-height:1.65;margin:10px 0 0;max-width:76ch">
+        The tools themselves are built on open science — RDKit, AutoDock Vina, published ADMET
+        models — and it would be a strange thing to put a toll booth in front of work other people
+        gave away. What genuinely costs money is <b>compute</b>: CPU hours for docking, capacity so
+        your jobs do not queue behind everyone else's, and storage for results. That is what the
+        paid tiers are for, and it is why the free tier can stay generous.
+      </p>
+      <p class="muted" style="font-size:.86rem;line-height:1.65;margin:12px 0 0;max-width:76ch">
+        The one thing that is genuinely ours is the fragment-prediction model. When it is good
+        enough to stand on published benchmark numbers, that is what will be worth paying for — and
+        we would rather show you those numbers first.
+      </p>
+    </div></div>
+
+    <div class="panel" style="margin-bottom:60px"><div class="panel-body">
+      <h2 style="font-size:1.1rem;margin:0 0 6px">Questions</h2>
+      <div id="faq" style="margin-top:8px"></div>
+    </div></div>
+  </main>
+  <div id="site-footer"></div>
+</body>
+</html>
