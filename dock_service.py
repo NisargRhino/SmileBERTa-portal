@@ -25,8 +25,13 @@ def options_handler(_routes):
 @app.route('/', methods=['GET'])
 @app.route('/health', methods=['GET'])
 def health():
+    # 'forwarded' reports whether the proxy is passing X-Forwarded-For. If it
+    # were ever false in production, every caller would collapse onto the Docker
+    # gateway address and share a single rate-limit bucket, locking everyone out
+    # at the hourly cap. No address is disclosed, only whether the header exists.
     return jsonify({'status': 'ok', 'service': 'docking', 'docking': docking.DOCKING_AVAILABLE, 'vina': docking.VINA_VERSION,
                     'uptime': round(time.time() - STARTED_AT), 'rss_mb': docking.rss_mb(),
+                    'forwarded': bool(request.headers.get('X-Forwarded-For')),
                     'queue': docking.queue_stats()})
 
 
