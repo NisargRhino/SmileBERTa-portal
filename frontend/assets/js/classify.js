@@ -48,7 +48,7 @@
     $('#results').innerHTML = `<div class="stack fade-in">
       <div class="card">
         <div class="row-between" style="margin-bottom:18px"><h3 style="margin:0">Prediction</h3>
-          <div class="row" style="gap:6px"><button class="btn btn-sm" id="save">${icon('save')} Save</button><button class="btn btn-sm" id="dock">${icon('target')} Dock</button><button class="btn btn-sm" id="frag">${icon('split')} Fragment</button><button class="btn btn-sm" id="json">${icon('download')}</button></div></div>
+          <div class="row" style="gap:6px"><button class="btn btn-sm" id="save">${icon('save')} Save</button><button class="btn btn-sm" id="dock">${icon('target')} Dock</button><button class="btn btn-sm" id="frag">${icon('split')} Fragment</button><button class="btn btn-sm" id="admet">${icon('gauge')} ADMET</button><button class="btn btn-sm" id="json">${icon('download')}</button></div></div>
         <div class="class-hero">
           <div class="icon-tile" style="width:56px;height:56px">${icon('tag')}</div>
           <div class="grow"><div class="muted" style="font-size:.76rem;text-transform:uppercase;letter-spacing:.12em">Predicted therapeutic class${parts.length > 1 ? 'es' : ''}</div>
@@ -84,6 +84,7 @@
     $('#save').addEventListener('click', () => saveItem('classification', (p.formula || 'Compound') + ' · ' + parts.map(label).join(', '), { smiles, result: d }, parts.map(label).join(', ')));
     $('#dock').addEventListener('click', () => handoff('docking', { smiles }));
     $('#frag').addEventListener('click', () => handoff('fragmentation', { smiles }));
+    $('#admet').addEventListener('click', () => handoff('admet', { smiles }));
     $('#json').addEventListener('click', () => download(JSON.stringify({ smiles, ...d }, null, 2), 'classification.json', 'application/json'));
   }
 

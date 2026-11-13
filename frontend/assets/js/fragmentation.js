@@ -61,6 +61,7 @@
               <button class="btn btn-sm" id="save">${icon('save')} Save</button>
               <button class="btn btn-sm" id="to-dock">${icon('target')} Dock</button>
               <button class="btn btn-sm" id="to-build">${icon('atom')} Builder</button>
+              <button class="btn btn-sm" id="to-admet">${icon('gauge')} ADMET</button>
             </div>
           </div>
           <div class="two-col">
@@ -129,6 +130,7 @@
     $('#save').addEventListener('click', () => saveItem('fragment', 'Fragment of ' + (a.formula || 'molecule'), { input: inputSmiles, result: d }, `${d.fragment_smiles} · ${d.protein}`));
     $('#to-dock').addEventListener('click', () => handoff('docking', { smiles: d.fragment_smiles, name: 'Predicted fragment' }));
     $('#to-build').addEventListener('click', () => handoff('builder', { smiles: d.fragment_smiles }));
+    $('#to-admet').addEventListener('click', () => handoff('admet', { smiles: d.fragment_smiles }));
     $('#dl-sdf').addEventListener('click', () => d.pdb ? download(d.pdb, 'fragment.pdb', 'chemical/x-pdb') : toast('No 3D structure available', 'error'));
     $('#dl-json').addEventListener('click', () => download(JSON.stringify({ input: inputSmiles, ...d }, null, 2), 'fragment_prediction.json', 'application/json'));
   }

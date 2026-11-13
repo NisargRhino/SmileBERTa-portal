@@ -4,6 +4,7 @@
   const KINDS = {
     molecule: ['Molecules', 'atom', 'builder'], fragment: ['Fragments', 'split', 'fragmentation'], classification: ['Classifications', 'tag', 'drug_class'],
     combination: ['Linked leads', 'merge', 'combine'], docking: ['Docking runs', 'target', 'docking'], structure: ['Structures', 'helix', 'studio'],
+    admet: ['ADMET profiles', 'gauge', 'admet'],
   };
   let items = [], filter = 'all';
 

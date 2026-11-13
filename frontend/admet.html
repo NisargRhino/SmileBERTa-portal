@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ADMET Profiler — SmileBERTa</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    .mode-row { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+    .ex-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 9px; }
+
+    /* Endpoint rows: value, verdict dot, and the provenance line under it. */
+    .ep { padding: 11px 0; border-bottom: 1px solid var(--border); }
+    .ep:last-child { border-bottom: 0; }
+    .ep-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+    .ep-label { font-size: .88rem; color: var(--text-2); }
+    .ep-val { font-family: var(--mono); font-size: .84rem; white-space: nowrap; display: flex; align-items: center; gap: 7px; }
+    .dot { width: 8px; height: 8px; border-radius: 99px; flex: 0 0 8px; }
+    .dot.good { background: var(--green); box-shadow: 0 0 7px var(--green); }
+    .dot.warn { background: var(--amber); box-shadow: 0 0 7px var(--amber); }
+    .dot.bad { background: var(--red); box-shadow: 0 0 7px var(--red); }
+    .dot.neutral { background: var(--muted); }
+    .ep-note { font-size: .76rem; color: var(--muted); margin-top: 5px; line-height: 1.5; }
+    .ep-cite { font-size: .72rem; color: var(--muted); opacity: .8; margin-top: 4px; font-style: italic; }
+
+    /* Drug-likeness filters */
+    .filt { border: 1.5px solid var(--border); border-radius: var(--radius); margin-bottom: 9px; overflow: hidden; }
+    .filt-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 13px; cursor: pointer; }
+    .filt-head:hover { background: rgba(255,255,255,.02); }
+    .filt-name { font-size: .87rem; font-weight: 500; }
+    .filt-body { padding: 0 13px 12px; display: none; }
+    .filt.open .filt-body { display: block; }
+    .filt-chev { transition: transform .18s; color: var(--muted); display: inline-flex; }
+    .filt.open .filt-chev { transform: rotate(90deg); }
+    .check { display: flex; gap: 8px; align-items: center; font-size: .8rem; padding: 4px 0; font-family: var(--mono); }
+    .check.no { color: #fca5a5; } .check.yes { color: var(--text-2); }
+
+    /* Alerts */
+    .alert-item { border-left: 3px solid var(--amber); padding: 9px 12px; background: rgba(251,191,36,.05); border-radius: 0 var(--radius) var(--radius) 0; margin-bottom: 8px; }
+    .alert-name { font-family: var(--mono); font-size: .82rem; }
+
+    /* Radar */
+    .radar-wrap { display: flex; justify-content: center; }
+    .radar-wrap svg { width: 100%; max-width: 360px; height: auto; }
+    .radar-legend { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 10px; font-size: .74rem; color: var(--muted); }
+    .radar-legend i { display: inline-block; width: 11px; height: 11px; border-radius: 3px; vertical-align: -1px; margin-right: 5px; }
+
+    /* Batch table */
+    .tbl-wrap { overflow-x: auto; border: 1.5px solid var(--border); border-radius: var(--radius); }
+    table.res { border-collapse: collapse; width: 100%; font-size: .79rem; }
+    table.res th, table.res td { padding: 8px 11px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    table.res th { background: var(--surface-2); font-weight: 600; font-size: .73rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); position: sticky; top: 0; }
+    table.res td { font-family: var(--mono); font-size: .78rem; }
+    table.res tr:last-child td { border-bottom: 0; }
+    table.res td.smi { font-size: .72rem; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+    table.res tr.bad td { color: #fca5a5; }
+
+    .ref-item { font-size: .79rem; padding: 7px 0; border-bottom: 1px solid var(--border); line-height: 1.5; }
+    .ref-item:last-child { border-bottom: 0; }
+    .ref-what { color: var(--text-2); }
+    .ref-cite { color: var(--muted); }
+  </style>
+  <script src="assets/js/core.js" defer></script>
+  <script src="assets/js/admet.js" defer></script>
+</head>
+<body>
+  <div id="site-nav"></div>
+  <main class="container">
+    <div class="page-head">
+      <div class="crumbs"><a href="./">Home</a><span>/</span><a href="./#tools">Tools</a><span>/</span><span>ADMET Profiler</span></div>
+      <div class="eyebrow">Pharmacokinetics · Drug-likeness</div>
+      <h1>ADMET Profiler</h1>
+      <p class="lead">Absorption, water solubility, blood–brain barrier crossing, seven drug-likeness filters and structural alerts — for one molecule or a few hundred. Every value says which published model produced it, so you can check the number against its paper.</p>
+    </div>
+
+    <div class="mode-row">
+      <button class="chip active" data-mode="single">Single molecule</button>
+      <button class="chip" data-mode="batch">Batch screen</button>
+    </div>
+
+    <!-- ── Single ─────────────────────────────────────────────────────── -->
+    <div id="mode-single">
+      <div class="panel" style="margin-bottom:18px"><div class="panel-body">
+        <label class="field">
+          <span>SMILES</span>
+          <div class="row" style="gap:8px;flex-wrap:wrap">
+            <input class="input mono" id="smi" placeholder="CC(=O)Oc1ccccc1C(=O)O" spellcheck="false" style="flex:1;min-width:220px">
+            <button class="btn btn-primary" id="run">Profile</button>
+          </div>
+        </label>
+        <div class="ex-row" id="examples"></div>
+      </div></div>
+
+      <div id="out" hidden>
+        <div class="tool-grid">
+          <aside class="stack">
+            <div class="panel"><div class="panel-body">
+              <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:10px">
+                <b>Structure</b>
+                <div class="row" style="gap:6px">
+                  <button class="btn btn-sm" id="save">Save</button>
+                  <button class="btn btn-sm" id="csv">CSV</button>
+                </div>
+              </div>
+              <div id="depict" style="display:flex;justify-content:center;min-height:170px"></div>
+              <div class="row" id="badges" style="gap:6px;flex-wrap:wrap;margin-top:10px"></div>
+              <div class="kv" id="ids" style="margin-top:12px"></div>
+            </div></div>
+
+            <div class="panel"><div class="panel-body">
+              <b>Bioavailability radar</b>
+              <p class="muted" style="font-size:.77rem;margin:5px 0 12px">
+                The shaded ring is the range considered favourable for oral bioavailability.
+                A shape that stays inside it on all six axes is a good oral candidate.
+              </p>
+              <div class="radar-wrap" id="radar"></div>
+              <div class="radar-legend">
+                <span><i style="background:rgba(34,211,238,.45)"></i>This molecule</span>
+                <span><i style="background:rgba(52,211,153,.18);border:1px solid rgba(52,211,153,.5)"></i>Favourable range</span>
+              </div>
+            </div></div>
+
+            <div class="panel"><div class="panel-body">
+              <b>Physicochemical</b>
+              <div class="kv" id="physchem" style="margin-top:10px"></div>
+            </div></div>
+          </aside>
+
+          <section class="stack">
+            <div class="panel"><div class="panel-body">
+              <b>Absorption &amp; distribution</b>
+              <div id="pk" style="margin-top:6px"></div>
+            </div></div>
+
+            <div class="panel"><div class="panel-body">
+              <b>Medicinal chemistry</b>
+              <div id="medchem" style="margin-top:6px"></div>
+            </div></div>
+
+            <div class="panel"><div class="panel-body">
+              <div class="row" style="justify-content:space-between;align-items:center">
+                <b>Drug-likeness filters</b>
+                <span class="badge" id="filt-count"></span>
+              </div>
+              <p class="muted" style="font-size:.77rem;margin:6px 0 12px">
+                Click a filter to see every criterion and which ones this molecule misses.
+                These are screening heuristics built from marketed drugs, not pass/fail verdicts —
+                plenty of approved drugs break several.
+              </p>
+              <div id="filters"></div>
+            </div></div>
+
+            <div class="panel"><div class="panel-body">
+              <div class="row" style="justify-content:space-between;align-items:center">
+                <b>Structural alerts</b>
+                <span class="badge" id="alert-count"></span>
+              </div>
+              <p class="muted" style="font-size:.77rem;margin:6px 0 12px">
+                Substructures associated with assay interference or reactivity. A hit is a reason
+                to look closely, not automatically to discard the compound.
+              </p>
+              <div id="alerts"></div>
+            </div></div>
+
+            <div class="panel"><div class="panel-body">
+              <b>Not computed here</b>
+              <p class="muted" style="font-size:.77rem;margin:6px 0 12px">
+                These endpoints need a trained model with a stated applicability domain. Rather than
+                show you a guess, SmileBERTa leaves them out — you can pull a published model for
+                them from the <a href="models">Model Hub</a>.
+              </p>
+              <div id="unavailable"></div>
+            </div></div>
+
+            <div class="panel"><div class="panel-body">
+              <b>How each value was computed</b>
+              <p class="muted" style="font-size:.77rem;margin:6px 0 10px">
+                Cite these if you use the results. SmileBERTa implements the published models; it
+                does not replace them.
+              </p>
+              <div id="refs"></div>
+            </div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Batch ──────────────────────────────────────────────────────── -->
+    <div id="mode-batch" hidden>
+      <div class="panel" style="margin-bottom:18px"><div class="panel-body">
+        <label class="field">
+          <span>SMILES — one per line</span>
+          <textarea class="input mono" id="bsmi" rows="7" spellcheck="false"
+            placeholder="CC(=O)Oc1ccccc1C(=O)O&#10;Cn1cnc2c1c(=O)n(C)c(=O)n2C&#10;CC(C)Cc1ccc(C(C)C(=O)O)cc1"></textarea>
+        </label>
+        <div class="dropzone" id="drop" style="margin-top:10px">
+          <b>Drop a CSV</b>
+          <p class="muted" style="font-size:.78rem;margin:4px 0 0">A column named <span class="mono">smiles</span> is picked up automatically.</p>
+        </div>
+        <div class="row" style="gap:8px;margin-top:14px;flex-wrap:wrap">
+          <button class="btn btn-primary" id="brun">Screen compounds</button>
+          <button class="btn" id="bcsv" disabled>Download CSV</button>
+          <span class="muted" id="bcount" style="font-size:.79rem;align-self:center"></span>
+        </div>
+      </div></div>
+
+      <div class="panel" id="bout" hidden><div class="panel-body">
+        <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:12px">
+          <b>Results</b>
+          <span class="muted" style="font-size:.78rem">Click a row to open it in full</span>
+        </div>
+        <div class="tbl-wrap"><table class="res" id="btbl"></table></div>
+      </div></div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+</body>
+</html>

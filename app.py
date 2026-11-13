@@ -13,6 +13,7 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, Draw
 from werkzeug.security import check_password_hash, generate_password_hash
 
+import admet
 import db
 import docking
 import models
@@ -36,8 +37,11 @@ CORS(app, origins='*', supports_credentials=False,
 
 TOKEN_TTL_DAYS = 90
 MAX_ITEM_BYTES = 6 * 1024 * 1024
-ITEM_KINDS = {'molecule', 'fragment', 'classification', 'docking', 'structure', 'combination', 'note'}
+ITEM_KINDS = {'molecule', 'fragment', 'classification', 'docking', 'structure', 'combination', 'note',
+               'admet'}
 STARTED_AT = time.time()
+# ADMET is pure RDKit (a few ms per molecule), so the batch cap is generous.
+ADMET_BATCH_MAX = int(os.environ.get('ADMET_BATCH_MAX', '200'))
 # Accounts with admin ("master") rights, e.g. ADMIN_USERNAMES=nisarg.shah@emory.edu
 ADMIN_USERNAMES = {u.strip().lower() for u in os.environ.get('ADMIN_USERNAMES', '').split(',') if u.strip()}
 
@@ -726,6 +730,62 @@ def make_notebook():
         resp.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
         return resp
     return jsonify({'notebook': nb, 'filename': filename})
+
+
+# ── ADMET ────────────────────────────────────────────────────────────────────
+
+@app.route('/admet', methods=['POST'])
+def admet_route():
+    """Full ADMET profile for one molecule."""
+    try:
+        mol = _smiles_mol()
+    except ChemError as e:
+        return err(str(e))
+    try:
+        profile = admet.profile(mol)
+    except admet.AdmetError as e:
+        return err(str(e))
+    except Exception as e:
+        return err(f'Could not profile that molecule: {e}', 500)
+    out = {'profile': profile}
+    if body().get('svg', True):
+        try:
+            out['svg'] = depict_svg(mol)
+        except Exception:
+            out['svg'] = None
+    return jsonify(out)
+
+
+@app.route('/admet/batch', methods=['POST'])
+def admet_batch():
+    """One compact row per molecule, for screening a list."""
+    data = body()
+    smiles_list = data.get('smiles_list') or []
+    if not smiles_list:
+        return err('No SMILES provided')
+    if len(smiles_list) > ADMET_BATCH_MAX:
+        return err(f'Maximum {ADMET_BATCH_MAX} SMILES per batch')
+    results = []
+    for raw in smiles_list:
+        s = str(raw).strip()
+        if not s:
+            continue
+        try:
+            mol = mol_from_smiles(s)
+            row = admet.summarise(mol)
+            row['input_smiles'] = s
+            row['error'] = None
+        except (ChemError, admet.AdmetError) as e:
+            row = {'input_smiles': s, 'error': str(e)}
+        except Exception as e:
+            row = {'input_smiles': s, 'error': f'Could not profile: {e}'}
+        results.append(row)
+    return jsonify({'results': results, 'count': len(results)})
+
+
+@app.route('/admet/references', methods=['GET'])
+def admet_references():
+    return jsonify({'references': admet.REFERENCES, 'unavailable': admet.UNAVAILABLE})
 
 
 if __name__ == '__main__':
