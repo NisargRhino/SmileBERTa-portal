@@ -58,22 +58,28 @@ VINA_CPU = os.environ.get('VINA_CPU', '2')
 # cores it just makes docking slower for no benefit.
 DOCK_NICE = int(os.environ.get('DOCK_NICE', '0'))
 VINA_TIMEOUT = int(os.environ.get('VINA_TIMEOUT', '900'))
-# Per-caller fairness: a few jobs at once, so one user with a batch script
-# cannot monopolise the queue.
+# Per-caller fairness, in two layers.
 #
-# Identity is the account id when the caller is signed in, and the client IP
-# otherwise. The IP path matters more than it looks: the production docking
-# service (dock_service.py) has no database and cannot authenticate anyone, so
-# in practice *every* job it sees is anonymous and the IP limit is the only one
-# that applies. The anonymous caps are therefore set generously enough for a
-# whole lab behind one university NAT, while still stopping a script.
+# A single IP bucket is wrong for the audience: a whole class on one university
+# NAT shares one address, so a per-IP cap of a few jobs locks out twenty people
+# who are each behind it legitimately. But the IP is the only thing a client
+# cannot forge, so it still has to be the backstop.
+#
+# Layer 1 — the caller: the account id if known, otherwise a random id the
+#   browser keeps in local storage. Tight limits, because this tracks one person
+#   at one desk. A determined abuser can rotate the id, which is what layer 2
+#   is for.
+# Layer 2 — the IP: much higher limits, sized so a whole lab fits under it while
+#   a single machine hammering the queue still does not.
 MAX_JOBS_PER_USER = max(1, int(os.environ.get('MAX_JOBS_PER_USER', '3')))
-MAX_JOBS_PER_IP = max(1, int(os.environ.get('MAX_JOBS_PER_IP', '2')))
+MAX_JOBS_PER_CLIENT = max(1, int(os.environ.get('MAX_JOBS_PER_CLIENT', '2')))
+MAX_JOBS_PER_IP = max(1, int(os.environ.get('MAX_JOBS_PER_IP', '8')))
 # Rolling-window cap, so sequential submissions are limited too, not just
 # concurrent ones.
 RATE_WINDOW_SEC = max(60, int(os.environ.get('RATE_WINDOW_SEC', '3600')))
 MAX_JOBS_PER_WINDOW_USER = max(1, int(os.environ.get('MAX_JOBS_PER_WINDOW_USER', '100')))
-MAX_JOBS_PER_WINDOW_IP = max(1, int(os.environ.get('MAX_JOBS_PER_WINDOW_IP', '30')))
+MAX_JOBS_PER_WINDOW_CLIENT = max(1, int(os.environ.get('MAX_JOBS_PER_WINDOW_CLIENT', '40')))
+MAX_JOBS_PER_WINDOW_IP = max(1, int(os.environ.get('MAX_JOBS_PER_WINDOW_IP', '400')))
 MAX_QUEUE = max(1, int(os.environ.get('MAX_QUEUE', '60')))
 RECEPTOR_CACHE_SIZE = max(0, int(os.environ.get('RECEPTOR_CACHE_SIZE', '24')))
 
@@ -340,10 +346,34 @@ def client_ip(request):
     return request.remote_addr or 'unknown'
 
 
-def _identity(user_id, ip):
+_CLIENT_ID_RE = re.compile(r'^[A-Za-z0-9_-]{8,64}$')
+
+
+def client_id(request):
+    """A per-browser id the client supplies, used only to subdivide an IP.
+
+    This is not a security boundary — anyone can rotate it — which is exactly
+    why the IP backstop exists. Its job is to stop twenty people behind one
+    campus NAT from sharing one bucket.
+    """
+    cid = (request.headers.get('X-SmileBERTa-Client') or '').strip()
+    return cid if _CLIENT_ID_RE.match(cid) else None
+
+
+def _buckets(user_id, ip, cid):
+    """The (identity, concurrent limit, window limit) pairs a job must satisfy.
+
+    Checked in order, narrowest first, so the message a user sees is about
+    their own usage rather than the shared backstop whenever possible.
+    """
+    out = []
     if user_id is not None:
-        return ('u', user_id), MAX_JOBS_PER_USER, MAX_JOBS_PER_WINDOW_USER, True
-    return ('ip', ip or 'unknown'), MAX_JOBS_PER_IP, MAX_JOBS_PER_WINDOW_IP, False
+        out.append((('u', user_id), MAX_JOBS_PER_USER, MAX_JOBS_PER_WINDOW_USER))
+    elif cid:
+        out.append((('c', cid), MAX_JOBS_PER_CLIENT, MAX_JOBS_PER_WINDOW_CLIENT))
+    # The IP backstop always applies, including to signed-in callers.
+    out.append((('ip', ip or 'unknown'), MAX_JOBS_PER_IP, MAX_JOBS_PER_WINDOW_IP))
+    return out
 
 
 def _check_window(ident, limit):
@@ -375,7 +405,7 @@ def _release_window(ident):
             hits.pop()
 
 
-def submit(params, user_id=None, ip=None):
+def submit(params, user_id=None, ip=None, cid=None):
     if not DOCKING_AVAILABLE:
         raise DockingError('Docking engine is not installed on this server')
     receptor = params.get('receptor_pdb') or ''
@@ -394,11 +424,23 @@ def submit(params, user_id=None, ip=None):
     exh = max(1, min(int(params.get('exhaustiveness', 8)), 32))
     modes = max(1, min(int(params.get('num_modes', 9)), 20))
     _cleanup_jobs()
-    ident, max_active, max_window, _signed_in = _identity(user_id, ip)
+    buckets = _buckets(user_id, ip, cid)
     # Rolling window first: it is the cheap check and the one that stops a
-    # script submitting thousands of jobs back to back.
-    _check_window(ident, max_window)
+    # script submitting thousands of jobs back to back. Every bucket must pass;
+    # charged slots are refunded if a later check refuses the job.
+    charged = []
+    try:
+        for ident, _max_active, max_window in buckets:
+            _check_window(ident, max_window)
+            charged.append(ident)
+    except DockingError:
+        for ident in charged:
+            _release_window(ident)
+        raise
 
+    # The job is attributed to the narrowest bucket, which is the one that
+    # should see it as "yours" when counting concurrent jobs.
+    own = buckets[0][0]
     job_id = uuid.uuid4().hex[:12]
     active = ('queued', 'preparing', 'running')
     try:
@@ -406,19 +448,24 @@ def submit(params, user_id=None, ip=None):
             pending = [j for j in _jobs.values() if j['status'] in active]
             if len(pending) >= MAX_QUEUE:
                 raise DockingError('The docking queue is full right now — please try again in a few minutes')
-            mine = sum(1 for j in pending if j.get('ident') == ident)
-            if mine >= max_active:
-                raise DockingError(
-                    f'You already have {mine} docking job{"s" if mine != 1 else ""} running or '
-                    f'queued (limit {max_active}). Wait for one to finish.')
+            for ident, max_active, _mw in buckets:
+                mine = sum(1 for j in pending if ident in j.get('idents', ()))
+                if mine >= max_active:
+                    shared = ident[0] == 'ip' and len(buckets) > 1
+                    raise DockingError(
+                        f'{"This network already has" if shared else "You already have"} {mine} '
+                        f'docking job{"s" if mine != 1 else ""} running or queued '
+                        f'(limit {max_active}). Wait for one to finish.')
             ahead = len(pending)
-            _jobs[job_id] = {'id': job_id, 'user_id': user_id, 'ident': ident, 'status': 'queued',
+            _jobs[job_id] = {'id': job_id, 'user_id': user_id, 'ident': own,
+                             'idents': tuple(b[0] for b in buckets), 'status': 'queued',
                              'progress': 0,
                              'message': f'Waiting in queue (position {ahead})' if ahead else 'Starting',
                              'log': [], 'created': time.time(), 'result': None, 'error': None}
     except DockingError:
         # Do not charge the caller a rate-limit slot for a job we refused.
-        _release_window(ident)
+        for ident in charged:
+            _release_window(ident)
         raise
     _ensure_workers()
     _queue.put((job_id, receptor, params.get('chains'), params.get('ligand_smiles'),
@@ -441,7 +488,7 @@ def get_job(job_id):
             return None
         # 'ident' holds the account id or the client IP — never send it to a
         # caller, who may not be the person who submitted the job.
-        out = {k: v for k, v in job.items() if k not in ('user_id', 'ident')}
+        out = {k: v for k, v in job.items() if k not in ('user_id', 'ident', 'idents')}
         out['log'] = list(job['log'])
         out['elapsed'] = round(time.time() - job['created'], 1)
         if job['status'] == 'queued':

@@ -158,6 +158,12 @@
         <div class="k">Session token</div>
         <div class="v">A random token identifying your signed-in session, valid for 90 days. It is
           kept in your browser's local storage, not in a cookie.</div>
+        <div class="k">Client identifier</div>
+        <div class="v">A random string your browser generates and keeps in local storage, sent with
+          requests so that docking rate limits apply per person rather than per network — otherwise
+          everyone sharing a university connection would share one quota. It identifies a browser,
+          not a person, contains no personal data, is never linked to your account, and clearing
+          your browser storage resets it.</div>
       </div>
       <p>That is the complete list. No name, institution, phone number, location or payment
       information is requested or stored.</p>

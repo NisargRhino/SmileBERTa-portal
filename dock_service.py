@@ -13,7 +13,10 @@ import docking
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 25 * 1024 * 1024
-CORS(app, origins='*', allow_headers=['Content-Type', 'Authorization'], methods=['GET', 'POST', 'OPTIONS'])
+# X-SmileBERTa-Client must be allowed or the browser's preflight blocks the
+# header and every caller silently falls back to the shared IP bucket.
+CORS(app, origins='*', allow_headers=['Content-Type', 'Authorization', 'X-SmileBERTa-Client'],
+     methods=['GET', 'POST', 'OPTIONS'])
 STARTED_AT = time.time()
 
 
@@ -41,7 +44,8 @@ def dock_submit():
         # No database here, so nobody can be authenticated: every caller is
         # rate-limited by client IP.
         return jsonify({'job_id': docking.submit(request.get_json(silent=True) or {},
-                                                 ip=docking.client_ip(request))})
+                                                 ip=docking.client_ip(request),
+                                                 cid=docking.client_id(request))})
     except docking.DockingError as e:
         return jsonify({'error': str(e)}), 400
 

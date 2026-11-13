@@ -136,10 +136,27 @@
     loginUrl() { return 'login?next=' + encodeURIComponent(location.pathname.split('/').pop() + location.search); },
   };
 
+  // A stable random id for this browser, so that everyone behind a shared
+  // university NAT gets their own docking rate-limit bucket instead of all
+  // twenty of them sharing one. It identifies a browser, not a person: it
+  // carries no personal data and is never linked to an account.
+  function clientId() {
+    let id = store.get('sb_client_id');
+    if (!id || !/^[A-Za-z0-9_-]{8,64}$/.test(id)) {
+      const buf = new Uint8Array(12);
+      (window.crypto || {}).getRandomValues
+        ? window.crypto.getRandomValues(buf)
+        : buf.forEach((_, i) => { buf[i] = Math.floor(Math.random() * 256); });
+      id = Array.from(buf, (b) => b.toString(16).padStart(2, '0')).join('');
+      store.set('sb_client_id', id);
+    }
+    return id;
+  }
+
   // ── API client ────────────────────────────────────────────────────────────
   async function api(path, opts = {}) {
     const { method = opts.body ? 'POST' : 'GET', body, timeout = 120000, raw = false, auth: useAuth = true, base = API } = opts;
-    const headers = {};
+    const headers = { 'X-SmileBERTa-Client': clientId() };
     if (body !== undefined) headers['Content-Type'] = 'application/json';
     if (useAuth && auth.token()) headers.Authorization = 'Bearer ' + auth.token();
     const ctrl = new AbortController();

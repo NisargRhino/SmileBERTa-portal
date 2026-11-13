@@ -33,7 +33,8 @@ except Exception:
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 25 * 1024 * 1024
 CORS(app, origins='*', supports_credentials=False,
-     allow_headers=['Content-Type', 'Authorization'], methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
+     allow_headers=['Content-Type', 'Authorization', 'X-SmileBERTa-Client'],
+     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
 
 TOKEN_TTL_DAYS = 90
 MAX_ITEM_BYTES = 6 * 1024 * 1024
@@ -674,7 +675,7 @@ def dock_submit():
     user = current_user()
     try:
         job_id = docking.submit(body(), user['id'] if user else None,
-                                ip=docking.client_ip(request))
+                                ip=docking.client_ip(request), cid=docking.client_id(request))
         return jsonify({'job_id': job_id})
     except docking.DockingError as e:
         return err(str(e))
