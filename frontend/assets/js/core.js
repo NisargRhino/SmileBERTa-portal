@@ -155,21 +155,28 @@
 
   // ── API client ────────────────────────────────────────────────────────────
   async function api(path, opts = {}) {
-    const { method = opts.body ? 'POST' : 'GET', body, timeout = 120000, raw = false, auth: useAuth = true, base = API } = opts;
+    // `retries`: extra attempts after a timeout or network failure. Only for requests
+    // that are safe to repeat — Render sometimes routes a connection to a dead path
+    // that never answers, and a fresh attempt usually lands on the working one.
+    const { method = opts.body ? 'POST' : 'GET', body, timeout = 120000, retries = 0, raw = false, auth: useAuth = true, base = API } = opts;
     const headers = { 'X-SmileBERTa-Client': clientId() };
     if (body !== undefined) headers['Content-Type'] = 'application/json';
     if (useAuth && auth.token()) headers.Authorization = 'Bearer ' + auth.token();
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), timeout);
     let res;
-    try {
-      res = await fetch(base + path, { method, headers, body: body !== undefined ? JSON.stringify(body) : undefined, signal: ctrl.signal });
-    } catch (e) {
-      clearTimeout(timer);
-      if (e.name === 'AbortError') throw new Error('The request timed out. The server may be waking up — please try again.');
-      throw new Error('Could not reach the SmileBERTa API. It may be waking up (free hosting sleeps when idle) — retry in a moment.');
+    for (let attempt = 0; ; attempt++) {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), timeout);
+      try {
+        res = await fetch(base + path, { method, headers, body: body !== undefined ? JSON.stringify(body) : undefined, signal: ctrl.signal });
+        clearTimeout(timer);
+        break;
+      } catch (e) {
+        clearTimeout(timer);
+        if (attempt < retries) continue;
+        if (e.name === 'AbortError') throw new Error('The request timed out. The server may be waking up — please try again.');
+        throw new Error('Could not reach the SmileBERTa API. It may be waking up (free hosting sleeps when idle) — retry in a moment.');
+      }
     }
-    clearTimeout(timer);
     if (res.status === 401 && auth.loggedIn() && path !== '/login') {
       auth.clear();
       renderNav.refresh && renderNav.refresh();
@@ -197,7 +204,9 @@
     const slow = setTimeout(() => status.state !== 'ok' && setStatus('waking'), 1800);
     for (let attempt = 0; attempt < 12; attempt++) {
       try {
-        const r = await fetch(API + '/health', { cache: 'no-store' });
+        // Time-limit each check: a connection that hangs would otherwise leave the
+        // pill on "Waking server…" long after the server is up.
+        const r = await fetch(API + '/health', { cache: 'no-store', signal: AbortSignal.timeout(15000) });
         if (r.ok) { clearTimeout(slow); setStatus('ok', await r.json()); return; }
       } catch (e) { /* retry */ }
       setStatus('waking');
