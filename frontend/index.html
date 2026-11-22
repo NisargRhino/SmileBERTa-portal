@@ -34,6 +34,40 @@
     .smiles-ticker .caret { display: inline-block; width: 7px; height: 13px; background: var(--cyan); vertical-align: -2px; animation: blink 1s steps(1) infinite; }
     @keyframes blink { 50% { opacity: 0; } }
 
+    /* Bert on the homepage: the agent, not a ninth tool card. */
+    .promo { display: grid; grid-template-columns: 1.02fr .98fr; gap: 44px; align-items: center; padding: 44px; }
+    /* The eyebrow is sized for text; an inline icon has to be told to behave. */
+    .promo .eyebrow { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+    .promo .eyebrow svg { width: 14px; height: 14px; flex: none; color: var(--cyan); }
+    .promo h2 { margin: 12px 0 16px; }
+    .promo-copy p { font-size: .98rem; }
+    .promo-copy em { color: #cfe3f5; font-style: italic; }
+    .promo-tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--border); }
+    .promo-tools span { font-size: .74rem; color: var(--muted); border: 1px solid var(--border); border-radius: 99px; padding: 4px 10px; }
+
+    .promo-demo { border-radius: 16px; border: 1px solid var(--border-strong); background: rgba(5,8,16,.82);
+      overflow: hidden; box-shadow: 0 30px 80px -26px rgba(0,0,0,.8); }
+    .demo-head { display: flex; align-items: center; gap: 8px; padding: 11px 14px; border-bottom: 1px solid var(--border);
+      font-size: .76rem; color: var(--muted); font-family: var(--display); }
+    .demo-head .dm { width: 20px; height: 20px; border-radius: 7px; background: var(--grad); flex: none; }
+    .demo-body { padding: 15px; display: flex; flex-direction: column; gap: 9px; }
+    .demo-msg.user { align-self: flex-end; max-width: 88%; background: rgba(59,130,246,.12); border: 1px solid rgba(59,130,246,.25);
+      color: #e8eefc; padding: 9px 12px; border-radius: 13px 13px 4px 13px; font-size: .84rem; line-height: 1.5; }
+    .demo-tool { display: flex; align-items: center; gap: 8px; padding: 8px 11px; border-radius: 10px;
+      border: 1px solid var(--border); background: rgba(0,0,0,.3); font-size: .8rem; }
+    .demo-tool .di { width: 15px; height: 15px; color: var(--cyan); flex: none; }
+    .demo-tool .di svg { width: 100%; height: 100%; }
+    .demo-tool .dn { font-family: var(--display); font-weight: 600; color: var(--text); }
+    .demo-tool .dv { font-family: var(--mono); font-size: .72rem; color: var(--faint); flex: 1; min-width: 0;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .demo-tool .ds { font-family: var(--mono); font-size: .78rem; color: var(--green); flex: none; }
+    .demo-tool.run { border-color: rgba(34,211,238,.4); }
+    .demo-tool.run .ds { color: var(--cyan); }
+    .demo-tool.run .di { animation: demoSpin 1.6s linear infinite; }
+    @keyframes demoSpin { to { transform: rotate(360deg); } }
+    .demo-text { font-size: .84rem; line-height: 1.6; color: var(--text-2); padding: 2px 2px 0; }
+    .demo-text b { color: #fff; }
+
     .logos { display: flex; justify-content: center; gap: 44px; flex-wrap: wrap; color: var(--faint); font-family: var(--display); font-weight: 600; font-size: 1.05rem; letter-spacing: -.01em; }
     .logos span { transition: color .2s; } .logos span:hover { color: var(--text-2); }
 
@@ -90,7 +124,8 @@
     .about-card { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
 
     @media (max-width: 1000px) {
-      .hero-grid, .about-card { grid-template-columns: 1fr; }
+      .hero-grid, .about-card, .promo { grid-template-columns: 1fr; }
+      .promo { padding: 32px; gap: 30px; }
       .tools-grid, .learn-grid { grid-template-columns: 1fr 1fr; }
       .pipe-row { grid-template-columns: 1fr; } .pipe-arrow { transform: rotate(90deg); justify-self: center; }
       .flow { grid-template-columns: 1fr 1fr; row-gap: 30px; } .flow::before { display: none; }
@@ -110,7 +145,7 @@
     <canvas id="hero-canvas" aria-hidden="true"></canvas>
     <div class="container hero-grid">
       <div>
-        <a class="pill-link reveal" href="docking"><span class="badge">New</span> Protein–ligand docking with AutoDock Vina →</a>
+        <a class="pill-link reveal" href="bert"><span class="badge">New</span> Meet Bert — the agent that runs every tool for you →</a>
         <h1 class="reveal" data-delay="1">Drug discovery,<br><span class="grad-text">accelerated by AI.</span></h1>
         <p class="lead reveal" data-delay="2">SmileBERTa brings transformer models, physics-based docking and interactive 3D chemistry together in one workspace. Predict fragments, classify compounds, build molecules and dock them into protein targets, all in your browser.</p>
         <div class="hero-ctas reveal" data-delay="3">
@@ -140,6 +175,40 @@
     <div class="container">
       <p class="center muted reveal" style="font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:22px">Built on proven open science</p>
       <div class="logos reveal" data-delay="1"><span>RDKit</span><span>PyTorch</span><span>Hugging Face</span><span>AutoDock Vina</span><span>Open Babel</span><span>3Dmol.js</span><span>RCSB PDB</span></div>
+    </div>
+  </section>
+
+  <section class="section" id="bert">
+    <div class="container">
+      <div class="card card-glow promo reveal">
+        <div class="promo-copy">
+          <div class="eyebrow" id="promo-eyebrow">Built on Claude</div>
+          <h2>Say hello to <span class="grad-text">Bert</span>.</h2>
+          <p class="text-2">Bert is the agent that drives the whole toolkit. Ask for the work the way you'd
+            ask a colleague — <em>“dock both of these into COX-2, then fragment whichever binds better”</em> —
+            and he plans it, runs the tools in order, compares the numbers himself and reports back with the
+            caveat that belongs to the method he just used.</p>
+          <p class="text-2">Every number he gives you comes from a tool run in your conversation. He shows
+            each call as it happens, so you can check the work instead of taking his word for it.</p>
+          <div class="row" style="margin-top:26px;flex-wrap:wrap">
+            <button class="btn btn-primary btn-lg" type="button" id="promo-ask">Ask Bert something</button>
+            <a class="btn btn-lg" href="bert">Open the full page</a>
+          </div>
+          <div class="promo-tools" id="promo-tools"></div>
+        </div>
+        <div class="promo-demo">
+          <div class="demo-head"><span class="dm"></span><span>Bert · research agent</span></div>
+          <div class="demo-body">
+            <div class="demo-msg user">Dock aspirin and ibuprofen into COX-2 (5IKR), then fragment whichever binds better.</div>
+            <div class="demo-tool done"><span class="di" data-ic="zap"></span><span class="dn">Docked</span><span class="dv">aspirin → 5IKR</span><span class="ds">−7.1</span></div>
+            <div class="demo-tool done"><span class="di" data-ic="zap"></span><span class="dn">Docked</span><span class="dv">ibuprofen → 5IKR</span><span class="ds">−8.4</span></div>
+            <div class="demo-tool run"><span class="di" data-ic="sparkles"></span><span class="dn">Predicting fragment</span><span class="dv">ibuprofen</span><span class="ds">…</span></div>
+            <div class="demo-text">Ibuprofen binds more strongly in the same pocket — <b>−8.4</b> against aspirin's
+              <b>−7.1 kcal/mol</b>. Both sit in the AGE site. Vina's error is about 2 kcal/mol, so treat this as
+              a ranking, not a measurement.</div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 

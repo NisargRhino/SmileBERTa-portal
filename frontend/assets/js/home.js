@@ -34,6 +34,20 @@
       <div class="icon-tile">${icon(t.icon)}</div><h4>${t.title}</h4><p>${t.desc}</p>
     </a>`).join('');
 
+  // ── Bert's section ────────────────────────────────────────────────────────
+  // The demo transcript is a still, not a live run: it shows the shape of an
+  // answer (tool cards, then prose with its caveat) without pretending to have
+  // docked anything. The button opens the real agent.
+  $$('.demo-tool .di').forEach((el) => { el.innerHTML = icon(el.dataset.ic); });
+  $('#promo-eyebrow').insertAdjacentHTML('afterbegin', icon('sparkles') + ' ');
+  $('#promo-tools').innerHTML = ['Docking', 'Fragment prediction', 'Drug classification', 'ADMET',
+    'Fragment linking', 'Properties', 'Literature'].map((t) => `<span>${t}</span>`).join('');
+  $('#promo-ask').addEventListener('click', () => {
+    // The launcher arrives with core.js; fall back to the page if it is not up yet.
+    if (SB.askBert) SB.askBert('');
+    else location.href = 'bert';
+  });
+
   // Real BPE tokens produced by the SmileBERTa tokenizer for aspirin.
   const tokens = ['CC', '(=', 'O', ')', 'Oc', '1', 'ccccc', '1', 'C', '(=', 'O', ')', 'O'];
   $('#tokens').innerHTML = tokens.map((t, i) => `<span class="tok" style="animation-delay:${0.25 + i * 0.09}s">${t}</span>`).join('');

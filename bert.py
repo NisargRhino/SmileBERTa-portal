@@ -722,7 +722,12 @@ def run(history, user_id=None, client_id=None, ip=None, user_key=None):
     except Exception as e:
         yield _sse('error', {'error': _friendly(e), 'code': 'api'})
 
-    if not byok:
+    # Only a turn that actually reached the model costs anything, so only that
+    # turn is counted. A rejected key, an unreachable API or a missing config
+    # burns no tokens, and billing it would let a server-side fault eat somebody's
+    # whole day of messages — and keep them locked out after the fault is fixed.
+    billable = bool(in_tokens or out_tokens)
+    if not byok and billable:
         try:
             db.bert_record(idents, _today(), tool_calls, in_tokens, out_tokens)
         except Exception:

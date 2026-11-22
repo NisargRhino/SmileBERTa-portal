@@ -471,3 +471,136 @@ kbd { font-family: var(--mono); font-size: .7rem; padding: 1px 5px; border-radiu
   background: rgba(255,255,255,.015); }
 .fb-q { font-size: .83rem; color: var(--muted); }
 .fb-bar .btn svg { width: 14px; height: 14px; }
+
+/* ── Bert: the research agent ────────────────────────────────────────────────
+   One stylesheet for both surfaces. `.bert-chat` is the conversation itself and
+   is identical everywhere; `.is-panel` (the docked launcher) and `.is-page`
+   (the full page) only change its proportions. */
+
+.bert-chat { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.bert-chat .bert-log { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 18px; display: flex; flex-direction: column; gap: 14px; scroll-behavior: smooth; }
+.bert-chat.is-page .bert-log { padding: 26px 28px; gap: 20px; }
+.bert-log::-webkit-scrollbar { width: 10px; }
+.bert-log::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 99px; border: 3px solid transparent; background-clip: content-box; }
+.bert-log::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.2); background-clip: content-box; }
+
+/* Messages */
+.bert-msg { display: flex; gap: 11px; align-items: flex-start; animation: bertIn .26s var(--ease) both; }
+@keyframes bertIn { from { opacity: 0; transform: translateY(6px); } }
+.bert-msg .av { width: 28px; height: 28px; border-radius: 9px; flex: none; display: grid; place-items: center; }
+.bert-msg .av svg { width: 16px; height: 16px; }
+.bert-msg.assistant .av { background: var(--grad); color: #04121c; box-shadow: 0 4px 16px -4px rgba(34,211,238,.5); }
+.bert-msg.user { flex-direction: row-reverse; }
+.bert-msg.user .av { background: rgba(255,255,255,.07); border: 1px solid var(--border-strong); color: var(--text-2); font-size: .72rem; font-weight: 700; font-family: var(--display); }
+.bert-msg .body { min-width: 0; flex: 1; line-height: 1.62; font-size: .92rem; }
+.bert-chat.is-page .bert-msg .body { font-size: .95rem; }
+.bert-msg.user .body { flex: 0 1 auto; max-width: 84%; background: rgba(59,130,246,.1); border: 1px solid rgba(59,130,246,.22); color: #e8eefc; padding: 9px 13px; border-radius: 14px 14px 4px 14px; }
+.bert-msg .body > :first-child { margin-top: 0; } .bert-msg .body > :last-child { margin-bottom: 0; }
+.bert-msg .body p { margin: 0 0 9px; }
+.bert-msg .body ul, .bert-msg .body ol { margin: 0 0 9px; padding-left: 19px; }
+.bert-msg .body li { margin-bottom: 4px; }
+.bert-msg .body h3, .bert-msg .body h4 { font-size: .95rem; margin: 15px 0 7px; font-family: var(--display); color: #fff; }
+.bert-msg .body a { color: var(--cyan); text-decoration: underline; text-underline-offset: 2px; }
+.bert-msg .body code { font-family: var(--mono); font-size: .85em; background: rgba(0,0,0,.4); border: 1px solid var(--border); border-radius: 5px; padding: 1px 5px; overflow-wrap: anywhere; }
+.bert-msg .body strong, .bert-msg .body b { color: #fff; }
+.bert-msg .body hr { border: 0; border-top: 1px solid var(--border); margin: 14px 0; }
+.bert-tablewrap { overflow-x: auto; margin: 2px 0 11px; }
+.bert-msg .body table { width: 100%; border-collapse: collapse; font-size: .86rem; }
+.bert-msg .body th { text-align: left; font-family: var(--display); font-size: .7rem; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border-strong); padding: 0 12px 6px 0; white-space: nowrap; }
+.bert-msg .body td { padding: 7px 12px 7px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+.bert-msg .body tr:last-child td { border-bottom: 0; }
+
+/* Tool cards */
+.bert-tool { border: 1px solid var(--border); border-radius: 11px; background: rgba(0,0,0,.28); overflow: hidden; margin: 0 0 8px; transition: border-color .2s; }
+.bert-tool[open] { border-color: var(--border-strong); }
+.bert-tool summary { cursor: pointer; padding: 9px 11px; display: flex; align-items: center; gap: 9px; list-style: none; font-size: .84rem; }
+.bert-tool summary::-webkit-details-marker { display: none; }
+.bert-tool summary:hover { background: rgba(255,255,255,.03); }
+.bert-tool .ico { width: 17px; height: 17px; flex: none; color: var(--cyan); display: grid; place-items: center; }
+.bert-tool .ico svg { width: 100%; height: 100%; }
+.bert-tool .tname { font-family: var(--display); font-weight: 600; color: var(--text); white-space: nowrap; }
+.bert-tool .targ { color: var(--faint); font-family: var(--mono); font-size: .72rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
+.bert-tool .tstate { font-size: .7rem; color: var(--muted); flex: none; text-transform: uppercase; letter-spacing: .07em; }
+.bert-tool.running { border-color: rgba(34,211,238,.35); }
+.bert-tool.running .tstate { color: var(--cyan); }
+.bert-tool.running .ico { animation: bertSpin 1.6s linear infinite; }
+@keyframes bertSpin { to { transform: rotate(360deg); } }
+.bert-tool.failed { border-color: rgba(248,113,113,.35); background: rgba(248,113,113,.04); }
+.bert-tool.failed .tstate, .bert-tool.failed .ico { color: var(--red); }
+.bert-tool .headline { padding: 0 11px 9px 37px; font-size: .84rem; color: var(--text-2); margin-top: -3px; }
+.bert-tool .headline b { color: #fff; font-weight: 600; }
+.bert-tool .headline code { font-family: var(--mono); font-size: .82em; color: #7dd3fc; overflow-wrap: anywhere; }
+.bert-tool pre { margin: 0; padding: 10px 12px; border-top: 1px solid var(--border); background: rgba(0,0,0,.45); font-family: var(--mono); font-size: .72rem; line-height: 1.55; color: var(--muted); overflow-x: auto; max-height: 240px; }
+
+/* Thinking dots */
+.bert-typing { display: inline-flex; gap: 4px; padding: 5px 0; }
+.bert-typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: bertBlink 1.3s infinite; }
+.bert-typing i:nth-child(2) { animation-delay: .18s; } .bert-typing i:nth-child(3) { animation-delay: .36s; }
+@keyframes bertBlink { 0%, 60%, 100% { opacity: .22; } 30% { opacity: 1; } }
+
+/* Composer */
+.bert-foot { border-top: 1px solid var(--border); padding: 11px; background: rgba(0,0,0,.2); flex: none; }
+.bert-chat.is-page .bert-foot { padding: 16px 18px; }
+.bert-composer { display: flex; gap: 8px; align-items: flex-end; background: var(--bg); border: 1px solid var(--border-strong); border-radius: 13px; padding: 6px 6px 6px 13px; transition: border-color .18s, box-shadow .18s; }
+.bert-composer:focus-within { border-color: rgba(34,211,238,.55); box-shadow: 0 0 0 3px rgba(34,211,238,.1); }
+.bert-composer textarea { flex: 1; resize: none; min-height: 34px; max-height: 150px; padding: 7px 0; border: 0; background: transparent; color: var(--text); font: inherit; font-size: .92rem; line-height: 1.5; }
+.bert-composer textarea:focus { outline: none; }
+.bert-composer textarea::placeholder { color: var(--faint); }
+.bert-send { flex: none; width: 34px; height: 34px; border-radius: 9px; border: 0; background: var(--grad); color: #04121c; display: grid; place-items: center; cursor: pointer; transition: opacity .18s, transform .18s; }
+.bert-send svg { width: 16px; height: 16px; }
+.bert-send:hover { transform: translateY(-1px); }
+.bert-send[disabled] { opacity: .4; pointer-events: none; }
+.bert-send .spinner { width: 15px; height: 15px; border-color: rgba(0,0,0,.25); border-top-color: #04121c; }
+.bert-meta { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 8px; font-size: .72rem; color: var(--faint); flex-wrap: wrap; }
+.bert-meta a { color: var(--muted); text-decoration: underline; }
+
+/* Starter chips */
+.bert-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 9px; }
+.bert-starters { display: grid; gap: 8px; margin-top: 12px; }
+.bert-starter { text-align: left; padding: 11px 13px; border-radius: 11px; border: 1px solid var(--border); background: rgba(255,255,255,.02); color: var(--text-2); cursor: pointer; font: inherit; font-size: .85rem; line-height: 1.45; transition: border-color .16s, transform .16s, background .16s; }
+.bert-starter:hover { border-color: rgba(34,211,238,.45); background: rgba(34,211,238,.05); transform: translateY(-1px); }
+.bert-starter b { display: block; font-family: var(--display); color: #fff; margin-bottom: 2px; font-size: .88rem; }
+
+/* Notices */
+.bert-notice { border-radius: 11px; padding: 11px 13px; font-size: .84rem; line-height: 1.55; }
+.bert-notice.warn { background: rgba(251,191,36,.07); border: 1px solid rgba(251,191,36,.28); color: #fde68a; }
+.bert-notice.err { background: rgba(248,113,113,.07); border: 1px solid rgba(248,113,113,.28); color: #fca5a5; }
+.bert-notice b { color: #fff; }
+.bert-keyrow { display: flex; gap: 7px; margin-top: 9px; flex-wrap: wrap; }
+.bert-keyrow input { flex: 1; min-width: 180px; padding: 8px 11px; border-radius: 9px; border: 1px solid var(--border-strong); background: var(--bg); color: var(--text); font-family: var(--mono); font-size: .78rem; }
+.bert-keyrow input:focus { outline: none; border-color: var(--cyan); }
+
+/* ── Docked launcher ──────────────────────────────────────────────────────── */
+.bert-fab { position: fixed; right: 22px; bottom: 22px; z-index: 900; width: 56px; height: 56px; border-radius: 50%; border: 0; cursor: pointer; background: var(--grad); color: #04121c; display: grid; place-items: center; box-shadow: 0 10px 34px -8px rgba(34,211,238,.6), 0 4px 14px rgba(0,0,0,.4); transition: transform .22s var(--ease), opacity .22s; }
+.bert-fab svg { width: 25px; height: 25px; }
+.bert-fab:hover { transform: translateY(-2px) scale(1.04); }
+.bert-fab::after { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(34,211,238,.5); animation: bertPulse 2.8s var(--ease) infinite; }
+@keyframes bertPulse { 0% { transform: scale(1); opacity: .7; } 70%, 100% { transform: scale(1.5); opacity: 0; } }
+.bert-fab.hidden { opacity: 0; pointer-events: none; transform: scale(.7); }
+.bert-fab .dot { position: absolute; top: 2px; right: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--green); border: 2px solid var(--bg); display: none; }
+.bert-fab.unread .dot { display: block; }
+
+.bert-panel { position: fixed; right: 22px; bottom: 22px; z-index: 901; width: 408px; max-width: calc(100vw - 32px); height: 620px; max-height: calc(100vh - 110px); display: flex; flex-direction: column; border-radius: 18px; border: 1px solid var(--border-strong); background: var(--panel-solid); box-shadow: 0 34px 90px -24px rgba(0,0,0,.85), 0 0 0 1px rgba(34,211,238,.12); overflow: hidden; transform-origin: bottom right; transition: opacity .22s var(--ease), transform .22s var(--ease); backdrop-filter: blur(14px); }
+.bert-panel.closed { opacity: 0; transform: scale(.92) translateY(10px); pointer-events: none; }
+.bert-head { display: flex; align-items: center; gap: 10px; padding: 12px 13px; border-bottom: 1px solid var(--border); background: linear-gradient(180deg, rgba(34,211,238,.07), transparent); flex: none; }
+.bert-head .mark { width: 32px; height: 32px; border-radius: 10px; background: var(--grad); color: #04121c; display: grid; place-items: center; flex: none; }
+.bert-head .mark svg { width: 18px; height: 18px; }
+.bert-head .who { flex: 1; min-width: 0; line-height: 1.25; }
+.bert-head .who .n { font-family: var(--display); font-weight: 700; font-size: .95rem; color: #fff; }
+.bert-head .who .s { font-size: .72rem; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+.bert-head .who .s::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex: none; }
+.bert-head .acts { display: flex; gap: 2px; flex: none; }
+.bert-iconbtn { width: 30px; height: 30px; border-radius: 8px; border: 0; background: transparent; color: var(--muted); cursor: pointer; display: grid; place-items: center; transition: background .15s, color .15s; }
+.bert-iconbtn svg { width: 15px; height: 15px; }
+.bert-iconbtn:hover { background: rgba(255,255,255,.08); color: #fff; }
+
+@media (max-width: 560px) {
+  .bert-panel { right: 0; bottom: 0; width: 100vw; max-width: 100vw; height: 100dvh; max-height: 100dvh; border-radius: 0; border: 0; }
+  .bert-fab { right: 16px; bottom: 16px; width: 52px; height: 52px; }
+}
+@media print { .bert-fab, .bert-panel { display: none !important; } }
+
+/* Bert's nav entry — a peer of Workspace and Pricing, not an item in Tools. */
+.nav-link.nav-bert { display: inline-flex; align-items: center; gap: 6px; }
+.nav-link.nav-bert svg { width: 15px; height: 15px; color: var(--cyan); }
+.nav-link.nav-bert:hover svg { color: #fff; }

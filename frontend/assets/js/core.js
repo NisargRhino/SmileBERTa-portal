@@ -93,8 +93,10 @@
       <path d="M14 45c9 10 27 10 36 0"/></g>
     <g fill="url(#lg-sb)"><circle cx="44" cy="10" r="3.6"/><circle cx="44" cy="22" r="3.6"/><circle cx="44" cy="34" r="3.6"/><circle cx="54" cy="22" r="3.6"/><circle cx="14" cy="45" r="2.6"/><circle cx="50" cy="45" r="2.6"/></g></svg>`;
 
+  // Bert is deliberately absent here. He is not a ninth tool — he is the way to
+  // drive the other eight — so he gets the launcher, his own nav entry and a
+  // place on the homepage rather than a slot in this list.
   const TOOLS = [
-    { href: 'bert', icon: 'spark', title: 'Ask Bert', desc: 'Your research agent — runs every tool for you' },
     { href: 'fragmentation', icon: 'split', title: 'Fragment Prediction', desc: 'Predict binding fragments with SmileBERTa' },
     { href: 'drug_class', icon: 'tag', title: 'Drug Classification', desc: 'Therapeutic class from structure' },
     { href: 'combine', icon: 'merge', title: 'Fragment Linking', desc: 'Merge fragments into drug-like leads' },
@@ -234,6 +236,7 @@
       <div class="nav-links">
         <div class="nav-drop" data-drop><button type="button" aria-haspopup="true">Tools ${icon('chevron')}</button><div class="nav-menu">${menuItems(TOOLS)}</div></div>
         <div class="nav-drop" data-drop><button type="button" aria-haspopup="true">Learn ${icon('chevron')}</button><div class="nav-menu">${menuItems(LEARN)}<a href="learn"><span class="mi-icon">${icon('book')}</span><span><span class="mi-title">All guides</span><span class="mi-desc">The science behind every tool</span></span></a></div></div>
+        <a class="nav-link nav-bert ${page === 'bert' ? 'active' : ''}" href="bert">${icon('sparkles')} Bert</a>
         <a class="nav-link ${page === 'workspace' ? 'active' : ''}" href="workspace">Workspace</a>
         <a class="nav-link ${page === 'pricing' ? 'active' : ''}" href="pricing">Pricing</a>
         <a class="nav-link" href="./#about">About</a>
@@ -251,6 +254,7 @@
       </div>
     </div></nav>
     <div class="mobile-menu" id="mobile-menu">
+      <h6>Agent</h6><a href="bert">Ask Bert</a>
       <h6>Tools</h6>${TOOLS.map((t) => `<a href="${t.href}">${t.title}</a>`).join('')}
       <h6>Learn</h6>${LEARN.map((t) => `<a href="${t.href}">${t.title}</a>`).join('')}
       <h6>Account</h6><a href="workspace">Workspace</a>${auth.isAdmin() ? '<a href="admin">Admin dashboard</a>' : ''}${user ? '<a href="#" data-signout>Sign out</a>' : '<a href="login">Sign in</a>'}
@@ -290,7 +294,7 @@
           <p class="muted" style="margin-top:14px;max-width:320px;font-size:.88rem">Open, AI-powered drug discovery tools — transformer models, physics-based docking and interactive 3D chemistry in the browser.</p></div>
         <div><h6>Tools</h6>${TOOLS.map((t) => `<a href="${t.href}">${t.title}</a>`).join('')}</div>
         <div><h6>Learn</h6>${LEARN.map((t) => `<a href="${t.href}">${t.title}</a>`).join('')}</div>
-        <div><h6>Platform</h6><a href="workspace">Workspace</a><a href="pricing">Pricing</a><a href="login">Sign in</a><a href="./#about">About</a><a href="credits">Credits &amp; citations</a><a href="terms">Terms &amp; privacy</a><a href="https://huggingface.co/NisargRhino" target="_blank" rel="noopener">Models on Hugging Face</a></div>
+        <div><h6>Platform</h6><a href="bert">Ask Bert</a><a href="workspace">Workspace</a><a href="pricing">Pricing</a><a href="login">Sign in</a><a href="./#about">About</a><a href="credits">Credits &amp; citations</a><a href="terms">Terms &amp; privacy</a><a href="https://huggingface.co/NisargRhino" target="_blank" rel="noopener">Models on Hugging Face</a></div>
       </div>
       <div class="footer-bottom"><span>© ${new Date().getFullYear()} SmileBERTa. <a href="terms">For research and education — not for clinical use.</a></span><span>Built with <a href="credits">RDKit · PyTorch · AutoDock Vina · 3Dmol.js</a></span></div>
     </div></footer>`;
@@ -638,6 +642,29 @@
   }
 
   // ── Boot ──────────────────────────────────────────────────────────────────
+  // Bert rides along on every page. The scripts are pulled in here rather than
+  // added to each page's <head>, so a page only has to load core.js to get him.
+  // Paths resolve against core.js's own URL, which survives clean addresses
+  // ("/builder") and any future move of the assets folder. async=false keeps the
+  // engine ahead of the launcher that uses it.
+  const BERT_SCRIPTS = ['bert-chat.js', 'bert-launcher.js'];
+
+  function loadBert() {
+    if (document.getElementById('bert-chat-js')) return;
+    let base = 'assets/js/';
+    try {
+      const self = document.querySelector('script[src*="core.js"]');
+      if (self) base = new URL(self.getAttribute('src'), location.href).href.replace(/core\.js.*$/, '');
+    } catch (e) { /* fall back to the relative path */ }
+    BERT_SCRIPTS.forEach((name, i) => {
+      const s = document.createElement('script');
+      s.src = base + name;
+      s.async = false;
+      if (i === 0) s.id = 'bert-chat-js';
+      document.head.appendChild(s);
+    });
+  }
+
   function boot() {
     // Clean addresses: "/builder" instead of "/builder.html", "/" instead of "/index.html"
     // (keeps any ?query and #section). The static host serves both forms.
@@ -650,6 +677,7 @@
     renderFooter();
     initReveal();
     pingHealth();
+    loadBert();
     // Keep the admin flag in sync with the server (it is controlled by ADMIN_USERNAMES on the API).
     if (auth.loggedIn()) api('/me').then((me) => { if (!!me.is_admin !== auth.isAdmin()) { store.set('auth_admin', me.is_admin ? '1' : '0'); renderNav(); } }).catch(() => {});
   }
