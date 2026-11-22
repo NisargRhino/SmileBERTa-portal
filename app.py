@@ -14,6 +14,7 @@ from rdkit.Chem import AllChem, Draw
 from werkzeug.security import check_password_hash, generate_password_hash
 
 import admet
+import bert
 import db
 import docking
 import models
@@ -33,7 +34,7 @@ except Exception:
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 25 * 1024 * 1024
 CORS(app, origins='*', supports_credentials=False,
-     allow_headers=['Content-Type', 'Authorization', 'X-SmileBERTa-Client'],
+     allow_headers=['Content-Type', 'Authorization', 'X-SmileBERTa-Client', 'X-Anthropic-Key'],
      methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
 
 TOKEN_TTL_DAYS = 90
@@ -154,6 +155,46 @@ def health():
         'docking': docking.DOCKING_AVAILABLE,
         'database': 'postgres' if db.IS_POSTGRES else 'sqlite',
         'persistent_storage': db.IS_POSTGRES,
+    })
+
+
+# ── Bert (research agent) ───────────────────────────────────────────────────
+# Bert orchestrates the platform's own tools from a plain-language request.
+# The Anthropic key is read from the server environment; a caller may instead
+# send their own key, which is used for that request only and never stored.
+
+def _bert_key():
+    """A caller-supplied Anthropic key, if any. Never logged, never persisted."""
+    key = (request.headers.get('X-Anthropic-Key') or '').strip()
+    return key if key.startswith('sk-') else ''
+
+
+@app.route('/bert/status', methods=['GET'])
+def bert_status():
+    user = current_user()
+    return jsonify(bert.status(user['id'] if user else None,
+                                docking.client_id(request), docking.client_ip(request)))
+
+
+@app.route('/bert/chat', methods=['POST'])
+def bert_chat():
+    data = body()
+    history = data.get('messages')
+    if not isinstance(history, list) or not history:
+        return err('messages must be a non-empty list')
+    if len(json.dumps(history)) > 400_000:
+        return err('That conversation is too long. Start a new one.')
+
+    user = current_user()
+    stream = bert.run(history,
+                       user_id=user['id'] if user else None,
+                       client_id=docking.client_id(request),
+                       ip=docking.client_ip(request),
+                       user_key=_bert_key())
+    return Response(stream, mimetype='text/event-stream', headers={
+        'Cache-Control': 'no-cache, no-transform',
+        'X-Accel-Buffering': 'no',       # tell any proxy not to buffer the stream
+        'Connection': 'keep-alive',
     })
 
 

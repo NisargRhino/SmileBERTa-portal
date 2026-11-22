@@ -16,6 +16,12 @@ services:
       # Usernames with admin ("master") rights, comma separated
       - key: ADMIN_USERNAMES
         value: nisarg.shah@emory.edu
+      # Bert, the research agent. Without a key Bert still works, but only for
+      # visitors who supply their own; the free allowance needs this set.
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: BERT_FREE_TURNS
+        value: "20"
 
   # ── Docking API (AutoDock Vina, no PyTorch → fits in 512 MB) ───────────
   - type: web

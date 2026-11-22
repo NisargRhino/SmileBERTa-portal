@@ -67,6 +67,7 @@
     eyeOff: '<path d="M17.9 17.9A10 10 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.1-5.9M9.9 4.2A9 9 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.2 3.2M1 1l22 22"/>',
     search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
     user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+    spark: '<path d="M12 2.6l2.1 5.9 5.9 2.1-5.9 2.1L12 18.6l-2.1-5.9L4 10.6l5.9-2.1z"/><path d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" opacity=".7"/>',
     logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
     menu: '<path d="M3 12h18M3 6h18M3 18h18"/>',
     flask: '<path d="M9 3h6M10 3v6L4.5 18.5A2 2 0 0 0 6.2 21h11.6a2 2 0 0 0 1.7-2.5L14 9V3"/><path d="M7 15h10"/>',
@@ -93,6 +94,7 @@
     <g fill="url(#lg-sb)"><circle cx="44" cy="10" r="3.6"/><circle cx="44" cy="22" r="3.6"/><circle cx="44" cy="34" r="3.6"/><circle cx="54" cy="22" r="3.6"/><circle cx="14" cy="45" r="2.6"/><circle cx="50" cy="45" r="2.6"/></g></svg>`;
 
   const TOOLS = [
+    { href: 'bert', icon: 'spark', title: 'Ask Bert', desc: 'Your research agent — runs every tool for you' },
     { href: 'fragmentation', icon: 'split', title: 'Fragment Prediction', desc: 'Predict binding fragments with SmileBERTa' },
     { href: 'drug_class', icon: 'tag', title: 'Drug Classification', desc: 'Therapeutic class from structure' },
     { href: 'combine', icon: 'merge', title: 'Fragment Linking', desc: 'Merge fragments into drug-like leads' },

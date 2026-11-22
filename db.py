@@ -157,6 +157,17 @@ CREATE TABLE IF NOT EXISTS feedback (
 CREATE INDEX IF NOT EXISTS idx_feedback_tool ON feedback(tool, created_at);
 CREATE INDEX IF NOT EXISTS idx_items_user ON items(user_id, kind);
 CREATE INDEX IF NOT EXISTS idx_tokens_user ON tokens(user_id);
+CREATE TABLE IF NOT EXISTS bert_usage (
+    id      INTEGER PRIMARY KEY AUTOINCREMENT,
+    ident   TEXT NOT NULL,
+    day     TEXT NOT NULL,
+    turns   INTEGER NOT NULL DEFAULT 0,
+    tool_calls INTEGER NOT NULL DEFAULT 0,
+    in_tokens  INTEGER NOT NULL DEFAULT 0,
+    out_tokens INTEGER NOT NULL DEFAULT 0,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_bert_usage ON bert_usage(ident, day);
 '''
 
 _SCHEMA_PG = '''
@@ -207,6 +218,17 @@ CREATE INDEX IF NOT EXISTS idx_feedback_tool ON feedback(tool, created_at);
 CREATE INDEX IF NOT EXISTS idx_items_user ON items(user_id, kind);
 CREATE INDEX IF NOT EXISTS idx_tokens_user ON tokens(user_id);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_users_lower ON users (lower(username));
+CREATE TABLE IF NOT EXISTS bert_usage (
+    id      SERIAL PRIMARY KEY,
+    ident   TEXT NOT NULL,
+    day     TEXT NOT NULL,
+    turns   INTEGER NOT NULL DEFAULT 0,
+    tool_calls INTEGER NOT NULL DEFAULT 0,
+    in_tokens  INTEGER NOT NULL DEFAULT 0,
+    out_tokens INTEGER NOT NULL DEFAULT 0,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_bert_usage ON bert_usage(ident, day);
 '''
 
 
@@ -268,3 +290,43 @@ def init_db():
         ensure_schema()
     except DatabaseUnavailable as e:
         print('[db] Database not reachable yet, will retry on first request:', e)
+
+
+# ── Bert usage ledger ───────────────────────────────────────────────────────
+# The free allowance is what stops the Anthropic bill from being open-ended, so
+# it lives in Postgres rather than in memory: a free-tier restart (which happens
+# on every sleep) would otherwise hand everyone a fresh allowance.
+
+def bert_usage(idents, day):
+    """Today's turn count for each identity, highest first."""
+    if not idents:
+        return 0
+    marks = ','.join('?' for _ in idents)
+    with connect() as conn:
+        rows = conn.all(f'SELECT ident, turns FROM bert_usage WHERE day = ? AND ident IN ({marks})',
+                        (day, *idents))
+    by_ident = {r['ident']: r['turns'] for r in rows}
+    return max([by_ident.get(i, 0) for i in idents] or [0])
+
+
+def bert_record(idents, day, tool_calls=0, in_tokens=0, out_tokens=0):
+    """Count one finished turn against every identity it belongs to."""
+    with connect() as conn:
+        for ident in idents:
+            updated = conn.execute(
+                'UPDATE bert_usage SET turns = turns + 1, tool_calls = tool_calls + ?, '
+                'in_tokens = in_tokens + ?, out_tokens = out_tokens + ?, updated_at = CURRENT_TIMESTAMP '
+                'WHERE ident = ? AND day = ?',
+                (tool_calls, in_tokens, out_tokens, ident, day)).rowcount
+            if not updated:
+                try:
+                    conn.execute(
+                        'INSERT INTO bert_usage (ident, day, turns, tool_calls, in_tokens, out_tokens) '
+                        'VALUES (?, ?, 1, ?, ?, ?)', (ident, day, tool_calls, in_tokens, out_tokens))
+                except Exception as e:
+                    if not is_integrity_error(e):
+                        raise
+                    conn.execute(  # another worker inserted the row first
+                        'UPDATE bert_usage SET turns = turns + 1, tool_calls = tool_calls + ?, '
+                        'in_tokens = in_tokens + ?, out_tokens = out_tokens + ? WHERE ident = ? AND day = ?',
+                        (tool_calls, in_tokens, out_tokens, ident, day))
