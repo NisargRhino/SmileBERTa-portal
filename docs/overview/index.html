@@ -1,0 +1,1080 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SmileBERTa — Platform Overview</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#3b82f6; --cyan:#22d3ee; --teal:#2dd4bf;
+    --grad:linear-gradient(135deg,#3b82f6 0%,#22d3ee 55%,#2dd4bf 100%);
+    --ink:#0f172a; --body:#334155; --muted:#64748b; --faint:#94a3b8;
+    --line:#e2e8f0; --soft:#f1f5f9; --navy:#070b16;
+    --display:'Space Grotesk','Inter',sans-serif;
+    --font:'Inter',-apple-system,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--font);color:var(--body);font-size:9.6pt;line-height:1.5;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @page{size:letter;margin:0}
+
+  .page{width:8.5in;height:11in;padding:0.62in 0.68in 0.5in;position:relative;overflow:hidden;page-break-after:always;background:#fff}
+  .page:last-child{page-break-after:auto}
+
+  /* ── cover ───────────────────────────────────────────── */
+  .cover{background:var(--navy);color:#fff;padding:0;display:flex;flex-direction:column;justify-content:space-between}
+  .cover .glow{position:absolute;width:15in;height:15in;top:-7in;right:-7in;border-radius:50%;
+    background:radial-gradient(circle,rgba(34,211,238,.20) 0%,rgba(59,130,246,.09) 38%,transparent 62%)}
+  .cover-inner{position:relative;padding:1.05in 0.78in 0.78in;flex:1;display:flex;flex-direction:column}
+  .cover-logo{display:flex;align-items:center;gap:13px;font-family:var(--display);font-weight:700;font-size:16.5pt;color:#fff;letter-spacing:-.02em}
+  .cover-logo svg{width:40px;height:40px}
+  .cover h1{font-family:var(--display);font-size:40pt;line-height:1.04;letter-spacing:-.035em;margin:.52in 0 0;color:#fff;font-weight:700;max-width:6in}
+  .cover h1 em{font-style:normal;color:var(--cyan)}
+  .cover .lede{font-size:11.5pt;line-height:1.58;color:#cbd5e1;max-width:4.9in;margin:.26in 0 0}
+  .cover .rule{width:2.1in;height:3px;border-radius:2px;background:var(--grad);margin:.34in 0 0}
+  .cover .who{margin-top:auto;font-size:10pt;color:#e2e8f0;line-height:1.72}
+  .cover .who b{color:#fff;font-weight:600;font-size:11pt}
+  .cover .who span{color:var(--faint)}
+  .cover-foot{position:relative;border-top:1px solid rgba(255,255,255,.12);padding:.2in .78in;display:flex;justify-content:space-between;font-size:8.6pt;color:var(--faint);letter-spacing:.04em;text-transform:uppercase}
+
+  /* ── running header / footer ─────────────────────────── */
+  .rh{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:7px;margin-bottom:.3in}
+  .rh .n{font-family:var(--display);font-weight:700;color:var(--ink);font-size:9pt}
+  .rh .t{font-size:8.3pt;color:var(--faint);letter-spacing:.05em;text-transform:uppercase}
+  .pf{position:absolute;left:.68in;right:.68in;bottom:.3in;display:flex;justify-content:space-between;font-size:8pt;color:var(--faint);border-top:1px solid var(--line);padding-top:7px}
+
+  .kicker{font-family:var(--display);font-size:8.3pt;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--blue);margin:0 0 7px}
+  h2{font-family:var(--display);font-size:21pt;line-height:1.14;letter-spacing:-.025em;color:var(--ink);margin:0 0 .13in;font-weight:700}
+  h2 .path{font-family:var(--mono);font-size:9.5pt;color:var(--muted);font-weight:400;letter-spacing:0}
+  h3{font-family:var(--display);font-size:10.6pt;color:var(--ink);margin:.2in 0 .07in;font-weight:600;letter-spacing:-.01em}
+  h4{font-family:var(--display);font-size:9.4pt;color:var(--ink);margin:0 0 5px;font-weight:600}
+  p{margin:0 0 8px}
+  .intro{font-size:10.4pt;line-height:1.6;color:var(--body);max-width:6.6in}
+  .intro b{color:var(--ink);font-weight:600}
+  a{color:var(--blue);text-decoration:none}
+  code{font-family:var(--mono);font-size:8.4pt;background:var(--soft);padding:1.5px 4px;border-radius:3px;color:#0f766e;word-break:break-word}
+  td code{white-space:nowrap;font-size:7.9pt}
+  ul{margin:0;padding-left:15px}
+  li{margin-bottom:5px}
+  .tight li{margin-bottom:3px}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:.3in}
+  .cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:.2in}
+
+  .card{border:1px solid var(--line);border-radius:9px;padding:11px 13px;background:#fff}
+  .card.soft{background:var(--soft);border-color:transparent}
+  .card.accent{border-left:3px solid var(--cyan)}
+  .note{background:var(--soft);border-left:3px solid var(--teal);border-radius:0 7px 7px 0;padding:10px 13px;font-size:9pt;color:var(--body)}
+  .note b{color:var(--ink)}
+  .warn{background:#fffbeb;border-left:3px solid #f59e0b;border-radius:0 7px 7px 0;padding:10px 13px;font-size:9pt}
+  .warn b{color:#92400e}
+
+  table{width:100%;border-collapse:collapse;font-size:8.7pt;margin:.1in 0}
+  th{text-align:left;font-family:var(--display);font-size:7.6pt;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:1.5px solid var(--line);padding:0 8px 6px 0;vertical-align:bottom}
+  td{padding:6.5px 8px 6.5px 0;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.42}
+  td b{color:var(--ink);font-weight:600}
+  tr:last-child td{border-bottom:none}
+  .num{font-family:var(--mono);font-size:8.3pt;white-space:nowrap}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.17in;margin:.2in 0}
+  .stat{border:1px solid var(--line);border-radius:9px;padding:11px 12px}
+  .stat .v{font-family:var(--display);font-size:17pt;font-weight:700;letter-spacing:-.03em;line-height:1;color:var(--blue)}
+  .stat .l{font-size:7.9pt;color:var(--muted);margin-top:5px;line-height:1.35}
+
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:.16in 0}
+  .step{border:1px solid var(--line);border-top:2.5px solid var(--cyan);border-radius:7px;padding:9px 10px}
+  .step .i{font-family:var(--display);font-size:7.5pt;color:var(--blue);font-weight:700;letter-spacing:.08em}
+  .step .h{font-family:var(--display);font-size:9.2pt;color:var(--ink);font-weight:600;margin:3px 0 2px}
+  .step .d{font-size:8.1pt;color:var(--muted);line-height:1.38}
+
+  .pill{display:inline-block;font-family:var(--display);font-size:7.3pt;font-weight:600;letter-spacing:.07em;text-transform:uppercase;
+    padding:2.5px 7px;border-radius:20px;vertical-align:middle}
+  .pill.new{background:#ecfdf5;color:#047857}
+  .pill.upd{background:#eff6ff;color:#1d4ed8}
+  .pill.soon{background:var(--soft);color:var(--muted)}
+
+  .toc{column-count:2;column-gap:.42in;margin-top:.12in}
+  .toc-row{display:flex;gap:9px;align-items:baseline;padding:4.5px 0;border-bottom:1px solid var(--line);break-inside:avoid}
+  .toc-row .n{font-family:var(--mono);font-size:8pt;color:var(--faint);width:19px;flex:none}
+  .toc-row .t{font-size:9pt;color:var(--ink)}
+  .toc-row .t small{color:var(--muted);font-size:7.8pt}
+
+  .arch{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin:.14in 0}
+  .box{border:1px solid var(--line);border-radius:8px;padding:10px 11px;background:#fff}
+  .box .bt{font-family:var(--display);font-size:9.2pt;font-weight:600;color:var(--ink)}
+  .box .bs{font-family:var(--mono);font-size:7.6pt;color:var(--blue);margin:2px 0 4px}
+  .box .bd{font-size:8pt;color:var(--muted);line-height:1.38}
+  .box.wide{grid-column:1/-1}
+  .box.dark{background:var(--navy);border-color:var(--navy)}
+  .box.dark .bt{color:#fff}.box.dark .bd{color:#94a3b8}.box.dark .bs{color:var(--cyan)}
+
+  .flow{display:flex;align-items:stretch;gap:0;margin:.16in 0}
+  .flow .f{flex:1;border:1px solid var(--line);border-radius:7px;padding:8px 9px;text-align:center}
+  .flow .arr{display:flex;align-items:center;padding:0 5px;color:var(--faint);font-size:11pt}
+  .flow .f .ft{font-family:var(--display);font-size:8.6pt;font-weight:600;color:var(--ink)}
+  .flow .f .fd{font-size:7.6pt;color:var(--muted);margin-top:2px}
+
+  .q{font-family:var(--display);font-size:13pt;line-height:1.42;color:var(--ink);letter-spacing:-.015em;
+     border-left:3px solid;border-image:var(--grad) 1;padding-left:16px;margin:.1in 0 .2in}
+  .label{font-family:var(--display);font-size:7.6pt;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:.18in 0 6px}
+  .hr{height:1px;background:var(--line);margin:.2in 0}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ COVER ═══════════ -->
+<section class="page cover">
+  <div class="glow"></div>
+  <div class="cover-inner">
+    <div class="cover-logo">
+      <svg viewBox="0 0 64 64">
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#3b82f6"/><stop offset=".6" stop-color="#22d3ee"/><stop offset="1" stop-color="#2dd4bf"/>
+        </linearGradient></defs>
+        <g fill="none" stroke="url(#lg)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 9 33 15.5v13L22 35 11 28.5v-13z"/><path d="M15 17.6v8.8M22 31l7.6-4.4" stroke-width="2.2" opacity=".8"/>
+          <path d="M33 15.5 44 10M33 22h11M33 28.5 44 34M44 10l10 12M44 22h10M44 34l10-12M44 10v24"/>
+          <path d="M14 45c9 10 27 10 36 0"/></g>
+        <g fill="url(#lg)"><circle cx="44" cy="10" r="3.6"/><circle cx="44" cy="22" r="3.6"/><circle cx="44" cy="34" r="3.6"/>
+          <circle cx="54" cy="22" r="3.6"/><circle cx="14" cy="45" r="2.6"/><circle cx="50" cy="45" r="2.6"/></g>
+      </svg>
+      <span>Smile<span style="color:var(--cyan)">BERT</span>a</span>
+    </div>
+
+    <h1>Drug discovery,<br><em>accelerated by AI.</em></h1>
+    <div class="rule"></div>
+    <p class="lede">A complete overview of the SmileBERTa platform: the eight tools and what each one
+      answers, the science and models behind them, how the system is built — and where it is going.</p>
+
+    <div class="who">
+      <b>Nisarg Shah</b><br>
+      Emory University · Biology, minors in AI &amp; Philosophy<br>
+      <span>nisarg.shah@emory.edu · smileberta-web.onrender.com</span>
+    </div>
+  </div>
+  <div class="cover-foot">
+    <span>Platform overview</span>
+    <span>Second edition · November 2026</span>
+  </div>
+</section>
+
+<!-- ═══════════ 01 OVERVIEW ═══════════ -->
+<section class="page">
+  <div class="rh"><span class="n">01 · Overview</span><span class="t">SmileBERTa · Platform Overview</span></div>
+
+  <p class="kicker">What it is</p>
+  <h2>A drug-discovery workbench that runs in a browser</h2>
+  <p class="intro">SmileBERTa combines <b>transformer language models trained on chemistry</b>,
+    <b>physics-based molecular modelling</b> and <b>interactive 3D visualization</b> in one workspace, so
+    anyone can go from a molecule written as text to a docked lead candidate without installing software.
+    Every tool is free and works without an account; an account saves your work permanently.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="v">8</div><div class="l">Interactive tools, from fragment prediction to ADMET</div></div>
+    <div class="stat"><div class="v">8,336</div><div class="l">Labelled compounds behind the classifier</div></div>
+    <div class="stat"><div class="v">25,364</div><div class="l">Reference fragments for SMILES correction</div></div>
+    <div class="stat"><div class="v">~35s</div><div class="l">A drug-sized docking run, end to end</div></div>
+  </div>
+
+  <div class="cols">
+    <div>
+      <h3>Who it is for</h3>
+      <ul class="tight">
+        <li><b>Students and educators</b> in medicinal chemistry, biochemistry or computational biology. Every tool has an illustrated guide explaining the science.</li>
+        <li><b>Researchers</b> who want fast hypotheses on fragments, therapeutic class, binding poses and developability.</li>
+        <li><b>Anyone curious</b> about how AI is changing drug discovery.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>What makes it different</h3>
+      <ul class="tight">
+        <li><b>AI and physics together.</b> Model predictions are checked with RDKit, force fields and AutoDock Vina.</li>
+        <li><b>One connected workflow.</b> Results hand off between tools: classify, fragment, link, build, dock, profile.</li>
+        <li><b>Every number is traceable.</b> Each computed value carries the equation, rule or paper it came from.</li>
+        <li><b>Nothing to install.</b> It all runs in the browser.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+  <p class="label">Contents</p>
+  <div class="toc">
+    <div class="toc-row"><span class="n">01</span><span class="t">Overview</span></div>
+    <div class="toc-row"><span class="n">02</span><span class="t">The discovery workflow</span></div>
+    <div class="toc-row"><span class="n">03</span><span class="t">Fragment Prediction</span></div>
+    <div class="toc-row"><span class="n">04</span><span class="t">Drug Classification</span></div>
+    <div class="toc-row"><span class="n">05</span><span class="t">Fragment Linking</span></div>
+    <div class="toc-row"><span class="n">06</span><span class="t">Molecule Builder</span></div>
+    <div class="toc-row"><span class="n">07</span><span class="t">Docking <small>— rebuilt</small></span></div>
+    <div class="toc-row"><span class="n">08</span><span class="t">Structure Studio</span></div>
+    <div class="toc-row"><span class="n">09</span><span class="t">ADMET Profiler <small>— new</small></span></div>
+    <div class="toc-row"><span class="n">10</span><span class="t">Model Hub <small>— new</small></span></div>
+    <div class="toc-row"><span class="n">11</span><span class="t">Accounts, Workspace &amp; feedback</span></div>
+    <div class="toc-row"><span class="n">12</span><span class="t">Learn guides &amp; credits</span></div>
+    <div class="toc-row"><span class="n">13</span><span class="t">Architecture &amp; technology</span></div>
+    <div class="toc-row"><span class="n">14</span><span class="t">Models &amp; data</span></div>
+    <div class="toc-row"><span class="n">15</span><span class="t">What changed since v1</span></div>
+    <div class="toc-row"><span class="n">16</span><span class="t">The vision</span></div>
+    <div class="toc-row"><span class="n">17</span><span class="t">Limitations &amp; roadmap</span></div>
+    <div class="toc-row"><span class="n">A</span><span class="t">Quick reference</span></div>
+  </div>
+
+  <div class="pf"><span>SmileBERTa · Platform Overview</span><span>2</span></div>
+</section>
+
+<!-- ═══════════ 02 WORKFLOW ═══════════ -->
+<section class="page">
+  <div class="rh"><span class="n">02 · The workflow</span><span class="t">SmileBERTa · Platform Overview</span></div>
+
+  <p class="kicker">From a SMILES string to a docked lead</p>
+  <h2>Eight tools, one pipeline</h2>
+  <p class="intro">Molecules are entered as <b>SMILES</b>, a line notation that writes atoms, bonds, branches
+    and rings as text — aspirin is <code>CC(=O)Oc1ccccc1C(=O)O</code>. Because a molecule becomes a sentence,
+    language models can read it. The tools are built to be used in sequence.</p>
+
+  <div class="flow">
+    <div class="f"><div class="ft">1 · Classify</div><div class="fd">what is it for?</div></div>
+    <div class="arr">→</div>
+    <div class="f"><div class="ft">2 · Fragment</div><div class="fd">which part matters?</div></div>
+    <div class="arr">→</div>
+    <div class="f"><div class="ft">3 · Link &amp; build</div><div class="fd">design a lead</div></div>
+    <div class="arr">→</div>
+    <div class="f"><div class="ft">4 · Dock</div><div class="fd">does it bind?</div></div>
+    <div class="arr">→</div>
+    <div class="f"><div class="ft">5 · Profile</div><div class="fd">could it be a drug?</div></div>
+  </div>
+  <p style="font-size:8.3pt;color:var(--muted);margin:0 0 .12in">
+    Structure Studio sits alongside the whole pipeline for inspecting any protein target, and the Model Hub
+    turns any step into a notebook you can run yourself.</p>
+
+  <table>
+    <thead><tr><th style="width:1.35in">Tool</th><th style="width:.72in">Type</th><th>What it answers</th><th style="width:1.45in">Key output</th></tr></thead>
+    <tbody>
+      <tr><td><b>Fragment Prediction</b></td><td>AI model</td><td>Which fragment of this drug-like molecule is most relevant to binding?</td><td>Fragment + Rule-of-Three check</td></tr>
+      <tr><td><b>Drug Classification</b></td><td>AI model</td><td>Which therapeutic area does this compound most likely belong to?</td><td>Class + ranked alternatives</td></tr>
+      <tr><td><b>Fragment Linking</b></td><td>Chemistry</td><td>How can two fragments be joined into a drug-like lead?</td><td>Linked candidates by QED</td></tr>
+      <tr><td><b>Molecule Builder</b></td><td>Force field</td><td>What does this molecule look like in 3D, and what is its lowest-energy shape?</td><td>Optimised 3D geometry</td></tr>
+      <tr><td><b>Docking</b></td><td>Physics</td><td>How, and how strongly, does a ligand bind a protein pocket?</td><td>Poses, kcal/mol, H-bonds</td></tr>
+      <tr><td><b>Structure Studio</b></td><td>Visualization</td><td>What does this protein look like: chains, backbone, pockets, surfaces?</td><td>Interactive 3D analysis</td></tr>
+      <tr><td><b>ADMET Profiler</b> <span class="pill new">New</span></td><td>Rules + equations</td><td>Would this molecule behave like a drug in the body?</td><td>Absorption, solubility, alerts</td></tr>
+      <tr><td><b>Model Hub</b> <span class="pill new">New</span></td><td>Tooling</td><td>What other chemistry models exist, and how do I run one on my data?</td><td>Runnable Colab notebook</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note" style="margin-top:.1in"><b>Hand-offs.</b> Every result carries one-click actions —
+    Dock, Open in Builder, Fragment, Profile, Save — so a classified compound can be fragmented, its fragment
+    linked, the lead refined in 3D, docked and profiled without retyping anything.</div>
+
+  <div class="pf"><span>SmileBERTa · Platform Overview</span><span>3</span></div>
+</section>
+
+<!-- ═══════════ 03 FRAGMENT PREDICTION ═══════════ -->
+<section class="page">
+  <div class="rh"><span class="n">03 · Tool</span><span class="t">SmileBERTa · Platform Overview</span></div>
+
+  <p class="kicker">AI model</p>
+  <h2>Fragment Prediction <span class="path">/fragmentation</span></h2>
+  <p class="intro">Enter a drug-like molecule and SmileBERTa predicts the fragment most relevant to binding,
+    then validates it chemically and scores it against the fragment-likeness <b>Rule of Three</b>.
+    Fragment-based drug discovery starts from small, efficient binders and grows them into leads; this tool
+    proposes the starting point. It is the platform's own model, trained for this task.</p>
+
+  <div class="note"><b>A real prediction.</b> The β-blocker scaffold
+    <code>CC(C)(C)NCC(O)COc1ccc(O)c2c1CCC(=O)N2</code> (308.4 Da) gives the fragment
+    <code>CC1=CC=C(O)C12CCC(=O)N2</code> (165.2 Da, cLogP 1.04) — valid as generated, and passing the Rule of Three.</div>
+
+  <div class="cols" style="margin-top:.2in">
+    <div>
+      <h3>How to use it</h3>
+      <ol style="margin:0;padding-left:16px;font-size:9pt">
+        <li style="margin-bottom:6px">Paste a SMILES string or pick an example (oxazolidinones, a β-blocker, a peptidomimetic, imatinib).</li>
+        <li style="margin-bottom:6px">Choose a target (KRAS, mTOR, AKT1, ERK2) and click <b>Predict fragment</b>.</li>
+        <li style="margin-bottom:6px">Compare input and fragment in 2D or 3D. Highlighted atoms show where the fragment sits in the parent.</li>
+        <li style="margin-bottom:6px">Add it to your fragment library, save it, or send it to Docking, ADMET or the Builder.</li>
+      </ol>
+      <p style="font-size:8.6pt;color:var(--muted);margin-top:8px">Batch mode runs up to 50 molecules from a CSV and exports the results.</p>
+    </div>
+    <div>
+      <h3>Under the hood</h3>
+      <ul class="tight" style="font-size:9pt">
+        <li>The SMILES is split into tokens from a <b>767-token chemical vocabulary</b> and passed through a 6-layer RoBERTa transformer (ChemBERTa-initialised).</li>
+        <li>The model writes out the fragment's tokens in a single forward pass.</li>
+        <li>If the output is not a valid molecule, it is repaired by a SMILES-corrector model, or failing that snapped to the closest of <b>25,364 reference fragments</b>.</li>
+        <li>RDKit canonicalizes the fragment, builds a 3D conformer (ETKDG + MMFF94) and computes properties.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card accent" style="margin-top:.22in">
+    <h4>New: tell the model when it is wrong <span class="pill new">New</span></h4>
+    <p style="margin:0;font-size:9pt">Every prediction now carries a rating control. You can mark it good or bad,
+      or submit the fragment you believe is correct. Nothing is stored unless you both rate a prediction
+      <b>and</b> opt in to sharing — see §11.</p>
+  </div>
+
+  <div class="pf"><span>SmileBERTa · Platform Overview</span><span>4</span></div>
+</section>
+
+<!-- ═══════════ 04 CLASSIFICATION ═══════════ -->
+<section class="page">
+  <div class="rh"><span class="n">04 · Tool</span><span class="t">SmileBERTa · Platform Overview</span></div>
+
+  <p class="kicker">AI model</p>
+  <h2>Drug Classification <span class="path">/drug_class</span></h2>
+  <p class="intro">Predicts a compound's therapeutic class directly from its structure across <b>12 categories</b>:
+    anti-infective, antineoplastic, central nervous system, cardiovascular, anti-inflammatory, hematologic,
+    gastrointestinal, lipid-regulating, respiratory, reproductive control, dermatologic and urological.
+    Compounds can carry more than one class.</p>
+
+  <div class="note">Fluoxetine (Prozac) is classified as <b>Central nervous system</b>. The model's raw text
+    output was exactly <code>cns</code> (similarity 1.00); runners-up are listed with their scores.</div>
+
+  <div class="cols" style="margin-top:.2in">
+    <div>
+      <h3>How it works</h3>
+      <ul class="tight" style="font-size:9pt">
+        <li>The same transformer architecture, fine-tuned on <b>8,336 labelled compounds</b>, writes the class name as text.</li>
+        <li>That text is matched to the <b>38 known labels</b> (single classes and observed combinations) by edit distance, so every answer is a valid class even when the raw output is noisy.</li>
+        <li>The <b>Closest label matches</b> chart shows how decisive the prediction was.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Also included</h3>
+      <ul class="tight" style="font-size:9pt">
+        <li>A drug-likeness profile: Lipinski's Rule of Five, Veber rules, QED score, TPSA, H-bond donors and acceptors, rotatable bonds and more.</li>
+        <li>2D structure and an interactive 3D conformer.</li>
+        <li>Batch mode: classify up to 100 compounds from a CSV, with a class-distribution chart and CSV export.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="warn" style="margin-top:.22in"><b>Read it as a hypothesis.</b> The classifier learns statistical
+    patterns, not mechanisms, and can be confidently wrong — ciprofloxacin, an antibiotic, is labelled
+    antineoplastic. Rare classes such as urological (48 training compounds) are the least reliable.</div>
+
+  <div class="pf"><span>SmileBERTa · Platform Overview</span><span>5</span></div>
+</section>
+
+<!-- ═══════════ 05 LINKING ═══════════ -->
+<section class="page">
+  <div class="rh"><span class="n">05 · Tool</span><span class="t">SmileBERTa · Platform Overview</span></div>
+
+  <p class="kicker">Chemistry</p>
+  <h2>Fragment Linking <span class="path">/combine</span></h2>
+  <p class="intro">Combines two fragments into larger, lead-like molecules. SmileBERTa joins them through short
+    <b>amine (C–N)</b> and <b>ester</b> linkers at open carbon positions, then keeps only candidates that pass
+    Lipinski's Rule of Five and score QED &gt; 0.3.</p>
+
+  <div class="note">The example pair produces six drug-like candidates, ranked by QED (top score 0.88), each
+    with molecular weight, cLogP and H-bond counts.</div>
+
+  <div class="cols" style="margin-top:.2in">
+    <div>
+      <h3>How to use it</h3>
+      <ol style="margin:0;padding-left:16px;font-size:9pt">
+        <li style="margin-bottom:6px">Fill slots A and B: type SMILES, or click fragments saved in your library from Fragment Prediction.</li>
+        <li style="margin-bottom:6px">Click <b>Link fragments</b>.</li>
+        <li style="margin-bottom:6px">Review candidates sorted by QED, open any in 3D, then save, dock, profile or refine them in the Builder.</li>
+      </ol>
+    </div>
+    <div>
+      <h3>Why the filters matter</h3>
+      <p style="font-size:9pt">Joining fragments easily produces molecules that are too large or too greasy to be
+        drugs. Lipinski's rules (MW ≤ 500, cLogP ≤ 5, HBD ≤ 5, HBA ≤ 10) and QED — similarity to approved oral
+        drugs — keep only realistic candidates, which saves time before docking.</p>
+    </div>
+  </div>
+
+  <div class="pf"><span>SmileBERTa · Platform Overview</span><span>6</span></div>
+</section>
+
+<!-- ═══════════ 06 BUILDER ═══════════ -->
+<section class="page">
+  <div class="rh"><span class="n">06 · Tool</span><span class="t">SmileBERTa · Platform Overview</span></div>
+
+  <p class="kicker">Force field</p>
+  <h2>Molecule Builder <span class="path">/builder</span></h2>
+  <p class="intro">An Avogadro-style 3D molecule editor. Build molecules atom by atom with automatic hydrogens,
+    then refine them with real molecular-mechanics force fields (<b>MMFF94, MMFF94s, UFF</b>) and search for
+    low-energy conformers.</p>
+
+  <div class="note">Caffeine optimised with MMFF94: the energy fell from <b>−30.1 to −122.5 kcal/mol</b> over
+    1,208 minimisation steps, animated live with the trace plotted beside it.</div>
+
+  <div class="cols" style="margin-top:.2in">
+    <div>
+      <h3>Building tools</h3>
+      <ul class="tight" style="font-size:9pt">
+        <li><b>Draw:</b> click an atom to grow a bonded atom of the selected element. Clicking a hydrogen replaces it.</li>
+        <li><b>Bond:</b> click two atoms to bond them, or cycle single, double and triple.</li>
+        <li><b>Delete</b>, <b>Charge</b> (cycle 0 / +1 / −1), and <b>Measure</b> (distance, angle, dihedral).</li>
+        <li>Element palette (C, H, N, O, S, P, F, Cl, Br, I, B, Si), keyboard shortcuts, undo/redo, and valence errors highlighted in red.</li>
+        <li>Start from SMILES or templates (benzene, indole, caffeine, aspirin…), or import SDF/MOL/XYZ/PDB.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Physics</h3>
+      <ul class="tight" style="font-size:9pt">
+        <li><b>Auto-clean:</b> a fast in-browser spring model tidies geometry after every edit.</li>
+        <li><b>Optimise geometry:</b> server-side RDKit minimisation (BFGS) with MMFF94, MMFF94s or UFF, recording frames that animate in the viewer.</li>
+        <li><b>Conformer search:</b> ETKDG v3 generates diverse shapes, MMFF94 minimises each, and duplicates are removed and ranked by relative energy.</li>
+        <li>Export SDF, XYZ, PDB, SMILES or PNG, save to the workspace, or send straight to Docking.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="pf"><span>SmileBERTa · Platform Overview</span><span>7</span></div>
+</section>
+<!-- ═══════════ 07 DOCKING ═══════════ -->
+<section class="page">
+  <div class="rh"><span class="n">07 · Tool</span><span class="t">SmileBERTa · Platform Overview</span></div>
+
+  <p class="kicker">Physics · rebuilt this release</p>
+  <h2>Docking with AutoDock Vina <span class="path">/docking</span></h2>
+  <p class="intro">Predicts how a ligand binds a protein and estimates binding affinity using
+    <b>AutoDock Vina 1.2.7</b>, one of the most widely used docking engines. Load any structure from the
+    Protein Data Bank, define the pocket, dock, and inspect each pose with its hydrogen bonds and contact
+    residues.</p>
+
+  <div class="card accent">
+    <h4>Roughly fifty times faster than the first release <span class="pill upd">Rebuilt</span></h4>
+    <p style="margin:0 0 7px;font-size:9pt">Docking used to share a free-tier server with the machine-learning
+      models, on about a tenth of one CPU core, running one job at a time at the lowest scheduling priority.
+      A drug-sized run took around half an hour, which reads as broken. It now runs on a dedicated
+      two-core server of its own, with a real job queue.</p>
+    <table style="margin:0">
+      <thead><tr><th>Measured on the live site</th><th style="width:1.1in">Before</th><th style="width:1.1in">After</th></tr></thead>
+      <tbody>
+        <tr><td>Benzamidine → trypsin (PDB 3PTB)</td><td class="num">38 s</td><td class="num"><b>3.7 s</b></td></tr>
+        <tr><td>Imatinib → EGFR</td><td class="num">~30 min</td><td class="num"><b>35 s</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="cols" style="margin-top:.2in">
+    <div>
+      <h3>Four steps</h3>
+      <ol style="margin:0;padding-left:16px;font-size:9pt">
+        <li style="margin-bottom:5px"><b>Receptor:</b> fetch a PDB ID (HIV-1 protease, SARS-CoV-2 Mpro, EGFR, acetylcholinesterase, trypsin…) or upload a file. Choose chains.</li>
+        <li style="margin-bottom:5px"><b>Ligand:</b> SMILES, an example drug, or a 3D model sent from the Builder.</li>
+        <li style="margin-bottom:5px"><b>Search box:</b> snap to a co-crystallised ligand, pick a point on the structure, or type coordinates. The box is drawn live as a wireframe so the protein stays visible.</li>
+        <li style="margin-bottom:5px"><b>Run:</b> set exhaustiveness and number of poses, then follow live progress and the log.</li>
+      </ol>
+    </div>
+    <div>
+      <h3>Pipeline &amp; results</h3>
+      <ul class="tight" style="font-size:9pt">
+        <li>Receptor cleaned, polar hydrogens added at pH 7.4, AutoDock atom types assigned (Open Babel).</li>
+        <li>Ligand embedded in 3D (ETKDG + MMFF94) and converted to a flexible torsion tree.</li>
+        <li>Vina's empirical scoring function searches with Monte-Carlo + BFGS.</li>
+        <li><b>Results:</b> pose table (kcal/mol, RMSD), estimated K<sub>i</sub>, H-bonds ≤ 3.5 Å, residues within 4 Å, and downloads as SDF, PDBQT, complex PDB or CSV.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:.18in"><b>Fair-use limits.</b> Free docking allows two jobs at a time and
+    forty an hour — enough for an afternoon of real work. Limits are counted per browser rather than per
+    network, so a whole classroom on one campus connection does not share a single quota.</div>
+
+  <div class="pf"><span>SmileBERTa · Platform Overview</span><span>8</span></div>
+</section>
+
+<!-- ═══════════ 08 STUDIO ═══════════ -->
+<section class="page">
+  <div class="rh"><span class="n">08 · Tool</span><span class="t">SmileBERTa · Platform Overview</span></div>
+
+  <p class="kicker">Visualization</p>
+  <h2>Structure Studio <span class="path">/studio</span></h2>
+  <p class="intro">A Chimera-style structure explorer for proteins, nucleic acids and small molecules. Look at
+    individual chains, the backbone, side chains, ligands, pockets and surfaces, measure geometry, and save the
+    full view as a session.</p>
+
+  <div class="note">Hemoglobin (PDB 4HHB) coloured by secondary structure, with side chains and heme groups
+    shown; the panel lists all four chains and their cofactors.</div>
+
+  <div class="cols3" style="margin-top:.2in">
+    <div class="card soft"><h4>Representations</h4><p style="margin:0;font-size:8.5pt">Cartoon, tube, backbone atoms, lines, sticks, ball-and-stick, spheres. Optional side chains, ligands, waters and hydrogens.</p></div>
+    <div class="card soft"><h4>Colouring &amp; surfaces</h4><p style="margin:0;font-size:8.5pt">By chain, secondary structure, rainbow N→C, element, residue type, Kyte–Doolittle hydrophobicity, B-factor or one colour. Solvent-excluded, solvent-accessible or van der Waals surfaces.</p></div>
+    <div class="card soft"><h4>Chains</h4><p style="margin:0;font-size:8.5pt">Every chain listed with residue and atom counts. Show, hide, zoom to or isolate any chain, and jump to any ligand or cofactor.</p></div>
+    <div class="card soft"><h4>Selections &amp; pockets</h4><p style="margin:0;font-size:8.5pt">Binding site: residues within 4–8 Å of any ligand, labelled. Custom queries by chain, residue range, residue name, atom name or element, added as styled layers.</p></div>
+    <div class="card soft"><h4>Measurements</h4><p style="margin:0;font-size:8.5pt">Click atoms to measure distance, angle or dihedral. Clicking an atom lists its residue, B-factor and every bond with its length.</p></div>
+    <div class="card soft"><h4>Info &amp; sequence</h4><p style="margin:0;font-size:8.5pt">Title, method, resolution and secondary-structure composition, plus a clickable sequence strip marking helices and sheets. Export PNG or save the session.</p></div>
+  </div>
+
+  <div class="pf"><span>SmileBERTa · Platform Overview</span><span>9</span></div>
+</section>
+
+<!-- ═══════════ 09 ADMET ═══════════ -->
+<section class="page">
+  <div class="rh"><span class="n">09 · Tool</span><span class="t">SmileBERTa · Platform Overview</span></div>
+
+  <p class="kicker">New in this release</p>
+  <h2>ADMET Profiler <span class="path">/admet</span></h2>
+  <p class="intro">A molecule that binds is not yet a drug. The ADMET Profiler asks the next question —
+    would this compound be absorbed, dissolve, reach its target and avoid obvious trouble? It reports
+    <b>absorption and permeability</b>, <b>aqueous solubility</b>, <b>drug-likeness filters</b>,
+    <b>structural alerts</b> and <b>synthetic accessibility</b> for one molecule in about six milliseconds,
+    or for up to 200 in a batch.</p>
+
+  <div class="q">Every number carries the equation, rule or paper it came from. Nothing is invented.</div>
+
+  <div class="cols">
+    <div>
+      <h3>What it reports</h3>
+      <ul class="tight" style="font-size:9pt">
+        <li><b>Absorption:</b> the BOILED-Egg model for passive gut absorption and blood–brain-barrier access, plus TPSA and descriptor ranges.</li>
+        <li><b>Solubility:</b> ESOL log S, converted to mg/mL and a solubility class.</li>
+        <li><b>Drug-likeness:</b> Lipinski, Veber, Egan, Muegge, Ghose and QED, each with the exact rule that passed or failed.</li>
+        <li><b>Alerts:</b> PAINS and Brenk substructure catalogues, with the matching fragment named.</li>
+        <li><b>Make-ability:</b> synthetic accessibility and natural-product likeness scores.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>The design rule</h3>
+      <p style="font-size:9pt">Each value carries a <b>basis</b> — equation, rule, range, substructure or
+        descriptor — and a <b>citation</b>. Endpoints that genuinely need a trained model, such as CYP
+        inhibition, P-gp substrate status, hERG, Ames and LD<sub>50</sub>, are returned in an explicit
+        <b>unavailable</b> list that points to the Model Hub, rather than being filled in with a plausible
+        number. A profile you cannot check is not useful to a researcher.</p>
+      <p style="font-size:8.6pt;color:var(--muted)">Built on RDKit and published models, so it adds no heavy
+        dependencies and runs alongside the language models without competing for memory.</p>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:.16in"><b>A correction found while building it.</b> Widely copied
+    secondary summaries state the BOILED-Egg brain-access box as <code>-2.9 &lt; TPSA &lt; 79.1</code>, which is
+    impossible — TPSA cannot be negative, and the two axes have been transposed somewhere along the way. Checked
+    against twenty known drugs, the corrected orientation identifies 10 of 10 CNS drugs while the literal one
+    misses caffeine. SmileBERTa uses the corrected reading and says so.</div>
+
+  <div class="pf"><span>SmileBERTa · Platform Overview</span><span>10</span></div>
+</section>
+
+<!-- ═══════════ 10 MODEL HUB ═══════════ -->
+<section class="page">
+  <div class="rh"><span class="n">10 · Tool</span><span class="t">SmileBERTa · Platform Overview</span></div>
+
+  <p class="kicker">New in this release</p>
+  <h2>Model Hub <span class="path">/models</span></h2>
+  <p class="intro">SmileBERTa's own models answer two questions well. The Model Hub is the honest admission
+    that there are hundreds of others — and a way to use them. Browse chemistry and biology models on
+    <b>Hugging Face</b>, read what each one does, then generate a <b>ready-to-run notebook</b> that loads the
+    model, prepares your data and produces results.</p>
+
+  <table>
+    <thead><tr><th style="width:1.5in">Notebook</th><th>What the generated code does</th></tr></thead>
+    <tbody>
+      <tr><td><b>Predict</b></td><td>Run predictions on your own molecules with a pretrained model.</td></tr>
+      <tr><td><b>Embed</b></td><td>Turn molecules into vectors and train a baseline model on top of them.</td></tr>
+      <tr><td><b>Fine-tune</b></td><td>Continue training the model on your own labelled data.</td></tr>
+      <tr><td><b>Descriptors</b></td><td>Compute RDKit descriptors and drug-likeness for a dataset.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="cols" style="margin-top:.14in">
+    <div class="card">
+      <h4>Why this belongs here</h4>
+      <p style="margin:0;font-size:9pt">The gap between reading about a model and running one is mostly
+        plumbing: the right library versions, a tokenizer, a dataframe in the right shape. A generated notebook
+        removes that afternoon of work, and it runs on free Colab hardware rather than on SmileBERTa's servers.</p>
+    </div>
+    <div class="card">
+      <h4>Where the unavailable endpoints go</h4>
+      <p style="margin:0;font-size:9pt">When the ADMET Profiler declines to guess at hERG or CYP inhibition, it
+        links here. The platform's answer to "we cannot compute that honestly" is to hand you the tools to
+        compute it yourself, not to approximate it.</p>
+    </div>
+  </div>
+
+  <div class="pf"><span>SmileBERTa · Platform Overview</span><span>11</span></div>
+</section>
+
+<!-- ═══════════ 11 ACCOUNTS ═══════════ -->
+<section class="page">
+  <div class="rh"><span class="n">11 · Platform</span><span class="t">SmileBERTa · Platform Overview</span></div>
+
+  <p class="kicker">Accounts, Workspace &amp; feedback</p>
+  <h2>Your work, kept</h2>
+  <p class="intro">Every tool works without signing in. A free account adds a personal <b>Workspace</b> where
+    molecules, predictions, docking runs, linked leads and structure sessions are saved permanently and can be
+    reopened exactly as they were.</p>
+
+  <div class="cols">
+    <div>
+      <h3>Workspace</h3>
+      <ul class="tight" style="font-size:9pt">
+        <li>Save from any tool; <b>Open</b> returns to that tool with the saved state restored — docking poses, studio views, built molecules.</li>
+        <li>The fragment library is synced to the account and shared by Fragment Prediction and Linking.</li>
+        <li>Counts by type, filters and search; rename, export as JSON, delete.</li>
+        <li>Change password, or delete the account and everything in it.</li>
+      </ul>
+      <h3>Admin</h3>
+      <p style="font-size:9pt">Accounts named in the server's <code>ADMIN_USERNAMES</code> setting get a dashboard
+        of all users, saved items by type, recent activity and server health.</p>
+    </div>
+    <div>
+      <h3>Security &amp; reliability</h3>
+      <ul class="tight" style="font-size:9pt">
+        <li>Passwords stored only as salted hashes (Werkzeug PBKDF2), never in plain text.</li>
+        <li>Sign-in uses random session tokens that expire after 90 days; signing out revokes them.</li>
+        <li>Data lives in a managed <b>Neon Postgres</b> database, so it survives restarts and redeploys.</li>
+        <li>If the database is briefly unreachable, users see a "try again" message and no data is lost.</li>
+        <li>Sign-in retries automatically when a connection stalls, instead of waiting out a long timeout.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card accent" style="margin-top:.2in">
+    <h4>Model feedback — opt-in, and off by default <span class="pill new">New</span></h4>
+    <p style="margin:0 0 6px;font-size:9pt">Predictions carry a rating control: good, bad, or
+      "here is the fragment I would have expected". This is how the model gets better over time (§16).</p>
+    <ul class="tight" style="font-size:8.8pt;margin-top:6px">
+      <li>Nothing is stored unless you <b>both</b> rate a prediction <b>and</b> opt in to sharing.</li>
+      <li>The consent dialog states exactly what is kept, and warns against enabling it for unpublished structures.</li>
+      <li>A Workspace toggle turns it off again at any time.</li>
+      <li>The terms of service and privacy policy describe this in plain language.</li>
+    </ul>
+  </div>
+
+  <div class="pf"><span>SmileBERTa · Platform Overview</span><span>12</span></div>
+</section>
+
+<!-- ═══════════ 12 LEARN + CREDITS ═══════════ -->
+<section class="page">
+  <div class="rh"><span class="n">12 · Education</span><span class="t">SmileBERTa · Platform Overview</span></div>
+
+  <p class="kicker">Learn guides</p>
+  <h2>The science, explained</h2>
+  <p class="intro">Four illustrated technical guides explain what happens inside every tool, with animated
+    diagrams, real model data and honest limitations. They double as teaching material and as search-friendly
+    content for the site.</p>
+
+  <table>
+    <thead><tr><th style="width:1.75in">Guide</th><th>What it covers</th></tr></thead>
+    <tbody>
+      <tr><td><b>How fragmentation works</b><br><code>/learn-fragmentation</code></td><td>Fragment-based discovery and the Rule of Three; reading SMILES; the real BPE tokens for aspirin; transformer architecture and self-attention; fine-tuning on BRICS fragments; the full inference and validation pipeline.</td></tr>
+      <tr><td><b>How classification works</b><br><code>/learn-classification</code></td><td>The 8,336-compound dataset and its class balance; classification as text generation; edit-distance label matching with a real example; drug-likeness metrics; limitations.</td></tr>
+      <tr><td><b>Docking &amp; scoring</b><br><code>/learn-docking</code></td><td>Receptor and ligand preparation; search boxes; plots of the five Vina scoring terms; Monte-Carlo search and exhaustiveness; reading affinities, RMSD and K<sub>i</sub>; good practice such as redocking.</td></tr>
+      <tr><td><b>Force fields</b><br><code>/learn-forcefields</code></td><td>Molecular-mechanics energy terms with plots; MMFF94 vs MMFF94s vs UFF; energy landscapes and BFGS minimisation; ETKDG conformer search; what the Builder does.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="hr"></div>
+
+  <p class="kicker">Credits &amp; policies</p>
+  <h2 style="font-size:15pt">Everything borrowed is named <span class="pill new">New</span></h2>
+  <div class="cols" style="margin-top:.1in">
+    <div>
+      <p style="font-size:9pt">The <code>/credits</code> page lists <b>every tool, model, data source and
+        published method</b> the platform uses, each with its citation, DOI and licence — copyable as a block
+        or exportable as a text file. A researcher can reproduce or cite anything SmileBERTa computed for them.</p>
+      <p style="font-size:9pt">Licences were read from installed package metadata rather than recalled.
+        One dependency in the core prediction path carried a copyleft licence and was replaced with a
+        permissive equivalent, verified identical on 20,000 random pairs before the swap shipped.</p>
+    </div>
+    <div>
+      <p style="font-size:9pt">A <b>terms of service</b> and <b>privacy policy</b> now cover what the platform
+        stores, what feedback is used for, and the limits of what predictions mean.</p>
+      <div class="warn"><b>For research and education only.</b> Not for clinical use. Model predictions and
+        docking scores are hypotheses for prioritising experiments, never substitutes for laboratory or
+        clinical evidence.</div>
+    </div>
+  </div>
+
+  <div class="pf"><span>SmileBERTa · Platform Overview</span><span>13</span></div>
+</section>
+
+<!-- ═══════════ 13 ARCHITECTURE ═══════════ -->
+<section class="page">
+  <div class="rh"><span class="n">13 · Engineering</span><span class="t">SmileBERTa · Platform Overview</span></div>
+
+  <p class="kicker">Architecture &amp; technology</p>
+  <h2>How the system is built</h2>
+  <p class="intro">Three services, a managed database and a dedicated docking host. The web and API services
+    deploy automatically from the GitHub repository; the docking host is deployed deliberately, because it is
+    the piece that must not wobble mid-run.</p>
+
+  <div class="arch">
+    <div class="box wide dark">
+      <div class="bt">User's browser</div>
+      <div class="bd">3Dmol.js (WebGL) · RDKit.js (WebAssembly) — 2D drawing, validation and all 3D rendering happen on the user's machine</div>
+    </div>
+    <div class="box">
+      <div class="bt">smileberta-web</div>
+      <div class="bs">Render static hosting</div>
+      <div class="bd">20 pages, clean URLs, shared design system, no build step</div>
+    </div>
+    <div class="box">
+      <div class="bt">smileberta-api</div>
+      <div class="bs">Docker · Flask · PyTorch</div>
+      <div class="bd">Models, accounts, builder, ADMET, Model Hub, feedback</div>
+    </div>
+    <div class="box">
+      <div class="bt">docking host</div>
+      <div class="bs">Dedicated 2-core VPS</div>
+      <div class="bd">AutoDock Vina 1.2.7 · Open Babel · queued background jobs, no PyTorch</div>
+    </div>
+    <div class="box"><div class="bt">Neon Postgres</div><div class="bs">managed</div><div class="bd">Accounts, saved work, fragment libraries, feedback</div></div>
+    <div class="box"><div class="bt">Hugging Face</div><div class="bs">baked into the image</div><div class="bd">Model weights, plus live model search for the Hub</div></div>
+    <div class="box"><div class="bt">RCSB PDB</div><div class="bs">fetched by the browser</div><div class="bd">Protein structures, loaded directly by the user's machine</div></div>
+  </div>
+
+  <div class="cols" style="margin-top:.1in">
+    <div>
+      <h3>Technology</h3>
+      <table style="margin-top:4px">
+        <tbody>
+          <tr><td style="width:1.1in"><b>Frontend</b></td><td>Vanilla HTML/CSS/JS, shared design system, no build step</td></tr>
+          <tr><td><b>3D graphics</b></td><td>3Dmol.js (WebGL)</td></tr>
+          <tr><td><b>In-browser chem</b></td><td>RDKit.js (WebAssembly)</td></tr>
+          <tr><td><b>Backend</b></td><td>Python 3.11, Flask, Gunicorn</td></tr>
+          <tr><td><b>Machine learning</b></td><td>PyTorch (CPU), Hugging Face Transformers</td></tr>
+          <tr><td><b>Cheminformatics</b></td><td>RDKit, Open Babel</td></tr>
+          <tr><td><b>Docking</b></td><td>AutoDock Vina 1.2.7</td></tr>
+          <tr><td><b>Database</b></td><td>PostgreSQL (Neon); SQLite for local development</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h3>Engineering decisions worth naming</h3>
+      <ul class="tight" style="font-size:8.9pt">
+        <li><b>Memory-aware model cache.</b> Each model needs about 250 MB, so on a 512 MB tier one stays resident and the other loads on demand. Int8 quantisation was rejected: it changed 15% of fragment predictions.</li>
+        <li><b>Docking on its own hardware.</b> Vina is CPU-bound and parallelises well, so the deciding factor was cores per dollar. A dedicated host beat the equivalent managed tier by roughly ten times on price.</li>
+        <li><b>Resilient database layer.</b> A fresh connection per request with retries, and no silent fallback to temporary storage — a database outage returns an error rather than quietly losing work.</li>
+        <li><b>Rate limits per browser, not per network.</b> A classroom behind one campus IP would otherwise share a single quota.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="pf"><span>SmileBERTa · Platform Overview</span><span>14</span></div>
+</section>
+
+<!-- ═══════════ 14 MODELS & DATA ═══════════ -->
+<section class="page">
+  <div class="rh"><span class="n">14 · Science</span><span class="t">SmileBERTa · Platform Overview</span></div>
+
+  <p class="kicker">Models &amp; data</p>
+  <h2>What the models are</h2>
+
+  <div class="cols">
+    <div>
+      <h3>Transformer models</h3>
+      <table style="margin-top:4px">
+        <tbody>
+          <tr><td style="width:1.25in"><b>Architecture</b></td><td>RoBERTa encoder + language-model head</td></tr>
+          <tr><td><b>Initialised from</b></td><td><code>seyonec/ChemBERTa-zinc-base-v1</code></td></tr>
+          <tr><td><b>Layers / heads</b></td><td>6 / 12</td></tr>
+          <tr><td><b>Hidden / FF</b></td><td>768 / 3,072</td></tr>
+          <tr><td><b>Vocabulary</b></td><td>767 BPE tokens</td></tr>
+          <tr><td><b>Input length</b></td><td>128 tokens</td></tr>
+          <tr><td><b>Size</b></td><td>≈ 44 M parameters, 176 MB each</td></tr>
+          <tr><td><b>Fragment model</b></td><td><code>NisargRhino/protein-models</code></td></tr>
+          <tr><td><b>Classifier</b></td><td><code>NisargRhino/drug-classification</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h3>Data</h3>
+      <table style="margin-top:4px">
+        <tbody>
+          <tr><td style="width:1.25in"><b>Classifier set</b></td><td>8,336 compounds, 12 categories, 38 labels; 1,350 multi-label</td></tr>
+          <tr><td><b>Largest classes</b></td><td>Anti-infective 2,923 · Antineoplastic 1,642 · CNS 1,528 · Cardiovascular 1,262</td></tr>
+          <tr><td><b>Smallest class</b></td><td>Urological 48</td></tr>
+          <tr><td><b>Fragment set</b></td><td>25,364 unique reference fragments</td></tr>
+          <tr><td><b>Fragmentation</b></td><td>RDKit BRICS rules</td></tr>
+        </tbody>
+      </table>
+      <h3>Physics &amp; chemistry methods</h3>
+      <ul class="tight" style="font-size:8.9pt">
+        <li>MMFF94 / MMFF94s / UFF force fields, BFGS minimisation</li>
+        <li>ETKDG v3 embedding and conformer generation</li>
+        <li>AutoDock Vina empirical scoring with Monte-Carlo search</li>
+        <li>Lipinski, Veber, Egan, Muegge, Ghose, QED, Rule of Three</li>
+        <li>ESOL solubility; BOILED-Egg absorption; PAINS and Brenk alerts</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="label">Example results, all measured</p>
+  <table>
+    <thead><tr><th style="width:2.1in">Experiment</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Classify imatinib</td><td>Antineoplastic — correct; imatinib is a cancer drug. 493.6 Da, 0 Lipinski violations</td></tr>
+      <tr><td>Classify fluoxetine</td><td>Central nervous system, exact model output — correct; it is an antidepressant</td></tr>
+      <tr><td>Classify ibuprofen</td><td>Raw output was garbled but the closest label was anti-inflammatory — correct</td></tr>
+      <tr><td>Dock indinavir → HIV-1 protease (1HSG)</td><td>−10.3 kcal/mol in the catalytic site, contacting ASP25</td></tr>
+      <tr><td>Dock benzamidine → trypsin (3PTB)</td><td>−6.1 kcal/mol in the S1 pocket next to ASP189 — 3.7 s on the live site</td></tr>
+      <tr><td>Optimise caffeine (MMFF94)</td><td>−30.1 → −122.5 kcal/mol, converged in 1,208 steps</td></tr>
+    </tbody>
+  </table>
+
+  <div class="pf"><span>SmileBERTa · Platform Overview</span><span>15</span></div>
+</section>
+
+<!-- ═══════════ 15 CHANGELOG ═══════════ -->
+<section class="page">
+  <div class="rh"><span class="n">15 · This release</span><span class="t">SmileBERTa · Platform Overview</span></div>
+
+  <p class="kicker">What changed since the first edition</p>
+  <h2>Three weeks of work, in order</h2>
+  <p class="intro">The first overview described six tools on free hosting. The brief since then was narrow:
+    <b>make it legitimate for working researchers</b> — fix speed and scale before adding surface area, then
+    make everything citable and honest.</p>
+
+  <table>
+    <thead><tr><th style="width:.78in">Date</th><th style="width:1.65in">Change</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td class="num">Nov 16</td><td><b>Sign-in reliability</b></td><td>Short timeouts with automatic retries, so a stalled connection costs a retry instead of a ninety-second failure.</td></tr>
+      <tr><td class="num">Nov 13</td><td><b>Pricing published</b></td><td>Where the paid tiers are heading — Researcher $5/mo, Lab $20/mo — while everything stays free during beta.</td></tr>
+      <tr><td class="num">Nov 13</td><td><b>Model feedback</b></td><td>Opt-in capture of ratings and corrections, off by default, with consent language in the terms.</td></tr>
+      <tr><td class="num">Nov 13</td><td><b>Fair rate limits</b></td><td>Per-browser buckets, so one classroom is not one quota. Docking limits for signed-out users too.</td></tr>
+      <tr><td class="num">Nov 13</td><td><b>Terms &amp; privacy policy</b></td><td>What is stored, what feedback is used for, and what a prediction is not.</td></tr>
+      <tr><td class="num">Nov 13</td><td><b>Credits page</b></td><td>Every tool, model and method cited with DOI and licence; a copyleft dependency swapped out of the core path.</td></tr>
+      <tr><td class="num">Nov 12</td><td><b>ADMET Profiler</b> <span class="pill new">New tool</span></td><td>Absorption, solubility, drug-likeness and alerts — every value traceable, nothing invented.</td></tr>
+      <tr><td class="num">Nov 12</td><td><b>Model Hub</b> <span class="pill new">New tool</span></td><td>Browse Hugging Face chemistry models and generate runnable notebooks.</td></tr>
+      <tr><td class="num">Nov 12</td><td><b>Docking rebuilt</b></td><td>Dedicated host, Vina 1.2.7, a real job queue: about fifty times faster, and concurrent.</td></tr>
+      <tr><td class="num">Nov 3–4</td><td><b>Accounts hardened</b></td><td>Managed Postgres, account deletion, admin dashboard, clean URLs.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note" style="margin-top:.14in"><b>The through-line.</b> Every item above is either speed, honesty
+    or trust. None of them is a new idea — they are the things that decide whether a researcher who tries the
+    platform once comes back to it.</div>
+
+  <div class="pf"><span>SmileBERTa · Platform Overview</span><span>16</span></div>
+</section>
+
+<!-- ═══════════ 16 VISION ═══════════ -->
+<section class="page">
+  <div class="rh"><span class="n">16 · Outlook</span><span class="t">SmileBERTa · Platform Overview</span></div>
+
+  <p class="kicker">The vision</p>
+  <h2>Where this is going</h2>
+
+  <div class="q">Computational drug discovery should be something a curious student can do on a
+    Tuesday afternoon — and something a working lab can trust on a Wednesday.</div>
+
+  <p class="intro">Today SmileBERTa is a workbench: eight tools that answer eight questions and hand results to
+    each other. The ambition is for it to become something a workbench cannot be on its own — a system that
+    <b>gets measurably better the more it is used</b>, because it can check its own predictions.</p>
+
+  <h3>The loop that closes</h3>
+  <p style="font-size:9.4pt">Most chemistry models are trained once and shipped. SmileBERTa is unusual in
+    doing fragment prediction <b>and</b> physics-based docking in the same place. That means a prediction can
+    be scored without waiting for a human to label it: a predicted fragment that docks well into the intended
+    pocket is evidence the prediction was good, generated automatically.</p>
+
+  <div class="flow" style="margin:.14in 0">
+    <div class="f"><div class="ft">Predict</div><div class="fd">model proposes a fragment</div></div>
+    <div class="arr">→</div>
+    <div class="f"><div class="ft">Dock</div><div class="fd">physics scores it</div></div>
+    <div class="arr">→</div>
+    <div class="f"><div class="ft">Measure</div><div class="fd">benchmark, every round</div></div>
+    <div class="arr">→</div>
+    <div class="f"><div class="ft">Retrain</div><div class="fd">offline, in curated batches</div></div>
+  </div>
+
+  <p style="font-size:9.4pt">Explicit user ratings (§11) are the first, smallest version of this signal. The
+    automatic version — using docking outcomes as labels — is the one that matters, and it is not built yet.</p>
+
+  <div class="warn"><b>Said plainly, because it is easy to overclaim.</b> The model does not learn from
+    conversations as they happen. Online learning on live user input drifts, degrades and can be poisoned. The
+    right shape is to <b>collect continuously, retrain deliberately offline, and measure every round</b> —
+    which is why a published benchmark comes before any retraining, and why "it improves with use" is not
+    something to sell until it demonstrably has.</div>
+
+  <h3>Three horizons</h3>
+  <table>
+    <thead><tr><th style="width:1.05in">Horizon</th><th style="width:1.75in">What it looks like</th><th>Why it follows from what exists</th></tr></thead>
+    <tbody>
+      <tr><td><b>Now</b><br><span style="color:var(--muted);font-size:8pt">0–3 months</span></td>
+          <td>A published benchmark for both models, on held-out data</td>
+          <td>You cannot improve what you cannot measure, and a platform that asks researchers to trust a model owes them real numbers rather than cherry-picked examples.</td></tr>
+      <tr><td><b>Next</b><br><span style="color:var(--muted);font-size:8pt">3–12 months</span></td>
+          <td>Target-specific models; docking outcomes as training labels; a paid tier that funds the compute</td>
+          <td>The fragment tool already records which target you chose, but today one shared model answers for all of them. Making that selector real is the single largest jump in usefulness available.</td></tr>
+      <tr><td><b>Later</b><br><span style="color:var(--muted);font-size:8pt">12 months +</span></td>
+          <td>Classroom licences, an API for screening campaigns, pharmacophore search, ML-based ADMET</td>
+          <td>Each is a tool a user has already asked the platform for and been told, honestly, that it cannot do yet.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="pf"><span>SmileBERTa · Platform Overview</span><span>17</span></div>
+</section>
+
+<!-- ═══════════ 16b VISION cont. ═══════════ -->
+<section class="page">
+  <div class="rh"><span class="n">16 · Outlook</span><span class="t">SmileBERTa · Platform Overview</span></div>
+
+  <h3 style="margin-top:0">Who it is for, in order</h3>
+  <div class="cols3">
+    <div class="card"><h4>Students first</h4><p style="margin:0;font-size:8.7pt">A student with no software, no cluster
+      and no budget can classify a drug, pull it apart, rebuild it, dock it and profile it in an afternoon —
+      and read why each step works. This is the audience the platform is already good for.</p></div>
+    <div class="card"><h4>Classrooms next</h4><p style="margin:0;font-size:8.7pt">The same workflow, with class codes,
+      an instructor view and limits sized for thirty students at once. The rate-limiting and queueing work is
+      already pointed at this.</p></div>
+    <div class="card"><h4>Then working labs</h4><p style="margin:0;font-size:8.7pt">Groups that need fast triage —
+      which of these forty compounds deserves a synthesis slot — with results that survive restarts, an API,
+      and a person to ask when something looks wrong.</p></div>
+  </div>
+
+  <h3>How it pays for itself</h3>
+  <p style="font-size:9.4pt">The core stays free, permanently and without an account. Published pricing names
+    two planned tiers — <b>Researcher at $5/month</b> for people who run this daily and need it not to queue,
+    and <b>Lab at $20/month</b> for a group sharing one target and one dataset. Nothing is charged today, and
+    the pricing page says so in those words.</p>
+  <p style="font-size:9.4pt">That is deliberately cheap, and it is affordable because of an engineering choice:
+    docking runs on hardware picked for cores per dollar rather than convenience, which is what made a
+    thirty-minute job into a thirty-five-second one at a cost of a few euros a month. Low prices are a
+    consequence of the architecture, not a discount.</p>
+
+  <h3>What would make this fail</h3>
+  <ul class="tight" style="font-size:9.2pt">
+    <li><b>Claiming more than the numbers support.</b> A researcher forgives a limitation that is documented;
+      they do not come back after a prediction that was quietly wrong. Every unavailable endpoint, every known
+      misclassification and every docking caveat in this document is there for that reason.</li>
+    <li><b>Feedback without measurement.</b> A few hundred ratings from twenty beta users, mostly on aspirin and
+      imatinib, will not move a transformer. Treated as a six-to-twelve-month asset it is valuable; treated as
+      a launch feature it is a story.</li>
+    <li><b>Growing surface area instead of depth.</b> A ninth tool is easier to build than a real benchmark for
+      the two models that already exist. The benchmark is the harder and more valuable thing.</li>
+  </ul>
+
+  <div class="note" style="margin-top:.2in"><b>The next real milestone</b> is not a feature. It is a research
+    group using SmileBERTa on their own compounds, and saying whether it helped.</div>
+
+  <div class="hr"></div>
+  <p class="label">About the author</p>
+  <p style="font-size:9.2pt">SmileBERTa was created by <b>Nisarg Shah</b>, a student at Emory University studying
+    Biology with minors in Artificial Intelligence and Philosophy. It began as a research project on
+    fragment-based drug discovery with chemical language models and has grown into an open platform that makes
+    computational drug discovery accessible to everyone. <span style="color:var(--muted)">Contact:
+    nisarg.shah@emory.edu</span></p>
+
+  <div class="pf"><span>SmileBERTa · Platform Overview</span><span>18</span></div>
+</section>
+
+<!-- ═══════════ 17 LIMITATIONS ═══════════ -->
+<section class="page">
+  <div class="rh"><span class="n">17 · Honesty</span><span class="t">SmileBERTa · Platform Overview</span></div>
+
+  <p class="kicker">Limitations &amp; roadmap</p>
+  <h2>What it cannot do yet</h2>
+
+  <div class="warn" style="margin-bottom:.18in"><b>For research and education only, not for clinical use.</b>
+    Model predictions and docking scores are hypotheses to prioritise experiments, not substitutes for
+    laboratory or clinical evidence.</div>
+
+  <table>
+    <thead><tr><th style="width:1.5in">Limitation</th><th>What it means in practice</th></tr></thead>
+    <tbody>
+      <tr><td><b>Target selector is cosmetic</b></td><td>The fragment tool records the chosen target (KRAS, mTOR, AKT1, ERK2), but the current checkpoint is a single shared model, so predictions do not yet change with the target.</td></tr>
+      <tr><td><b>Classifier errors</b></td><td>It learns statistical patterns, not mechanisms, and can be confidently wrong. Ciprofloxacin is labelled antineoplastic; rare classes such as urological are least reliable.</td></tr>
+      <tr><td><b>Docking assumptions</b></td><td>The protein is rigid, explicit waters and entropy are largely ignored, and Vina's typical error is about 2 kcal/mol. Use it to compare related compounds, and validate by redocking.</td></tr>
+      <tr><td><b>ADMET coverage</b></td><td>CYP inhibition, P-gp substrate status, hERG, Ames and LD<sub>50</sub> need trained models and are reported as unavailable rather than estimated.</td></tr>
+      <tr><td><b>No published benchmark</b></td><td>Both models are demonstrated with real examples, not yet with held-out evaluation numbers. This is the next piece of work.</td></tr>
+      <tr><td><b>Cold starts</b></td><td>The free-tier API sleeps when idle, so the first request after a quiet period can take about a minute. Docking, on its own host, does not sleep.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="cols" style="margin-top:.2in">
+    <div class="card">
+      <h4>Near term</h4>
+      <ul class="tight" style="font-size:8.8pt;margin-top:5px">
+        <li>Published benchmarks for both models</li>
+        <li>Paid hosting to remove cold starts</li>
+        <li>Custom domain and professional email</li>
+        <li>Email verification and password reset</li>
+        <li>A research group's beta test, and what it tells us</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Growth</h4>
+      <ul class="tight" style="font-size:8.8pt;margin-top:5px">
+        <li>Target-specific fragment models</li>
+        <li>Docking outcomes as automatic training labels</li>
+        <li>Researcher and Lab plans; classroom licences</li>
+        <li>API access for large-scale screening</li>
+        <li>Pharmacophore search; ML-based ADMET endpoints</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="pf"><span>SmileBERTa · Platform Overview</span><span>19</span></div>
+</section>
+
+<!-- ═══════════ APPENDIX ═══════════ -->
+<section class="page">
+  <div class="rh"><span class="n">A · Appendix</span><span class="t">SmileBERTa · Platform Overview</span></div>
+
+  <p class="kicker">Quick reference</p>
+  <h2>Pages, services and endpoints</h2>
+
+  <div class="cols">
+    <div>
+      <p class="label" style="margin-top:.1in">Pages</p>
+      <table style="margin-top:0">
+        <tbody>
+          <tr><td style="width:1.5in">Home</td><td><code>/</code></td></tr>
+          <tr><td>Fragment Prediction</td><td><code>/fragmentation</code></td></tr>
+          <tr><td>Drug Classification</td><td><code>/drug_class</code></td></tr>
+          <tr><td>Fragment Linking</td><td><code>/combine</code></td></tr>
+          <tr><td>Molecule Builder</td><td><code>/builder</code></td></tr>
+          <tr><td>Docking</td><td><code>/docking</code></td></tr>
+          <tr><td>Structure Studio</td><td><code>/studio</code></td></tr>
+          <tr><td>ADMET Profiler</td><td><code>/admet</code></td></tr>
+          <tr><td>Model Hub</td><td><code>/models</code></td></tr>
+          <tr><td>Workspace</td><td><code>/workspace</code></td></tr>
+          <tr><td>Sign in / register</td><td><code>/login</code></td></tr>
+          <tr><td>Pricing</td><td><code>/pricing</code></td></tr>
+          <tr><td>Credits</td><td><code>/credits</code></td></tr>
+          <tr><td>Terms &amp; privacy</td><td><code>/terms</code></td></tr>
+          <tr><td>Learn hub + 4 guides</td><td><code>/learn</code>, <code>/learn-*</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <p class="label" style="margin-top:.1in">API endpoints</p>
+      <table style="margin-top:0">
+        <tbody>
+          <tr><td style="width:1.85in"><code>POST /predict_fragment</code></td><td>Fragment prediction</td></tr>
+          <tr><td><code>POST /batch_fragment</code></td><td>Batch, up to 50</td></tr>
+          <tr><td><code>POST /classify_smiles</code></td><td>Therapeutic class</td></tr>
+          <tr><td><code>POST /batch_classify</code></td><td>Batch, up to 100</td></tr>
+          <tr><td><code>POST /combine</code></td><td>Fragment linking</td></tr>
+          <tr><td><code>POST /analyze</code></td><td>Property profile + SVG</td></tr>
+          <tr><td><code>POST /admet</code></td><td>ADMET profile</td></tr>
+          <tr><td><code>POST /admet/batch</code></td><td>Batch, up to 200</td></tr>
+          <tr><td><code>GET /admet/references</code></td><td>Citations for every value</td></tr>
+          <tr><td><code>POST /builder/optimize</code></td><td>Force-field minimisation</td></tr>
+          <tr><td><code>POST /builder/conformers</code></td><td>Conformer search</td></tr>
+          <tr><td><code>POST /dock</code> · <code>GET /dock/&lt;id&gt;</code></td><td>Docking job and status</td></tr>
+          <tr><td><code>POST /feedback</code></td><td>Opt-in model feedback</td></tr>
+          <tr><td><code>POST /register</code> · <code>/login</code></td><td>Accounts</td></tr>
+          <tr><td><code>/items</code></td><td>Saved workspace items</td></tr>
+          <tr><td><code>GET /health</code></td><td>Status, models, storage</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="label">Services</p>
+  <table>
+    <tbody>
+      <tr><td style="width:1.5in"><b>Website</b></td><td><code>smileberta-web.onrender.com</code></td></tr>
+      <tr><td><b>API</b></td><td><code>smileberta-api.onrender.com</code></td></tr>
+      <tr><td><b>Docking</b></td><td>Dedicated host, reached over HTTPS by the web app</td></tr>
+      <tr><td><b>Source</b></td><td><code>github.com/NisargRhino/SmileBERTa-portal</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="note" style="margin-top:.2in">Second edition, November 2026. Figures in this document were
+    measured on the live site; where a number could not be measured, it is named as unavailable rather than
+    estimated.</div>
+
+  <div class="pf"><span>SmileBERTa · Platform Overview</span><span>20</span></div>
+</section>
+
+</body>
+</html>
