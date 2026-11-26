@@ -17,6 +17,12 @@ services:
       VINA_MEM_MB: "${VINA_MEM_MB:-2048}"
       MAX_JOBS_PER_USER: "${MAX_JOBS_PER_USER:-3}"
       RECEPTOR_CACHE_SIZE: "${RECEPTOR_CACHE_SIZE:-24}"
+      # Redocking validation. DATABASE_URL is optional: with it, validated
+      # structures are cached in Postgres and survive a redeploy; without it the
+      # cache is in memory and the warm-up runs again after each restart.
+      DATABASE_URL: "${DATABASE_URL:-}"
+      REDOCK_WARM: "${REDOCK_WARM:-1}"
+      REDOCK_WARM_IDS: "${REDOCK_WARM_IDS:-3PTB,1HSG,1M17,4EY7,6LU7}"
     expose:
       - "10000"
     healthcheck:

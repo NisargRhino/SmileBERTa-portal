@@ -11,7 +11,7 @@ ADD https://github.com/ccsb-scripps/AutoDock-Vina/releases/download/v1.2.7/vina_
 RUN chmod +x /usr/local/bin/vina && vina --version
 COPY requirements-dock.txt .
 RUN pip install --no-cache-dir -r requirements-dock.txt
-COPY docking.py chem_tools.py dock_service.py ./
+COPY docking.py chem_tools.py redock.py db.py dock_service.py ./
 # Defaults suit a 4-core host: two concurrent docking jobs on two cores each, so one
 # job's single-threaded prep (Open Babel, ETKDG) overlaps another job's Vina search.
 ENV PYTHONUNBUFFERED=1 VINA_CPU=2 DOCK_CONCURRENCY=2 DOCK_NICE=0 VINA_MEM_MB=2048

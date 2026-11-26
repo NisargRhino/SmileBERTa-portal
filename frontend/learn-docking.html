@@ -94,9 +94,33 @@
         <div class="eq">ΔG = RT · ln K<sub>i</sub>  ⇒  K<sub>i</sub> = exp(ΔG / RT),  RT ≈ 0.593 kcal/mol at 298 K</div>
         <p>So −7 kcal/mol corresponds to roughly 7 µM, and −10 kcal/mol to roughly 50 nM. Treat these numbers as rough orders of magnitude only.</p>
 
+        <h2 id="redocking">Validating a setup by redocking</h2>
+        <p>Every docking tool asks you to trust its output. <strong>Redocking</strong> is the standard way to find out how much trust a specific target deserves. Take a structure that was solved with a ligand bound — the experiment already knows where that ligand sits — remove it, dock it back into its own pocket, and measure how far the predicted pose lands from the observed one. If the pipeline cannot reproduce an answer we already have, nothing else it says about that pocket is trustworthy.</p>
+        <p>The docking tool does this in one click: <strong>Validate this setup</strong> appears whenever the structure you fetched contains a suitable co-crystallised ligand. Three details decide whether the number means anything:</p>
+        <ul>
+          <li><strong>The ligand is rebuilt, not reused.</strong> SmileBERTa takes the crystal ligand's connectivity, writes a SMILES and embeds a fresh conformer with ETKDG and MMFF94 — the same path your own SMILES takes. Handing Vina the crystal coordinates as a starting point would give impressively low RMSDs that measure nothing at all.</li>
+          <li><strong>The box comes from the crystal ligand, not from your box.</strong> It is centred on the ligand's centroid and sized to its extent plus 8 Å, clamped to 18–26 Å per side. The run has to test the pipeline, and it has to be reproducible between users.</li>
+          <li><strong>RMSD is measured without superposition.</strong> It is symmetry-corrected and heavy-atom only (RDKit's <code>CalcRMS</code>, not <code>GetBestRMS</code>), because the question is whether the pose landed in the right place in the pocket — not whether it is the same shape somewhere else. Symmetry correction matters: a flipped phenyl ring is chemically identical and should not count as error.</li>
+        </ul>
+        <div class="table-wrap spec-table"><table class="table"><thead><tr><th>Top-pose RMSD</th><th>Verdict</th><th>What to do with it</th></tr></thead><tbody>
+          <tr><td>≤ 2.0 Å</td><td><span class="badge green">Reliable</span></td><td>The pipeline reproduced the known binding pose. Results for this pocket are worth taking seriously.</td></tr>
+          <tr><td>2.0–3.0 Å</td><td><span class="badge amber">Marginal</span></td><td>The right region, the wrong pose. Treat scores as rough ranking only.</td></tr>
+          <tr><td>&gt; 3.0 Å</td><td><span class="badge red">Unreliable</span></td><td>The known pose was not reproduced. Do not trust docking here without changing the setup.</td></tr>
+        </tbody></table></div>
+        <p><strong>Why 2 Å?</strong> It is the conventional success threshold throughout the redocking literature, and it is roughly the resolution at which a pose still supports the conclusions people draw from one: which residues are contacted, which H-bonds are formed, which substituent points into which sub-pocket. Below 2 Å those answers survive; by 3 Å they generally do not. The threshold is a convention, not a law of nature — but it is the convention published results are judged against, so softening it would only make the verdict less useful.</p>
+        <p><strong>If validation fails,</strong> the setup is usually what is wrong, not the pocket:</p>
+        <ul>
+          <li><strong>The box is too large.</strong> A big box gives the search more decoys to find and dilutes the sampling. Tighten it to the pocket plus a few ångströms.</li>
+          <li><strong>Exhaustiveness is too low.</strong> If repeated runs disagree with each other, the search has not converged — raise it before concluding anything about the pocket.</li>
+          <li><strong>Protonation is wrong.</strong> Charged ligands and histidines near the site are the usual culprits; the pose depends on where the H-bond donors are.</li>
+          <li><strong>A structural water or cofactor was stripped.</strong> Some pockets are only the right shape with a bridging water in them, and receptor preparation discards waters.</li>
+          <li><strong>The pocket genuinely needs more than rigid docking.</strong> Side chains that reorganise on binding (induced fit) cannot be reproduced by a rigid receptor, however good the search is. That calls for flexible-receptor or ensemble methods, not a better box.</li>
+        </ul>
+        <p><strong>What passing does not tell you.</strong> A reliable verdict is about <em>this</em> ligand in <em>this</em> pocket with <em>these</em> settings. A different ligand — larger, more flexible, differently charged — can still be placed wrongly in a pocket that redocks its own ligand perfectly, and the Vina score remains a rough estimate either way (typical error about 2 kcal/mol). Validation tells you the pipeline is capable of being right here. It does not tell you it is right about your compound.</p>
+
         <h2 id="limits">Good practice and limitations</h2>
         <ul>
-          <li><strong>Validate with redocking.</strong> Dock the co-crystallised ligand back into its own structure. If the top pose is within 2 Å RMSD of the crystal pose, your box and settings are reasonable.</li>
+          <li><strong>Validate with redocking.</strong> Dock the co-crystallised ligand back into its own structure — the docking tool's <a href="docking">Validate this setup</a> button does it for you. If the top pose is within 2 Å RMSD of the crystal pose, your box and settings are reasonable. <a href="#redocking">More on redocking validation</a>.</li>
           <li><strong>Compare, don't trust absolutes.</strong> Vina scores rank related compounds better than they predict exact affinities. The typical error is about 2 kcal/mol.</li>
           <li><strong>The protein is rigid.</strong> Induced fit, waters that mediate binding, and entropy are largely ignored.</li>
           <li><strong>Look at the pose.</strong> A good score with no sensible H-bonds, or a ligand half outside the pocket, is a warning sign.</li>

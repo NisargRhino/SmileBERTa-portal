@@ -12,25 +12,49 @@
     ['Benzamidine', 'NC(=N)c1ccccc1'],
     ['Ibuprofen', 'CC(C)Cc1ccc(C(C)C(=O)O)cc1'],
   ];
-  const SKIP_HET = new Set(['HOH', 'WAT', 'DOD', 'SO4', 'PO4', 'GOL', 'EDO', 'PEG', 'ACT', 'DMS', 'CL', 'NA', 'K', 'MG', 'CA', 'ZN', 'MN', 'NI', 'CD', 'IOD', 'BR', 'FMT', 'MPD', 'TRS', 'BME', 'NO3', 'SCN', 'EPE', 'MES', 'IMD', 'PG4', '1PE', 'P6G', 'CIT', 'TLA', 'HEZ']);
+  // Solvent, buffer, cryoprotectant, sugar and ion residues — never the ligand a
+  // structure was solved to show. Mirrors EXCLUDE_RESIDUES in redock.py, so the
+  // "Validate this setup" button only appears when the server would accept the
+  // structure. Keep the two lists in step.
+  const SKIP_HET = new Set(['HOH', 'DOD', 'WAT', 'SO4', 'PO4', 'GOL', 'EDO', 'PEG', 'PG4', '1PE', 'P6G', 'MES',
+    'TRS', 'ACT', 'ACY', 'DMS', 'IMD', 'FMT', 'CIT', 'TLA', 'MPD', 'BME', 'NAG', 'MAN',
+    'BMA', 'FUC', 'GAL', 'NDG', 'HEZ', 'NO3', 'SCN', 'EPE', 'CL', 'BR', 'IOD', 'NA',
+    'K', 'MG', 'CA', 'ZN', 'MN', 'FE', 'FE2', 'CU', 'NI', 'CD', 'HG', 'CO', 'SR', 'CS']);
+  // Validation rules, also mirrored from redock.py.
+  const MIN_LIG_HEAVY = 8;      // smaller HETATM residues are additives, not ligands
+  const COVALENT_CUTOFF = 2.1;  // Å: a ligand atom this close to the protein is bonded to it
 
   let viewer = null, receptor = null, recModel = null, poseModel = null;
   let ligMolblock = null, job = null, result = null, currentPose = 0, picking = false;
+  let valCrystal = null, valDocked = null, validating = false;
 
   // ── PDB parsing ──────────────────────────────────────────────────────────
+  function element(line) {
+    return (line.slice(76, 78).trim() || line.slice(12, 16).replace(/[^A-Za-z]/g, '').slice(0, 1)).toUpperCase();
+  }
+
   function parsePDB(text) {
     const chains = new Map(), hets = new Map(); let title = '', n = 0;
-    const atoms = [];
+    const atoms = [], protHeavy = [];
     for (const line of text.split(/\r?\n/)) {
       if (line.startsWith('TITLE')) title += line.slice(10).trim() + ' ';
       if (line.startsWith('ENDMDL')) break;
       const rec = line.slice(0, 6);
       if (rec !== 'ATOM  ' && rec !== 'HETATM') continue;
-      const resn = line.slice(17, 20).trim(), ch = line.slice(21, 22), resi = line.slice(22, 26).trim();
+      const resn = line.slice(17, 20).trim().toUpperCase(), ch = line.slice(21, 22), resi = line.slice(22, 27).trim();
+      const alt = line.slice(16, 17), el = element(line);
       const p = [parseFloat(line.slice(30, 38)), parseFloat(line.slice(38, 46)), parseFloat(line.slice(46, 54))];
       n++;
-      if (rec === 'ATOM  ') { const c = chains.get(ch) || { id: ch, residues: new Set(), atoms: 0 }; c.residues.add(resi); c.atoms++; chains.set(ch, c); atoms.push(p); }
-      else if (!SKIP_HET.has(resn)) { const k = `${resn} ${ch}${resi}`; const h = hets.get(k) || { key: k, resn, chain: ch, resi, pts: [] }; h.pts.push(p); hets.set(k, h); }
+      if (rec === 'ATOM  ') {
+        const c = chains.get(ch) || { id: ch, residues: new Set(), atoms: 0 }; c.residues.add(resi); c.atoms++; chains.set(ch, c); atoms.push(p);
+        if (el !== 'H' && el !== 'D' && (alt === ' ' || alt === 'A')) protHeavy.push(p);
+      } else if (!SKIP_HET.has(resn)) {
+        const k = `${resn} ${ch}${resi}`;
+        const h = hets.get(k) || { key: k, resn, chain: ch, resi, pts: [], heavy: [] };
+        h.pts.push(p);
+        if (el !== 'H' && el !== 'D' && (alt === ' ' || alt === 'A')) h.heavy.push(p);
+        hets.set(k, h);
+      }
     }
     hets.forEach((h) => {
       const c = [0, 1, 2].map((k) => h.pts.reduce((s, p) => s + p[k], 0) / h.pts.length);
@@ -38,7 +62,59 @@
       h.center = c; h.size = ext.map((e) => Math.min(40, Math.max(18, Math.ceil(e + 10))));
     });
     const center = atoms.length ? [0, 1, 2].map((k) => atoms.reduce((s, p) => s + p[k], 0) / atoms.length) : [0, 0, 0];
-    return { title: title.trim(), atoms: n, chains: [...chains.values()].map((c) => ({ id: c.id, residues: c.residues.size, atoms: c.atoms })), ligands: [...hets.values()].filter((h) => h.pts.length >= 6), center };
+    const ligands = [...hets.values()].filter((h) => h.pts.length >= 6);
+    return { title: title.trim(), atoms: n, chains: [...chains.values()].map((c) => ({ id: c.id, residues: c.residues.size, atoms: c.atoms })), ligands, center, entities: ligandEntities([...hets.values()], protHeavy) };
+  }
+
+  // Ligands are not always one residue: 6LU7's inhibitor is deposited as three
+  // linked components. Residues whose heavy atoms are within bonding distance of
+  // each other are one ligand entity. Mirrors _bonded_groups() in redock.py.
+  function ligandEntities(hets, protHeavy) {
+    const parent = hets.map((_, i) => i);
+    const find = (i) => { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
+    for (let i = 0; i < hets.length; i++) {
+      for (let j = i + 1; j < hets.length; j++) {
+        if (find(i) === find(j)) continue;
+        if (minDistance(hets[i].heavy, hets[j].heavy) < COVALENT_CUTOFF) parent[find(j)] = find(i);
+      }
+    }
+    const groups = new Map();
+    hets.forEach((h, i) => { const k = find(i); (groups.get(k) || groups.set(k, []).get(k)).push(h); });
+    return [...groups.values()].map((group) => {
+      group.sort((a, b) => b.heavy.length - a.heavy.length || a.key.localeCompare(b.key));
+      const heavy = group.flatMap((h) => h.heavy);
+      return { resn: group[0].resn, chain: group[0].chain, resi: group[0].resi, heavy,
+        residues: group.map((h) => h.key), covalent: minDistance(heavy, protHeavy) < COVALENT_CUTOFF };
+    });
+  }
+
+  function minDistance(a, b) {
+    if (!a.length || !b.length) return Infinity;
+    let best = Infinity;
+    for (const p of a) {
+      for (const q of b) {
+        const dx = p[0] - q[0], dy = p[1] - q[1], dz = p[2] - q[2];
+        const d = dx * dx + dy * dy + dz * dz;
+        if (d < best) best = d;
+      }
+    }
+    return Math.sqrt(best);
+  }
+
+  // The ligand the server would pick: entities (bonded groups of HETATM
+  // residues) of at least 8 heavy atoms, not covalently bound to the protein and
+  // made of a single chemical component, most heavy atoms first with chain and
+  // residue number breaking ties. Mirrors choose_ligand() in redock.py — when
+  // one changes, change the other.
+  function validationLigand(info) {
+    const ok = info.entities.filter((e) => e.heavy.length >= MIN_LIG_HEAVY)
+      .sort((a, b) => b.heavy.length - a.heavy.length || a.chain.localeCompare(b.chain) || a.resi.localeCompare(b.resi));
+    if (!ok.length) return { ligand: null, reason: 'none' };
+    const free = ok.filter((e) => !e.covalent);
+    if (!free.length) return { ligand: null, reason: 'covalent', comp: ok[0].resn };
+    const single = free.filter((e) => e.residues.length === 1);
+    if (!single.length) return { ligand: null, reason: 'multi', comp: free[0].residues.join(' + ') };
+    return { ligand: single[0], reason: null };
   }
 
   // ── Viewer ───────────────────────────────────────────────────────────────
@@ -51,10 +127,10 @@
     const chains = selectedChains();
     const sel = { chain: chains, hetflag: false };
     // Fade the ribbon once a pose is shown so it never hides the ligand.
-    if (st === 'cartoon') recModel.setStyle(sel, { cartoon: { colorscheme: 'chain', opacity: poseModel ? 0.45 : 0.92, thickness: 0.4 } });
+    if (st === 'cartoon') recModel.setStyle(sel, { cartoon: { colorscheme: 'chain', opacity: (poseModel || valDocked) ? 0.45 : 0.92, thickness: 0.4 } });
     if (st === 'lines') recModel.setStyle(sel, { line: { colorscheme: 'Jmol' } });
     if (st === 'surface') { recModel.setStyle(sel, { cartoon: { color: '#334155', opacity: 0.4 } }); viewer.addSurface($3Dmol.SurfaceType.MS, { opacity: 0.75, colorscheme: { prop: 'b', gradient: 'rwb' } }, { model: recModel, chain: chains, hetflag: false }); }
-    if ($('#show-het').checked) recModel.setStyle({ hetflag: true, not: { resn: [...SKIP_HET] } }, { stick: { radius: 0.18, colorscheme: 'grayCarbon' } });
+    if ($('#show-het').checked && !valCrystal) recModel.setStyle({ hetflag: true, not: { resn: [...SKIP_HET] } }, { stick: { radius: 0.18, colorscheme: 'grayCarbon' } });
     if (poseModel && $('#show-site').checked && result) {
       const res = (result.poses[currentPose].interactions.residues || []).map((r) => r.residue.split(' ')[1]);
       res.forEach((cr) => recModel.setStyle({ chain: cr[0], resi: cr.slice(1), hetflag: false }, { stick: { radius: 0.14, colorscheme: 'whiteCarbon' }, cartoon: st === 'cartoon' ? { colorscheme: 'chain', opacity: 0.45 } : undefined }));
@@ -91,7 +167,9 @@
   async function loadReceptor(text, label, pdbId = null) {
     receptor = { text, label, pdbId, info: parsePDB(text) };
     if (!receptor.info.chains.length) { receptor = null; return toast('No protein chains found in this file', 'error'); }
-    viewer.removeAllModels(); poseModel = null; result = null;
+    // Every model reference becomes stale here, so drop them before anything
+    // tries to remove one individually.
+    viewer.removeAllModels(); poseModel = null; result = null; valCrystal = null; valDocked = null;
     recModel = viewer.addModel(text, 'pdb');
     $('#stage-empty').classList.add('hidden');
     const info = receptor.info;
@@ -106,6 +184,7 @@
     viewer.zoomTo(); viewer.render();
     $('#hud').classList.remove('hidden'); $('#hud').textContent = `${label} · ${info.chains.length} chain(s) · ${info.ligands.length} ligand(s)`;
     resetResults();
+    offerValidation();
     markSteps();
   }
 
@@ -135,6 +214,133 @@
     $('#st-3').classList.toggle('done', !!receptor);
   }
 
+  // ── Redocking validation ─────────────────────────────────────────────────
+  // "How much should I trust docking in this pocket?" answered the only honest
+  // way available: dock the structure's own ligand back and measure the error
+  // against the experimental pose.
+
+  function clearValidation() {
+    if (valCrystal) { viewer.removeModel(valCrystal); valCrystal = null; }
+    if (valDocked) { viewer.removeModel(valDocked); valDocked = null; }
+    $('#validate-result').classList.add('hidden');
+  }
+
+  function offerValidation() {
+    const ctrls = $('#validate-controls'), none = $('#validate-none');
+    ctrls.classList.add('hidden'); none.classList.add('hidden'); none.innerHTML = '';
+    clearValidation();
+    if (!receptor) return;
+    const { ligand, reason, comp } = validationLigand(receptor.info);
+    if (!receptor.pdbId) {
+      // Validation re-fetches the structure by ID server-side, so the run is
+      // reproducible and cacheable. An uploaded file has no ID to fetch.
+      if (ligand) none.innerHTML = `<p class="kbd-hint" style="margin:0">Fetch this structure by PDB ID to validate the setup against its co-crystallised ligand.</p>`;
+      none.classList.toggle('hidden', !ligand);
+      return;
+    }
+    if (ligand) {
+      ctrls.classList.remove('hidden');
+      const btn = $('#validate');
+      btn.innerHTML = icon('check') + ' Validate this setup';
+      btn.title = `Redocks ${ligand.resn} (chain ${ligand.chain}, ${ligand.heavy.length} heavy atoms)`;
+      return;
+    }
+    none.classList.remove('hidden');
+    none.innerHTML = `<p class="kbd-hint" style="margin:0">${reason === 'covalent'
+      ? `The ligand in this structure (${esc(comp)}) is covalently bound to the protein. Redocking a covalent ligand with a non-covalent protocol would not mean anything, so validation is not available here.`
+      : reason === 'multi'
+        ? `The ligand in this structure is deposited as several linked components (${esc(comp)}). Rebuilding it from its chemical definition is not something this check can do reliably, so validation is not available here.`
+        : 'This structure has no co-crystallised ligand, so the setup cannot be validated automatically.'}</p>`;
+  }
+
+  async function validate() {
+    if (!receptor || !receptor.pdbId || validating) return;
+    const btn = $('#validate');
+    validating = true; btn.classList.add('loading');
+    clearValidation();
+    $('#run-progress').classList.remove('hidden'); $('#run-progress > div').style.width = '2%';
+    $('#run-log').classList.remove('hidden'); $('#run-log').textContent = '';
+    $('#run-status').innerHTML = 'Submitting validation run…';
+    try {
+      const body = { pdb_id: receptor.pdbId, exhaustiveness: +$('#exh').value, num_poses: +$('#modes').value };
+      const sub = await api('/dock/validate', { body, timeout: 120000, base: SB.DOCK_API, auth: false });
+      const t0 = Date.now();
+      while (true) {
+        const v = await api('/dock/validate/' + sub.job_id, { timeout: 60000, base: SB.DOCK_API, auth: false });
+        if (v.status === 'done') { showValidation(v); break; }
+        if (v.status === 'error') throw new Error(v.error || 'Validation failed');
+        $('#run-progress > div').style.width = (v.progress || 0) + '%';
+        $('#run-status').innerHTML = `<b style="color:#fff">Validating ${esc(v.pdb_id || receptor.pdbId)}: ${esc(v.message || 'working')}</b> <span class="muted">· ${Math.round((Date.now() - t0) / 1000)}s</span>`;
+        if (v.log) { $('#run-log').innerHTML = v.log.map((l) => `<div class="${l.includes('Error') ? 'err' : l.includes('Done') ? 'ok' : ''}">${esc(l)}</div>`).join(''); $('#run-log').scrollTop = 1e6; }
+        await SB.sleep(2000);
+      }
+    } catch (e) {
+      $('#validate-result').classList.remove('hidden');
+      $('#validate-result').innerHTML = `<div class="notice">${esc(e.message)}</div>`;
+      $('#run-status').innerHTML = `<span style="color:var(--red)">${esc(e.message)}</span>`;
+    } finally {
+      validating = false; btn.classList.remove('loading');
+      btn.innerHTML = icon('check') + ' Validate this setup';
+      $('#run-progress').classList.add('hidden');
+    }
+  }
+
+  function showValidation(v) {
+    const band = { reliable: 'Reliable', marginal: 'Marginal', unreliable: 'Unreliable' }[v.verdict] || '—';
+    const lig = v.ligand || {};
+    const s = v.settings || {};
+    const best = v.best_pose || {};
+    $('#validate-result').classList.remove('hidden');
+    $('#validate-result').innerHTML = `
+      <div class="verdict ${esc(v.verdict)}">
+        <div class="vt"><span class="vr">${fmt(v.top_pose.rmsd, 1)} Å</span><span>${band}</span></div>
+        <p>${esc(v.message)}</p>
+      </div>
+      <div style="margin-top:10px">
+        <div class="vrow" style="border-top:0"><span>Top-pose RMSD vs crystal</span><b>${fmt(v.top_pose.rmsd, 1)} Å</b></div>
+        <div class="vrow"><span>Top-pose Vina score</span><b>${fmt(v.top_pose.score, 1)} kcal/mol</b></div>
+        <div class="vrow"><span>Best of ${v.poses ? v.poses.length : s.num_poses} poses</span><b>${fmt(best.rmsd, 1)} Å <span class="muted" style="font-weight:400">(rank ${best.rank})</span></b></div>
+        <div class="vrow"><span>Ligand</span><b>${esc(lig.comp_id || '?')}</b></div>
+        <div class="vrow"><span></span><span style="text-align:right">${esc(lig.name || '')}</span></div>
+        <div class="vrow"><span>Settings</span><b>exh ${esc(s.exhaustiveness)} · ${esc(s.num_poses)} poses</b></div>
+        <div class="vrow"><span>Validation box</span><b>${(v.box.size || []).map((x) => Math.round(x)).join('×')} Å</b></div>
+        ${v.cached ? `<div class="vrow"><span>Cached result</span><b>${esc((v.computed_at || '').slice(0, 10))}</b></div>` : ''}
+      </div>
+      ${v.crystal_sdf && v.docked_sdf ? `<div style="margin-top:10px">
+        <div class="label">Overlay in the viewer</div>
+        <label class="check"><input type="checkbox" id="val-show-crystal" checked> <span class="swatch" style="background:#fbbf24"></span> Crystal pose (${esc(lig.comp_id || '')})</label>
+        <label class="check"><input type="checkbox" id="val-show-docked" checked> <span class="swatch" style="background:#22d3ee"></span> Docked top pose</label>
+      </div>` : ''}
+      ${v.note ? `<p class="kbd-hint" style="margin:9px 0 0">${esc(v.note)}</p>` : ''}
+      <p class="kbd-hint" style="margin:9px 0 0">Measured as symmetry-corrected heavy-atom RMSD without superposition. The ligand was rebuilt from its chemical definition and re-embedded (${fmt(v.start_rmsd, 1)} Å from the crystal pose before docking), so this is a real test.
+        <a href="learn-docking#redocking">What does this mean?</a></p>`;
+    if (v.crystal_sdf && v.docked_sdf) {
+      // One viewer, two extra models. A real docking pose and a validation
+      // overlay would fight over the same space, so showing one clears the other.
+      if (poseModel) { viewer.removeModel(poseModel); poseModel = null; }
+      valCrystal = viewer.addModel(v.crystal_sdf, 'sdf');
+      valDocked = viewer.addModel(v.docked_sdf, 'sdf');
+      styleReceptor();      // fades the ribbon so the two poses stay visible
+      styleValidation();
+      $('#val-show-crystal').addEventListener('change', styleValidation);
+      $('#val-show-docked').addEventListener('change', styleValidation);
+      viewer.zoomTo({ within: { distance: 11, sel: { model: valCrystal } } }, 700);
+    }
+    $('#run-status').innerHTML = `<b style="color:#fff">Validation complete</b> <span class="muted">· top-pose RMSD ${fmt(v.top_pose.rmsd, 1)} Å (${band.toLowerCase()})${v.cached ? ', from cache' : ''}</span>`;
+    toast(`${receptor.pdbId}: ${band.toLowerCase()} — ${fmt(v.top_pose.rmsd, 1)} Å RMSD`,
+      v.verdict === 'reliable' ? 'ok' : v.verdict === 'marginal' ? 'info' : 'error');
+  }
+
+  function styleValidation() {
+    if (!valCrystal || !valDocked) return;
+    const on = (id) => { const el = $(id); return !el || el.checked; };
+    valCrystal.setStyle({}, on('#val-show-crystal') ? { stick: { radius: 0.17, color: '#fbbf24' } } : {});
+    valDocked.setStyle({}, on('#val-show-docked') ? { stick: { radius: 0.22, colorscheme: 'cyanCarbon' }, sphere: { scale: 0.2, colorscheme: 'cyanCarbon' } } : {});
+    valCrystal.setStyle({ elem: 'H' }, {});
+    valDocked.setStyle({ elem: 'H' }, {});
+    viewer.render();
+  }
+
   // ── Run & poll ───────────────────────────────────────────────────────────
   function resetResults() { result = null; $('#results-panel').classList.add('hidden'); $('#contacts-panel').classList.add('hidden'); }
 
@@ -147,6 +353,7 @@
     if (s.some((v) => v < 5 || v > 40)) return toast('Box edges must be between 5 and 40 Å', 'error');
     const btn = $('#run'); btn.classList.add('loading'); btn.innerHTML = '<span class="spinner"></span> Docking…';
     resetResults();
+    clearValidation();   // a validation overlay and a docking pose cannot share the viewer
     $('#run-progress').classList.remove('hidden'); $('#run-progress > div').style.width = '2%';
     $('#run-log').classList.remove('hidden'); $('#run-log').textContent = '';
     $('#run-status').innerHTML = 'Submitting job…';
@@ -261,6 +468,7 @@
     });
     $('#pick-cancel').addEventListener('click', (e) => { e.preventDefault(); picking = false; $('#pick-hud').classList.add('hidden'); });
     $('#run').addEventListener('click', run);
+    $('#validate').addEventListener('click', validate);
     $('#reset-view').addEventListener('click', () => { viewer.zoomTo(); viewer.render(); });
     $('#shot').addEventListener('click', () => { const a = document.createElement('a'); a.href = viewer.pngURI(); a.download = 'docking.png'; a.click(); });
     const dd = $('#results-panel [data-drop]');

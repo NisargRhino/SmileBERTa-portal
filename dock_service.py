@@ -10,6 +10,7 @@ from flask import Flask, jsonify, make_response, request
 from flask_cors import CORS
 
 import docking
+import redock
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 25 * 1024 * 1024
@@ -18,6 +19,9 @@ app.config['MAX_CONTENT_LENGTH'] = 25 * 1024 * 1024
 CORS(app, origins='*', allow_headers=['Content-Type', 'Authorization', 'X-SmileBERTa-Client'],
      methods=['GET', 'POST', 'OPTIONS'])
 STARTED_AT = time.time()
+# Validate the docking page's example structures once, in the background, so the
+# first visitor to click "Validate this setup" gets a real result immediately.
+redock.start_warm_thread()
 
 
 @app.route('/<path:_routes>', methods=['OPTIONS'])
@@ -35,6 +39,7 @@ def health():
     return jsonify({'status': 'ok', 'service': 'docking', 'docking': docking.DOCKING_AVAILABLE, 'vina': docking.VINA_VERSION,
                     'uptime': round(time.time() - STARTED_AT), 'rss_mb': docking.rss_mb(),
                     'forwarded': bool(request.headers.get('X-Forwarded-For')),
+                    'redock_cache': redock.cache_stats(),
                     'queue': docking.queue_stats()})
 
 
@@ -48,6 +53,31 @@ def dock_submit():
                                                  cid=docking.client_id(request))})
     except docking.DockingError as e:
         return jsonify({'error': str(e)}), 400
+
+
+@app.route('/dock/validate', methods=['POST'])
+def dock_validate():
+    """Redock a structure's own co-crystallised ligand and measure the error."""
+    data = request.get_json(silent=True) or {}
+    try:
+        job_id, cached = redock.start(data.get('pdb_id'), data.get('exhaustiveness', 4),
+                                      data.get('num_poses', 9),
+                                      ip=docking.client_ip(request),
+                                      cid=docking.client_id(request))
+        return jsonify({'job_id': job_id, 'cached': cached})
+    except redock.RedockError as e:
+        return jsonify({'error': str(e)}), 400
+    except docking.DockingError as e:
+        return jsonify({'error': str(e)}), 400
+
+
+@app.route('/dock/validate/<job_id>', methods=['GET'])
+def dock_validate_status(job_id):
+    st = redock.status(job_id)
+    if not st:
+        return jsonify({'error': 'Validation run not found (it may have expired or the '
+                                 'server restarted)'}), 404
+    return jsonify(st)
 
 
 @app.route('/dock/<job_id>', methods=['GET'])

@@ -23,16 +23,9 @@ services:
       - key: BERT_FREE_TURNS
         value: "20"
 
-  # ── Docking API (AutoDock Vina, no PyTorch → fits in 512 MB) ───────────
-  - type: web
-    name: smileberta-dock
-    env: docker
-    plan: free
-    dockerfilePath: ./Dockerfile.dock
-    healthCheckPath: /health
-    envVars:
-      - key: VINA_CPU
-        value: "1"
+  # Docking is not a Render service. It runs on a dedicated VPS, because Vina is
+  # CPU-bound and Render's cores cost roughly ten times as much per core. The
+  # frontend reaches it directly via SB.DOCK_API; see deploy/README.md.
 
   # ── Static frontend ──────────────────────────────────────────────────────
   - type: static_site

@@ -19,6 +19,7 @@ import db
 import docking
 import models
 import notebooks
+import redock
 from chem_tools import (ChemError, analyze, builder_export, conformer_search, depict_svg, embed_3d,
                         mol_from_atoms, mol_from_smiles, mol_to_builder_json, optimize_geometry)
 from combine_frag import combine_fragments
@@ -722,6 +723,35 @@ def dock_submit():
         return jsonify({'job_id': job_id})
     except docking.DockingError as e:
         return err(str(e))
+
+
+@app.route('/dock/validate', methods=['POST'])
+def dock_validate():
+    """Redock a structure's own co-crystallised ligand and measure the error.
+
+    Production docking runs on the VPS, so the frontend normally calls this on
+    `SB.DOCK_API`; it lives here too because local development points both at
+    this service.
+    """
+    user = current_user()
+    try:
+        job_id, cached = redock.start(body().get('pdb_id'), body().get('exhaustiveness', 4),
+                                      body().get('num_poses', 9),
+                                      user_id=user['id'] if user else None,
+                                      ip=docking.client_ip(request), cid=docking.client_id(request))
+        return jsonify({'job_id': job_id, 'cached': cached})
+    except redock.RedockError as e:
+        return err(str(e))
+    except docking.DockingError as e:
+        return err(str(e))
+
+
+@app.route('/dock/validate/<job_id>', methods=['GET'])
+def dock_validate_status(job_id):
+    st = redock.status(job_id)
+    if not st:
+        return err('Validation run not found (it may have expired or the server restarted)', 404)
+    return jsonify(st)
 
 
 @app.route('/dock/<job_id>', methods=['GET'])

@@ -12,6 +12,7 @@ and queue position.
 """
 import collections
 import hashlib
+import itertools
 import os
 import queue
 import re
@@ -89,7 +90,11 @@ _recent_lock = threading.Lock()
 
 _jobs = {}
 _jobs_lock = threading.Lock()
-_queue = queue.Queue()
+# Priority queue, not FIFO: a redocking-validation run must never make somebody
+# wait for their own docking. Entries are (priority, sequence, job_id, spec) —
+# lower priority first, and the sequence number keeps it FIFO within a priority.
+_queue = queue.PriorityQueue()
+_seq = itertools.count()
 _workers_started = False
 _workers_lock = threading.Lock()
 # clean-PDB sha1 ─▶ receptor pdbqt. Receptor prep is deterministic and costs
@@ -111,9 +116,9 @@ def _ensure_workers():
 
 def _worker():
     while True:
-        args = _queue.get()
+        _priority, _seq, job_id, spec = _queue.get()
         try:
-            _run_job(*args)
+            _run_job(job_id, spec)
         except Exception:  # pragma: no cover - _run_job handles its own errors
             pass
         finally:
@@ -376,25 +381,30 @@ def _buckets(user_id, ip, cid):
     return out
 
 
-def _check_window(ident, limit):
-    """Rolling-window rate limit. Raises DockingError when the caller is over it."""
+def _check_window(ident, limit, weight=1.0):
+    """Rolling-window rate limit. Raises DockingError when the caller is over it.
+
+    Each entry carries a weight so some jobs can cost less than a full slot:
+    redocking validations are short, reproducible and worth encouraging, so they
+    count at half weight.
+    """
     now = time.time()
     cutoff = now - RATE_WINDOW_SEC
     with _recent_lock:
         # Drop identities that have gone quiet, so this cannot grow without bound.
-        for key in [k for k, v in _recent.items() if not v or v[-1] < cutoff]:
+        for key in [k for k, v in _recent.items() if not v or v[-1][0] < cutoff]:
             if key != ident:
                 del _recent[key]
         hits = _recent.setdefault(ident, collections.deque())
-        while hits and hits[0] < cutoff:
+        while hits and hits[0][0] < cutoff:
             hits.popleft()
-        if len(hits) >= limit:
-            wait = int((hits[0] + RATE_WINDOW_SEC - now) / 60) + 1
+        if sum(w for _ts, w in hits) + weight > limit:
+            wait = int((hits[0][0] + RATE_WINDOW_SEC - now) / 60) + 1
             raise DockingError(
                 f'Rate limit reached: {limit} docking jobs per '
                 f'{RATE_WINDOW_SEC // 60} minutes. Try again in about {wait} minute'
                 f'{"s" if wait != 1 else ""}.')
-        hits.append(now)
+        hits.append((now, weight))
 
 
 def _release_window(ident):
@@ -405,7 +415,14 @@ def _release_window(ident):
             hits.pop()
 
 
-def submit(params, user_id=None, ip=None, cid=None):
+def submit(params, user_id=None, ip=None, cid=None, validation=None, priority=0, rate_weight=1.0):
+    """Queue a docking job and return its id.
+
+    `validation` is set only by redock.py, never from a request body: it carries
+    the crystal pose a redocking run is scored against. `priority` 1 puts the job
+    behind every ordinary dock, and `rate_weight` is what it costs the caller's
+    hourly allowance.
+    """
     if not DOCKING_AVAILABLE:
         raise DockingError('Docking engine is not installed on this server')
     receptor = params.get('receptor_pdb') or ''
@@ -431,7 +448,7 @@ def submit(params, user_id=None, ip=None, cid=None):
     charged = []
     try:
         for ident, _max_active, max_window in buckets:
-            _check_window(ident, max_window)
+            _check_window(ident, max_window, rate_weight)
             charged.append(ident)
     except DockingError:
         for ident in charged:
@@ -468,8 +485,11 @@ def submit(params, user_id=None, ip=None, cid=None):
             _release_window(ident)
         raise
     _ensure_workers()
-    _queue.put((job_id, receptor, params.get('chains'), params.get('ligand_smiles'),
-                params.get('ligand_molblock'), center, size, exh, modes))
+    _queue.put((priority, next(_seq), job_id,
+                {'receptor_pdb': receptor, 'chains': params.get('chains'),
+                 'smiles': params.get('ligand_smiles'), 'molblock': params.get('ligand_molblock'),
+                 'center': center, 'size': size, 'exhaustiveness': exh, 'num_modes': modes,
+                 'validation': validation}))
     return job_id
 
 
@@ -514,7 +534,11 @@ def _limit_child():
         pass
 
 
-def _run_job(job_id, receptor_pdb, chains, smiles, molblock, center, size, exh, modes):
+def _run_job(job_id, spec):
+    receptor_pdb, chains = spec['receptor_pdb'], spec['chains']
+    smiles, molblock = spec['smiles'], spec['molblock']
+    center, size = spec['center'], spec['size']
+    exh, modes = spec['exhaustiveness'], spec['num_modes']
     workdir = tempfile.mkdtemp(prefix='dock_')
     try:
         # If this runs inside the ML API, free the transformer models first.
@@ -594,9 +618,18 @@ def _run_job(job_id, receptor_pdb, chains, smiles, molblock, center, size, exh, 
             raise DockingError('Vina produced no poses')
         _log(job_id, f'Done: {len(poses)} poses, best affinity {poses[0]["affinity"]:.2f} kcal/mol '
                      f'({time.time() - start:.0f}s)')
-        _update(job_id, status='done', progress=100, message='Complete',
-                result={'ligand_smiles': canonical, 'center': center, 'size': size,
-                        'exhaustiveness': exh, 'poses': poses, 'receptor_pdb': clean})
+        result = {'ligand_smiles': canonical, 'center': center, 'size': size,
+                  'exhaustiveness': exh, 'poses': poses, 'receptor_pdb': clean}
+        if spec.get('validation'):
+            # A redocking run: measure every pose against the crystal pose it was
+            # supposed to reproduce. Imported here so docking.py keeps working on
+            # a host that has no redock.py.
+            import redock
+            result['validation'] = redock.score(spec['validation']['crystal_sdf'], poses)
+            v = result['validation']
+            _log(job_id, f"Validation: top-pose RMSD {v['top_pose']['rmsd']} Å → {v['verdict']}"
+                         if v.get('top_pose') else f"Validation could not be scored: {v.get('error')}")
+        _update(job_id, status='done', progress=100, message='Complete', result=result)
     except (DockingError, ChemError) as e:
         _log(job_id, 'Error: ' + str(e))
         _update(job_id, status='error', error=str(e), message='Failed')

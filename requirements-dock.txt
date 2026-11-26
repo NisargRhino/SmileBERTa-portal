@@ -4,3 +4,6 @@ gunicorn==23.0.0
 rdkit==2023.9.6
 numpy==1.26.4
 openbabel-wheel==3.1.1.23
+# Only for the redocking-validation cache (db.py). Without DATABASE_URL the
+# service runs exactly as before and caches validations in memory.
+psycopg2-binary==2.9.9

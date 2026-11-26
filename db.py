@@ -168,6 +168,11 @@ CREATE TABLE IF NOT EXISTS bert_usage (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE UNIQUE INDEX IF NOT EXISTS idx_bert_usage ON bert_usage(ident, day);
+CREATE TABLE IF NOT EXISTS redock_cache (
+    cache_key  TEXT PRIMARY KEY,
+    payload    TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 '''
 
 _SCHEMA_PG = '''
@@ -229,6 +234,11 @@ CREATE TABLE IF NOT EXISTS bert_usage (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE UNIQUE INDEX IF NOT EXISTS idx_bert_usage ON bert_usage(ident, day);
+CREATE TABLE IF NOT EXISTS redock_cache (
+    cache_key  TEXT PRIMARY KEY,
+    payload    TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 '''
 
 
@@ -330,3 +340,27 @@ def bert_record(idents, day, tool_calls=0, in_tokens=0, out_tokens=0):
                         'UPDATE bert_usage SET turns = turns + 1, tool_calls = tool_calls + ?, '
                         'in_tokens = in_tokens + ?, out_tokens = out_tokens + ? WHERE ident = ? AND day = ?',
                         (tool_calls, in_tokens, out_tokens, ident, day))
+
+
+# ── Redocking-validation cache ──────────────────────────────────────────────
+# A validation of one PDB ID at given settings is the same run for everybody, so
+# it is computed once and shared. The cache is also what lets a first-time
+# visitor see a real number instead of waiting for Vina.
+
+def redock_cache_get(key):
+    with connect() as conn:
+        return conn.one('SELECT cache_key, payload, created_at FROM redock_cache WHERE cache_key = ?',
+                        (key,))
+
+
+def redock_cache_put(key, payload):
+    with connect() as conn:
+        updated = conn.execute('UPDATE redock_cache SET payload = ?, created_at = CURRENT_TIMESTAMP '
+                               'WHERE cache_key = ?', (payload, key)).rowcount
+        if not updated:
+            try:
+                conn.execute('INSERT INTO redock_cache (cache_key, payload) VALUES (?, ?)',
+                             (key, payload))
+            except Exception as e:
+                if not is_integrity_error(e):
+                    raise   # another worker inserted the same key first
