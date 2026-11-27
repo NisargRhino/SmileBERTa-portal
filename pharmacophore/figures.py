@@ -257,6 +257,109 @@ def figure_protein_coverage(stats, out_dir):
     })
 
 
+def ligand_promiscuity(release):
+    """How much a ligand's labels change when the pocket changes.
+
+    This bounds the pocket's possible contribution without training anything.
+    If a molecule carried the same labels wherever it binds, a ligand-only model
+    could be near-perfect and the pocket would have nothing left to add — which
+    is one of the two readings of the transformer's small ablation delta. The
+    other is that the conditioning is too weak. This measurement separates them.
+    """
+    import itertools
+    by_ligand = {}
+    records_dir = os.path.join(release, 'records')
+    if not os.path.isdir(records_dir):
+        return {}
+    for name in sorted(os.listdir(records_dir)):
+        if not name.endswith('.jsonl'):
+            continue
+        with open(os.path.join(records_dir, name)) as handle:
+            for line in handle:
+                try:
+                    record = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if record.get('rejected') or not record.get('inchikey'):
+                    continue
+                by_ligand.setdefault(record['inchikey'], []).append(record)
+
+    def typed(record):
+        out = set()
+        for index, types in (record.get('per_atom') or {}).items():
+            for name in types:
+                out.add((int(index), name))
+        return out
+
+    def touched(record):
+        return {int(i) for i in (record.get('per_atom') or {})}
+
+    overlap_atoms, overlap_typed, pairs, multi = [], [], 0, 0
+    for records in by_ligand.values():
+        representative = {}
+        for record in records:
+            representative.setdefault(record.get('uniprot'), record)
+        if len(representative) < 2:
+            continue
+        multi += 1
+        for a, b in itertools.combinations(representative.values(), 2):
+            pairs += 1
+            for fn, store in ((touched, overlap_atoms), (typed, overlap_typed)):
+                x, y = fn(a), fn(b)
+                if x or y:
+                    store.append(len(x & y) / len(x | y))
+    if not overlap_typed:
+        return {}
+    return {
+        'ligands': len(by_ligand),
+        'ligands_in_multiple_proteins': multi,
+        'cross_protein_pairs': pairs,
+        'overlap_atoms_touched': {
+            'mean': round(float(np.mean(overlap_atoms)), 4),
+            'median': round(float(np.median(overlap_atoms)), 4)},
+        'overlap_atom_and_type': {
+            'mean': round(float(np.mean(overlap_typed)), 4),
+            'median': round(float(np.median(overlap_typed)), 4)},
+        'identical_label_pairs': round(
+            float(np.mean([v > 0.999 for v in overlap_typed])), 4),
+        'disjoint_label_pairs': round(
+            float(np.mean([v < 0.001 for v in overlap_typed])), 4),
+        'values': overlap_typed,
+    }
+
+
+def figure_promiscuity(promiscuity, out_dir):
+    """The ceiling on any ligand-only model, measured from the labels."""
+    values = promiscuity.get('values')
+    if not values:
+        return None
+    fig, axes = plt.subplots(1, 2, figsize=(9.2, 3.5))
+
+    ax = axes[0]
+    ax.hist(values, bins=np.linspace(0, 1, 26), color=WITH_POCKET, alpha=0.9)
+    ax.axvline(float(np.median(values)), color=SHUFFLED, ls='--', lw=1.2,
+               label='median %.2f' % np.median(values))
+    ax.set_xlabel('label overlap (Jaccard) for one ligand across two proteins')
+    ax.set_ylabel('pairs')
+    ax.legend(frameon=False, fontsize=8)
+    ax.set_title('The same molecule is labelled differently\nin different pockets')
+
+    ax = axes[1]
+    identical = promiscuity['identical_label_pairs'] * 100
+    disjoint = promiscuity['disjoint_label_pairs'] * 100
+    partial = 100 - identical - disjoint
+    ax.bar(['identical', 'partial', 'no overlap'], [identical, partial, disjoint],
+           color=[NO_POCKET, WITH_POCKET, SHUFFLED])
+    for i, value in enumerate([identical, partial, disjoint]):
+        ax.text(i, value + 1, '%.1f%%' % value, ha='center', fontsize=8)
+    ax.set_ylabel('% of cross-protein pairs')
+    ax.set_title('A ligand-only model must give one answer\nfor all of these')
+
+    fig.tight_layout()
+    payload = {k: v for k, v in promiscuity.items() if k != 'values'}
+    return _save(fig, out_dir, 'ligand_promiscuity', payload)
+
+
 # --------------------------------------------------------------------------
 # Model and ablation figures
 # --------------------------------------------------------------------------
@@ -398,7 +501,7 @@ def figure_training_curves(model, out_dir):
     return _save(fig, out_dir, 'training_curves', payload)
 
 
-def write_report(release, stats, baselines, model, figures, out_dir):
+def write_report(release, stats, baselines, model, figures, out_dir, promiscuity=None):
     """A markdown summary beside the figures, generated from the same values."""
     lines = ['# Pharmacophore results', '',
              'Generated by `pharmacophore.figures` from the committed results '
@@ -413,6 +516,26 @@ def write_report(release, stats, baselines, model, figures, out_dir):
              '| Atoms carrying a contact | %.1f%% |'
              % (100 * stats['atoms_with_contact'] / max(stats['heavy_atoms'], 1)),
              '']
+    if promiscuity:
+        lines += [
+            '## How much could the pocket possibly matter?', '',
+            'Measured from the labels alone, no model involved. Taking every '
+            'ligand that appears in more than one protein and comparing its '
+            'per-atom labels between those proteins:', '',
+            '| | |', '| --- | --- |',
+            f"| Ligands appearing in >1 protein | {promiscuity['ligands_in_multiple_proteins']:,} "
+            f"of {promiscuity['ligands']:,} |",
+            f"| Cross-protein pairs compared | {promiscuity['cross_protein_pairs']:,} |",
+            '| Median label overlap (atom + type) | %.3f |'
+            % promiscuity['overlap_atom_and_type']['median'],
+            '| Pairs with identical labels | %.1f%% |'
+            % (100 * promiscuity['identical_label_pairs']),
+            '| Pairs sharing no label at all | %.1f%% |'
+            % (100 * promiscuity['disjoint_label_pairs']),
+            '',
+            'A ligand-only model has to give one answer for every pair in that '
+            'table, so the low overlap is a hard ceiling on how well it can do '
+            'and direct evidence that the pocket carries information.', '']
     if model or baselines:
         lines += ['## Does the pocket contribute?', '',
                   '| Regime | RF ligand | RF +pocket | RF delta | net ligand | '
@@ -464,8 +587,14 @@ def run(release, out_dir=None, log=print):
     model = _drop_stale_regimes(
         _load(os.path.join(release, 'results', 'model.json')), baselines, log)
 
+    promiscuity = ligand_promiscuity(release)
+    if promiscuity:
+        log('  same ligand across different proteins: %.3f median label overlap '
+            'over %d pairs' % (promiscuity['overlap_atom_and_type']['median'],
+                               promiscuity['cross_protein_pairs']))
     figures = [figure_corpus_overview(stats, out_dir),
-               figure_protein_coverage(stats, out_dir)]
+               figure_protein_coverage(stats, out_dir),
+               figure_promiscuity(promiscuity, out_dir)]
     if baselines or model:
         figures.append(figure_ablation(baselines, model, out_dir))
     if model:
@@ -473,7 +602,8 @@ def run(release, out_dir=None, log=print):
         for regime in ('unseen_ligand', 'unseen_protein', 'both_unseen'):
             figures.append(figure_per_type(model, out_dir, regime))
     figures = [f for f in figures if f]
-    report = write_report(release, stats, baselines, model, figures, out_dir)
+    report = write_report(release, stats, baselines, model, figures, out_dir,
+                          promiscuity)
     for path in figures:
         log('  wrote %s' % path)
     log('  wrote %s' % report)
