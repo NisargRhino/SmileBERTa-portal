@@ -106,6 +106,7 @@ def process(pdb_id):
 
 def build(release, ids, workers=4, shard_size=500, log=print):
     os.makedirs(os.path.join(release, 'records'), exist_ok=True)
+    sources.sifts_mapping()   # one download, before the workers fork
     already = done_ids(release)
     todo = [i for i in ids if i not in already]
     log(f'{len(ids)} candidates, {len(already)} already done, {len(todo)} to process')
@@ -203,7 +204,12 @@ def main():
         print(json.dumps(summarise(args.release), indent=2))
         return
 
-    ids = args.ids or sources.entry_ids(limit=args.limit)
+    if args.ids:
+        ids = args.ids
+    else:
+        ids = sources.candidate_ids(os.path.join(args.release, 'candidate_ids.json'))
+        if args.limit:
+            ids = ids[:args.limit]
     manifest = build(args.release, ids, workers=args.workers)
     print(json.dumps({k: v for k, v in manifest.items() if k != 'sources'}, indent=2))
 

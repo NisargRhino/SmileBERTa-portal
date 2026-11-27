@@ -10,9 +10,11 @@ Network access is wrapped so that a build can be resumed: everything fetched is
 cached on disk by URL, and a re-run costs nothing for what it already has. A
 corpus build touches tens of thousands of entries and will be interrupted.
 """
+import gzip
 import hashlib
 import json
 import os
+import threading
 import time
 import urllib.error
 import urllib.parse
@@ -63,6 +65,28 @@ SOURCES = {
 }
 
 
+# Politeness. A corpus build makes tens of thousands of requests to public
+# infrastructure that nobody is being paid to run, and RCSB began timing out
+# requests during development when this was absent. The limiter is global
+# because it has to hold across threads, and generous because finishing an hour
+# later costs nothing while being blocked costs the build.
+# Per *process*: workers do not share this clock, so the aggregate rate is
+# roughly workers / interval. At 0.25 s and 4 workers that is ~16 requests a
+# second, which is modest for a bulk file endpoint and well short of what got
+# the search API to start timing out during development.
+MIN_REQUEST_INTERVAL = float(os.environ.get('SB_REQUEST_INTERVAL', '0.25'))
+_rate_lock = threading.Lock()
+_last_request = [0.0]
+
+
+def _throttle():
+    with _rate_lock:
+        wait = MIN_REQUEST_INTERVAL - (time.monotonic() - _last_request[0])
+        if wait > 0:
+            time.sleep(wait)
+        _last_request[0] = time.monotonic()
+
+
 def _cache_path(url):
     digest = hashlib.sha256(url.encode()).hexdigest()[:24]
     return os.path.join(CACHE_DIR, digest[:2], digest)
@@ -84,6 +108,7 @@ def fetch(url, timeout=60, retries=3, cache=True, binary=False):
     last = None
     for attempt in range(retries):
         try:
+            _throttle()
             req = urllib.request.Request(url, headers={'User-Agent': USER_AGENT})
             with urllib.request.urlopen(req, timeout=timeout) as r:
                 data = r.read()
@@ -95,7 +120,9 @@ def fetch(url, timeout=60, retries=3, cache=True, binary=False):
             time.sleep(2 ** attempt)
         except Exception as e:
             last = e
-            time.sleep(2 ** attempt)
+            # Back off hard on a throttle or a server error: retrying quickly is
+            # what turns rate limiting into a ban.
+            time.sleep(min(60, 5 * (2 ** attempt)))
     else:
         raise RuntimeError(f'could not fetch {url}: {last}')
 
@@ -181,7 +208,17 @@ def polymer_entity(pdb_id, entity_id):
     return fetch_json(f'{RCSB_DATA}/polymer_entity/{pdb_id.upper()}/{entity_id}')
 
 
-def structure_pdb(pdb_id):
+# Structure files are NOT cached by default. At roughly 1 MB each, a build over
+# the ~140,000 candidate entries would need about 140 GB, and this machine has
+# 17 GB free — caching them would fill the disk and take the build down with it.
+# The labels extracted from a structure are a few kilobytes, so the records are
+# what persist and a restart simply re-downloads whatever entry it was mid-way
+# through. Set SB_CACHE_STRUCTURES=1 when working on a small set and repeated
+# parsing is worth the space.
+CACHE_STRUCTURES = os.environ.get('SB_CACHE_STRUCTURES', '0') == '1'
+
+
+def structure_pdb(pdb_id, cache=None):
     """The PDB-format coordinates.
 
     Entries too large for the legacy format are mmCIF-only and raise
@@ -189,7 +226,8 @@ def structure_pdb(pdb_id):
     than silently skipping, since 'how many structures did the format cost us'
     is a number the manifest should carry.
     """
-    return fetch(f'{RCSB_FILES}/{pdb_id.upper()}.pdb')
+    use_cache = CACHE_STRUCTURES if cache is None else cache
+    return fetch(f'{RCSB_FILES}/{pdb_id.upper()}.pdb', cache=use_cache)
 
 
 def component_ideal_sdf(comp_id):
@@ -216,3 +254,66 @@ def chembl_activities(target_chembl_id, limit=1000, offset=0, standard_types=Non
 def credits_block():
     """The `/credits` entries for every source used, generated not remembered."""
     return [{'id': k, **v} for k, v in sorted(SOURCES.items())]
+
+
+# ── SIFTS: PDB chain → UniProt, in one file instead of a request per entry ───
+# Asking the RCSB API for each entry's polymer entities costs several calls per
+# structure, which is hundreds of thousands of requests across a full build and
+# days of waiting once throttling is respected. EBI publishes the whole mapping
+# as a single file, which is both faster and far kinder to the API.
+
+SIFTS_URL = ('https://ftp.ebi.ac.uk/pub/databases/msd/sifts/flatfiles/tsv/'
+             'pdb_chain_uniprot.tsv.gz')
+_sifts = None
+_sifts_lock = threading.Lock()
+
+
+def sifts_mapping():
+    """{(pdb_id, chain): uniprot} for every chain in the PDB, loaded once."""
+    global _sifts
+    with _sifts_lock:
+        if _sifts is not None:
+            return _sifts
+        path = _cache_path(SIFTS_URL)
+        if not os.path.exists(path):
+            data = fetch(SIFTS_URL, timeout=300, binary=True, cache=True)
+        else:
+            with open(path, 'rb') as f:
+                data = f.read()
+        mapping = {}
+        for line in gzip.decompress(data).decode('utf-8', 'replace').splitlines():
+            if not line or line.startswith('#') or line.startswith('PDB'):
+                continue
+            parts = line.split('\t')
+            if len(parts) < 3:
+                continue
+            mapping.setdefault((parts[0].upper(), parts[1]), parts[2])
+        _sifts = mapping
+        return _sifts
+
+
+def candidate_ids(path, max_resolution=2.5, page=10000, log=print):
+    """The candidate PDB IDs, fetched once and then read from `path`.
+
+    The list costs fourteen quick requests and never changes within a release,
+    so it is written down rather than re-derived on every restart.
+    """
+    if os.path.exists(path):
+        with open(path) as f:
+            return json.load(f)['ids']
+    query = candidate_query(max_resolution)
+    ids, start = [], 0
+    while True:
+        res = rcsb_search(query, rows=page, start=start)
+        hits = res.get('result_set', [])
+        ids.extend(h['identifier'] for h in hits)
+        total = res.get('total_count', 0)
+        log(f'  candidate ids: {len(ids)}/{total}')
+        start += page
+        if not hits or start >= total:
+            break
+    os.makedirs(os.path.dirname(path) or '.', exist_ok=True)
+    with open(path, 'w') as f:
+        json.dump({'max_resolution': max_resolution, 'count': len(ids),
+                   'fetched': time.strftime('%Y-%m-%d %H:%M:%S'), 'ids': ids}, f)
+    return ids

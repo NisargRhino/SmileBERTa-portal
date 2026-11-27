@@ -100,19 +100,33 @@ class Rejected(Exception):
         self.detail = detail
 
 
-def entry_is_usable(meta):
-    """Resolution and method gate, from the entry metadata rather than the file."""
-    info = meta.get('rcsb_entry_info', {})
-    methods = info.get('experimental_method') or ''
-    if 'X-ray' not in methods and 'X-RAY' not in str(methods).upper():
-        raise Rejected('not_xray', str(methods)[:40])
-    res = info.get('resolution_combined')
-    res = res[0] if isinstance(res, list) and res else res
-    if res is None:
+def entry_is_usable(pdb_text):
+    """Resolution and method gate, read from the structure's own header.
+
+    Taken from the file rather than from the entry API on purpose: the file is
+    downloaded anyway, and one API call per entry is a hundred thousand calls
+    across a build. The header is authoritative for both fields.
+    """
+    method, resolution = None, None
+    for line in pdb_text.splitlines():
+        if line.startswith('EXPDTA'):
+            method = line[10:].strip().upper()
+        elif line.startswith('REMARK   2 RESOLUTION'):
+            for token in line.split():
+                try:
+                    resolution = float(token)
+                    break
+                except ValueError:
+                    continue
+        elif line.startswith(('ATOM', 'HETATM')):
+            break
+    if method and 'X-RAY' not in method:
+        raise Rejected('not_xray', method[:40])
+    if resolution is None:
         raise Rejected('no_resolution')
-    if res > MAX_RESOLUTION:
-        raise Rejected('resolution_too_low', f'{res} A')
-    return float(res)
+    if resolution > MAX_RESOLUTION:
+        raise Rejected('resolution_too_low', f'{resolution} A')
+    return resolution
 
 
 def ligand_candidates(pdb_text):
@@ -197,26 +211,29 @@ def pocket_residues(pdb_text, ligand_atoms, radius=POCKET_RADIUS):
     return near
 
 
-def uniprot_for_chain(pdb_id, meta, chain):
+def uniprot_for_chain(pdb_id, chain, pocket=None):
     """The UniProt accession for the chain the ligand sits against.
 
-    Without it the complex cannot be joined to bioactivity or clustered by
-    protein for the split, so a complex that cannot be mapped is rejected.
+    Resolved from the SIFTS bulk mapping rather than per-entry API calls, which
+    turns several requests per structure into one download for the whole PDB.
+
+    A ligand's own chain letter is often not a protein chain — many depositors
+    give the ligand its own. When the direct lookup misses, the pocket's own
+    residues say which protein chains the ligand actually touches, and the most
+    represented of those is the right answer.
     """
-    entity_ids = (meta.get('rcsb_entry_container_identifiers', {})
-                  .get('polymer_entity_ids') or [])
-    for entity_id in entity_ids:
-        try:
-            entity = sources.polymer_entity(pdb_id, entity_id)
-        except Exception:
-            continue
-        ids = entity.get('rcsb_polymer_entity_container_identifiers', {})
-        chains = (ids.get('auth_asym_ids') or []) + (ids.get('asym_ids') or [])
-        if chain and chain not in chains:
-            continue
-        for ref in (ids.get('reference_sequence_identifiers') or []):
-            if ref.get('database_name') == 'UniProt':
-                return ref.get('database_accession'), entity_id
+    mapping = sources.sifts_mapping()
+    hit = mapping.get((pdb_id.upper(), chain))
+    if hit:
+        return hit
+    if pocket:
+        counts = {}
+        for (_resname, pocket_chain, _resseq) in pocket:
+            acc = mapping.get((pdb_id.upper(), pocket_chain))
+            if acc:
+                counts[acc] = counts.get(acc, 0) + 1
+        if counts:
+            return max(counts, key=counts.get)
     raise Rejected('no_uniprot_mapping', f'chain {chain}')
 
 
@@ -228,12 +245,11 @@ def select(pdb_id):
     separately and deduplicated later by (uniprot, ligand InChIKey), because two
     copies of the same complex in one crystal are one observation, not two.
     """
-    meta = sources.entry_metadata(pdb_id)
-    resolution = entry_is_usable(meta)
     try:
         pdb_text = sources.structure_pdb(pdb_id)
     except FileNotFoundError:
         raise Rejected('no_pdb_format', 'mmCIF-only entry')
+    resolution = entry_is_usable(pdb_text)
 
     candidates, _parsed = ligand_candidates(pdb_text)
     if not candidates:
@@ -246,8 +262,8 @@ def select(pdb_id):
             artefact = is_artefact(cand['comp_id'], mol)
             if artefact:
                 raise Rejected(artefact, cand['comp_id'])
-            uniprot, entity_id = uniprot_for_chain(pdb_id, meta, cand['chain'])
             pocket = pocket_residues(pdb_text, cand['atoms'])
+            uniprot = uniprot_for_chain(pdb_id, cand['chain'], pocket)
         except Rejected as e:
             out.append({'pdb_id': pdb_id, 'comp_id': cand['comp_id'],
                         'rejected': e.reason, 'detail': e.detail})
@@ -260,7 +276,6 @@ def select(pdb_id):
             'chain': cand['chain'],
             'resi': cand['resi'],
             'uniprot': uniprot,
-            'entity_id': entity_id,
             'smiles': smiles,
             'inchikey': Chem.MolToInchiKey(mol),
             'heavy_atoms': cand['heavy_atoms'],
