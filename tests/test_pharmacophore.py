@@ -162,5 +162,60 @@ class ProvenanceTests(unittest.TestCase):
         self.assertIn('share-alike', chembl['redistribution'])
 
 
+class ResolutionGateTests(unittest.TestCase):
+    """The quality gate silently passed everything for a whole build.
+
+    `REMARK   2 RESOLUTION.    2.00 ANGSTROMS.` splits into
+    ['REMARK', '2', 'RESOLUTION.', '2.00', 'ANGSTROMS.'] and the first token
+    that parses as a float is the remark number. Every entry came out at
+    exactly 2.0 A, so nothing was ever above the 2.5 A limit. The corpus
+    survived only because the candidate query filters on resolution at the RCSB
+    end; the gate itself was doing nothing.
+    """
+
+    @staticmethod
+    def _header(remark):
+        return ('EXPDTA    X-RAY DIFFRACTION\n' + remark +
+                '\nATOM      1  N   ALA A   1      0.000   0.000   0.000')
+
+    def test_the_remark_number_is_not_mistaken_for_the_resolution(self):
+        text = self._header('REMARK   2 RESOLUTION.    1.08 ANGSTROMS.')
+        self.assertAlmostEqual(C.entry_is_usable(text), 1.08)
+
+    def test_a_low_resolution_entry_is_rejected(self):
+        text = self._header('REMARK   2 RESOLUTION.    2.60 ANGSTROMS.')
+        with self.assertRaises(C.Rejected) as caught:
+            C.entry_is_usable(text)
+        message = caught.exception.args[0]
+        self.assertTrue(message.startswith('resolution_too_low'), message)
+        # The real figure must reach the rejection detail, or the manifest
+        # cannot say how far outside the limit the entry was.
+        self.assertIn('2.6', message)
+
+    def test_a_borderline_entry_is_kept(self):
+        text = self._header('REMARK   2 RESOLUTION.    2.50 ANGSTROMS.')
+        self.assertAlmostEqual(C.entry_is_usable(text), 2.50)
+
+    def test_nmr_has_no_resolution(self):
+        text = self._header('REMARK   2 RESOLUTION. NOT APPLICABLE.')
+        with self.assertRaises(C.Rejected) as caught:
+            C.entry_is_usable(text)
+        self.assertEqual(caught.exception.args[0], 'no_resolution')
+
+
+class FigureHonestyTests(unittest.TestCase):
+    """A figure must not put results from two different splits on one axis."""
+
+    def test_a_stale_model_regime_is_dropped(self):
+        from pharmacophore import figures as F
+        model = {'unseen_ligand': {'counts': {'test': 12}},
+                 'both_unseen': {'counts': {'test': 77}}}
+        baselines = {'unseen_ligand': {'_split': {'test_complexes': 1745}},
+                     'both_unseen': {'_split': {'test_complexes': 77}}}
+        kept = F._drop_stale_regimes(model, baselines, log=lambda *a: None)
+        self.assertNotIn('unseen_ligand', kept)
+        self.assertIn('both_unseen', kept)
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

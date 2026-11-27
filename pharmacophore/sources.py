@@ -44,6 +44,15 @@ SOURCES = {
         'used_for': 'protein-ligand complexes, crystal poses, contact geometry',
         'redistribution': 'permitted',
     },
+    'wwpdb_derived': {
+        'name': 'wwPDB derived data (resolu.idx)',
+        'url': 'https://files.wwpdb.org/pub/pdb/derived_data/index/',
+        'licence': 'CC0 1.0 (public domain)',
+        'citation': 'Berman H, Henrick K, Nakamura H. Announcing the worldwide '
+                    'Protein Data Bank. Nat Struct Biol. 2003;10:980.',
+        'used_for': 'authoritative resolution per entry, in one bulk file',
+        'redistribution': 'permitted',
+    },
     'chembl': {
         'name': 'ChEMBL',
         'url': 'https://www.ebi.ac.uk/chembl/',
@@ -290,6 +299,50 @@ def sifts_mapping():
             mapping.setdefault((parts[0].upper(), parts[1]), parts[2])
         _sifts = mapping
         return _sifts
+
+
+RESOLUTION_URL = 'https://files.wwpdb.org/pub/pdb/derived_data/index/resolu.idx'
+_resolutions = None
+_resolutions_lock = threading.Lock()
+
+
+def resolution_index():
+    """{pdb_id: resolution} for the whole PDB, from one bulk file.
+
+    The wwPDB publishes this index, so the alternative — an entry API call per
+    structure — would be a hundred thousand requests for a number that is
+    already available in a single download, the same argument that made
+    `sifts_mapping` bulk.
+
+    It is also the authoritative value. Parsing it out of the structure's own
+    REMARK 2 header works, but that line reads
+    `REMARK   2 RESOLUTION.    2.00 ANGSTROMS.`, and a naive split finds the
+    remark number "2" before the actual figure — which is exactly the bug that
+    stamped every entry in the first build at 2.0 A. Entries derived from NMR
+    and other non-X-ray methods carry -1.00 here and are returned as None.
+    """
+    global _resolutions
+    with _resolutions_lock:
+        if _resolutions is not None:
+            return _resolutions
+        path = _cache_path(RESOLUTION_URL)
+        if not os.path.exists(path):
+            data = fetch(RESOLUTION_URL, timeout=300, binary=True, cache=True)
+        else:
+            with open(path, 'rb') as handle:
+                data = handle.read()
+        values = {}
+        for line in data.decode('utf-8', 'replace').splitlines():
+            parts = [p.strip() for p in line.split(';')]
+            if len(parts) != 2 or len(parts[0]) != 4:
+                continue
+            try:
+                value = float(parts[1])
+            except ValueError:
+                continue
+            values[parts[0].upper()] = value if value > 0 else None
+        _resolutions = values
+        return _resolutions
 
 
 def candidate_ids(path, max_resolution=2.5, page=10000, log=print):

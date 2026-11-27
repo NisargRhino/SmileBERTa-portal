@@ -116,7 +116,15 @@ def entry_is_usable(pdb_text):
         if line.startswith('EXPDTA'):
             method = line[10:].strip().upper()
         elif line.startswith('REMARK   2 RESOLUTION'):
-            for token in line.split():
+            # "REMARK   2 RESOLUTION.    2.00 ANGSTROMS."
+            # Everything up to and including the word RESOLUTION has to be
+            # dropped before looking for a number. Splitting the whole line and
+            # taking the first float finds the remark number "2", so every
+            # entry in the first build came out at exactly 2.0 A and the 2.5 A
+            # gate never rejected anything. NMR entries say "NOT APPLICABLE"
+            # here and correctly leave resolution as None.
+            tail = line[len('REMARK   2 RESOLUTION'):].lstrip('. ')
+            for token in tail.split():
                 try:
                     resolution = float(token)
                     break
