@@ -418,6 +418,76 @@ def figure_ablation(baselines, model, out_dir):
     return _save(fig, out_dir, 'ablation', payload)
 
 
+def figure_subset_ablation(baselines, model, out_dir):
+    """Corpus-wide against promiscuous-ligand ablation, forest against network.
+
+    This is the comparison that identifies where the problem is. Both models see
+    the same split, the same features and the same subset; if one finds the
+    pocket and the other does not, the difference is the architecture, not the
+    data.
+    """
+    rows = []
+    for regime in ('unseen_ligand', 'unseen_protein', 'both_unseen'):
+        b = (baselines or {}).get(regime) or {}
+        m = (model or {}).get(regime) or {}
+        entry = {'regime': regime}
+        entry['rf_all'] = (b.get('_ablation') or {}).get('delta')
+        entry['net_all'] = (m.get('_ablation') or {}).get('delta')
+        bs = b.get('multi_protein_ligands') or {}
+        ms = m.get('multi_protein_ligands') or {}
+        entry['rf_subset'] = (bs.get('_ablation') or {}).get('delta')
+        entry['net_subset'] = (ms.get('_ablation') or {}).get('delta')
+        entry['subset_atoms'] = bs.get('atoms') or ms.get('atoms')
+        entry['subset_complexes'] = bs.get('complexes') or ms.get('complexes')
+        if any(entry.get(k) is not None for k in
+               ('rf_all', 'net_all', 'rf_subset', 'net_subset')):
+            rows.append(entry)
+    if not rows:
+        return None
+
+    fig, ax = plt.subplots(figsize=(8.8, 4.0))
+    labels = ['RF, all', 'RF, promiscuous', 'net, all', 'net, promiscuous']
+    keys = ['rf_all', 'rf_subset', 'net_all', 'net_subset']
+    colours = [NO_POCKET, WITH_POCKET, '#f0a202', SHUFFLED]
+    width = 0.2
+    x = np.arange(len(rows))
+    for i, (key, label, colour) in enumerate(zip(keys, labels, colours)):
+        values = [(r.get(key) if r.get(key) is not None else np.nan) for r in rows]
+        ax.bar(x + (i - 1.5) * width, values, width, label=label, color=colour)
+        for j, value in enumerate(values):
+            if not np.isnan(value):
+                ax.text(x[j] + (i - 1.5) * width, value + 0.002,
+                        '%.3f' % value, ha='center', fontsize=6.5)
+    ax.axhline(0.02, color=ACCENT, ls='--', lw=1.1,
+               label='0.02 margin: "uses the pocket"')
+    ax.axhline(0, color='#333', lw=0.8)
+    ax.set_xticks(x)
+    ax.set_xticklabels(['%s\n%s' % (r['regime'],
+                                    ('subset %s complexes' % f"{r['subset_complexes']:,}")
+                                    if r.get('subset_complexes') else 'subset too small')
+                        for r in rows], fontsize=8)
+    ax.set_ylabel('macro AUC lost by removing the pocket')
+    # The title states only what the bars actually present support. The network
+    # arms are absent whenever model.json was written against an older split,
+    # and a figure that keeps its conclusion in the title regardless would be
+    # asserting a comparison it is not showing.
+    has_net = any(r.get('net_all') is not None or r.get('net_subset') is not None
+                  for r in rows)
+    has_rf = any(r.get('rf_all') is not None for r in rows)
+    if has_net and has_rf:
+        title = ('Where the pocket signal goes: the forest finds it, '
+                 'the network does not')
+    elif has_rf:
+        title = ('Pocket contribution by regime (forest only — no model results '
+                 'for the current split yet)')
+    else:
+        title = 'Pocket contribution by regime'
+    ax.set_title(title, fontsize=10)
+    ax.legend(frameon=False, fontsize=8, ncol=2, loc='upper left')
+    fig.tight_layout()
+    return _save(fig, out_dir, 'subset_ablation', {'rows': rows})
+
+
 def figure_per_type(model, out_dir, regime='unseen_ligand'):
     """Per-type AUC against support, because an average hides the rare types."""
     arm = ((model or {}).get(regime) or {}).get('with_pocket') or {}
@@ -597,6 +667,7 @@ def run(release, out_dir=None, log=print):
                figure_promiscuity(promiscuity, out_dir)]
     if baselines or model:
         figures.append(figure_ablation(baselines, model, out_dir))
+        figures.append(figure_subset_ablation(baselines, model, out_dir))
     if model:
         figures.append(figure_training_curves(model, out_dir))
         for regime in ('unseen_ligand', 'unseen_protein', 'both_unseen'):
