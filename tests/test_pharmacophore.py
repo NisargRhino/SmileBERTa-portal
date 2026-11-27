@@ -203,6 +203,26 @@ class ResolutionGateTests(unittest.TestCase):
         self.assertEqual(caught.exception.args[0], 'no_resolution')
 
 
+class PromiscuousSubsetTests(unittest.TestCase):
+    """The ablation is only sensitive where the pocket is in contention."""
+
+    def test_atom_mask_follows_flatten_order(self):
+        from pharmacophore import dataset as D
+        examples = [
+            {'inchikey': 'AAA', 'n_heavy': 3},     # promiscuous
+            {'inchikey': 'BBB', 'n_heavy': 2},     # single-protein
+            {'inchikey': 'AAA', 'n_heavy': 1},
+        ]
+        mask = D.atom_mask(examples, {'AAA'})
+        self.assertEqual(list(mask), [True, True, True, False, False, True])
+        self.assertEqual(int(mask.sum()), 4)
+
+    def test_a_ligand_in_one_protein_is_not_promiscuous(self):
+        from pharmacophore import dataset as D
+        examples = [{'inchikey': 'BBB', 'n_heavy': 2}]
+        self.assertEqual(int(D.atom_mask(examples, {'AAA'}).sum()), 0)
+
+
 class FigureHonestyTests(unittest.TestCase):
     """A figure must not put results from two different splits on one axis."""
 

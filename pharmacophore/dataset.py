@@ -117,6 +117,7 @@ def record_to_example(record):
         'key': (record['pdb_id'], record['comp_id']),
         'smiles': record['smiles'],
         'uniprot': record['uniprot'],
+        'inchikey': record.get('inchikey'),
         'atom_features': atoms,
         'pocket_features': np.array(pocket_features(record), dtype=np.float32),
         'labels': label_matrix(record, n_heavy),
@@ -139,6 +140,33 @@ def load_examples(release, split_map=None, subset=None):
         if example is not None:
             out.append(example)
     return out
+
+
+def promiscuous_ligands(release):
+    """InChIKeys seen bound to more than one distinct protein.
+
+    These are the only complexes where the pocket is actually in contention.
+    For a ligand that appears once, memorising the molecule is the correct
+    answer and a ligand-only model loses nothing by ignoring the protein --
+    and since only about one ligand in eight is promiscuous, a corpus-wide
+    ablation average is mostly measuring cases that cannot distinguish the two
+    arms. Restricting to this set is what makes the ablation sensitive.
+    """
+    seen = {}
+    for record in iter_records(release):
+        if record.get('rejected') or not record.get('inchikey'):
+            continue
+        seen.setdefault(record['inchikey'], set()).add(record.get('uniprot'))
+    return {key for key, proteins in seen.items() if len(proteins) > 1}
+
+
+def atom_mask(examples, inchikeys):
+    """Per-atom boolean mask over `flatten`/`predict` output order."""
+    flags = []
+    for example in examples:
+        promiscuous = example.get('inchikey') in inchikeys
+        flags.extend([promiscuous] * example['n_heavy'])
+    return np.array(flags, dtype=bool)
 
 
 def flatten(examples, with_pocket=True):

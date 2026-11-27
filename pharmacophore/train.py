@@ -27,6 +27,14 @@ from pharmacophore.splits import REGIMES, load_split
 
 SEED = 20261126
 
+# Floor for reporting the promiscuous-ligand ablation. In `unseen_ligand` that
+# subset is 12 complexes, because holding ligands out by scaffold removes the
+# promiscuous ones almost by construction; a verdict on 12 complexes is the
+# kind of number this project exists to avoid publishing. In `unseen_protein`
+# it is over a thousand, which is the regime the reverse direction -- new
+# protein in, fragments out -- actually depends on.
+MIN_SUBSET_ATOMS = 1000
+
 
 def set_seed(seed=SEED):
     random.seed(seed)
@@ -162,6 +170,40 @@ def run(release, regime, epochs=30, log=print):
                                                out['shuffled_pocket']['test'])
     log('  ablation : %s' % out['_ablation']['reason'])
     log('  shuffled : %s' % out['_shuffle_check']['reason'])
+
+    # The same ablation restricted to ligands that bind more than one protein.
+    # The corpus-wide number above is the one the spec asks for and is left
+    # exactly as it was; this is reported beside it because only about one
+    # ligand in eight is promiscuous, so the corpus-wide average is dominated
+    # by complexes where the pocket cannot change the answer. Measured on the
+    # labels, those promiscuous ligands share a median of 0.27 of their labels
+    # between proteins, so this is where an ablation can actually discriminate.
+    try:
+        promiscuous = D.promiscuous_ligands(release)
+        mask = D.atom_mask(test_examples, promiscuous)
+        n_complexes = sum(1 for e in test_examples if e.get('inchikey') in promiscuous)
+        if mask.sum() >= MIN_SUBSET_ATOMS:
+            subset = {
+                'atoms': int(mask.sum()),
+                'complexes': n_complexes,
+                'share_of_test_atoms': round(float(mask.mean()), 4),
+                'with_pocket': M.summarise(y_true[mask], y_score[mask]),
+                'no_pocket': M.summarise(y_true_n[mask], y_score_n[mask]),
+                'shuffled_pocket': M.summarise(y_true_s[mask], y_score_s[mask]),
+            }
+            subset['_ablation'] = M.ablation_verdict(subset['with_pocket'],
+                                                     subset['no_pocket'])
+            out['multi_protein_ligands'] = subset
+            log('  promiscuous-ligand subset (%d atoms over %d complexes, %.1f%% '
+                'of test): %s' % (subset['atoms'], n_complexes,
+                                  100 * subset['share_of_test_atoms'],
+                                  subset['_ablation']['reason']))
+        else:
+            log('  promiscuous-ligand subset too small to report (%d atoms over '
+                '%d complexes, floor is %d atoms)'
+                % (int(mask.sum()), n_complexes, MIN_SUBSET_ATOMS))
+    except Exception as exc:              # never let analysis break a run
+        log('  promiscuous-ligand subset failed: %s' % exc)
     return out
 
 

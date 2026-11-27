@@ -31,6 +31,10 @@ from pharmacophore.splits import REGIMES, load_split
 
 SEED = 20261126
 
+# See pharmacophore.train for why this floor exists: the promiscuous subset is
+# 12 complexes in unseen_ligand and over a thousand in unseen_protein.
+MIN_SUBSET_ATOMS = 1000
+
 
 def frequency_prior(train_examples, test_examples):
     """Per-atom-type base rates learned from training, applied to test.
@@ -100,16 +104,44 @@ def run(release, regime='both_unseen', log=print):
     results['frequency_prior'] = M.summarise(y_test, frequency_prior(train, test))
     log('  frequency prior      macro AUC %s' % results['frequency_prior']['macro_auc'])
 
-    results['random_forest_ligand_only'] = M.summarise(
-        y_test, random_forest(train, test, with_pocket=False))
+    scores_without = random_forest(train, test, with_pocket=False)
+    results['random_forest_ligand_only'] = M.summarise(y_test, scores_without)
     log('  RF ligand only       macro AUC %s' % results['random_forest_ligand_only']['macro_auc'])
 
-    results['random_forest_with_pocket'] = M.summarise(
-        y_test, random_forest(train, test, with_pocket=True))
+    scores_with = random_forest(train, test, with_pocket=True)
+    results['random_forest_with_pocket'] = M.summarise(y_test, scores_with)
     log('  RF ligand + pocket   macro AUC %s' % results['random_forest_with_pocket']['macro_auc'])
 
     results['_ablation'] = M.ablation_verdict(results['random_forest_with_pocket'],
                                               results['random_forest_ligand_only'])
+
+    # Same ablation on the ligands that bind more than one protein — the only
+    # complexes where the pocket is in contention. Reported beside the
+    # corpus-wide number, which is left untouched.
+    try:
+        promiscuous = D.promiscuous_ligands(release)
+        mask = D.atom_mask(test, promiscuous)
+        n_complexes = sum(1 for e in test if e.get('inchikey') in promiscuous)
+        if mask.sum() >= MIN_SUBSET_ATOMS:
+            with_pocket = M.summarise(y_test[mask], scores_with[mask])
+            without = M.summarise(y_test[mask], scores_without[mask])
+            results['multi_protein_ligands'] = {
+                'atoms': int(mask.sum()),
+                'complexes': n_complexes,
+                'share_of_test_atoms': round(float(mask.mean()), 4),
+                'random_forest_with_pocket': with_pocket,
+                'random_forest_ligand_only': without,
+                '_ablation': M.ablation_verdict(with_pocket, without),
+            }
+            log('  promiscuous subset   %d atoms over %d complexes, %s'
+                % (int(mask.sum()), n_complexes,
+                   results['multi_protein_ligands']['_ablation']['reason']))
+        else:
+            log('  promiscuous subset   too small to report (%d atoms over %d '
+                'complexes)' % (int(mask.sum()), n_complexes))
+    except Exception as exc:
+        log('  promiscuous subset failed: %s' % exc)
+
     log('  ablation: %s (%s)' % (results['_ablation']['verdict'], results['_ablation']['reason']))
     results['_split'] = {'regime': regime, 'train_complexes': len(train),
                          'test_complexes': len(test),
