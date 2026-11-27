@@ -100,6 +100,7 @@ def collect():
         'interventions_classification': load('interventions_classification'),
         'interventions_fragment': load('interventions_fragment'),
         'memorisation_control_fragment': load('memorisation_control_fragment'),
+        'expanded_corpus_fragment': load('expanded_corpus_fragment'),
         'memorisation_control_classification': load('memorisation_control_classification'),
         'named_examples': load('named_examples'),
     }
@@ -336,6 +337,14 @@ def markdown(d):
         frows.append(['Shipped transformer *(contaminated)*', _f(m['validity_rate_raw']),
                       _f(m['exact_match_rate']), _f(m['mean_tanimoto_to_reference']),
                       _f(m['substructure_rate']), _f(m['rule_of_three_pass_rate'])])
+    if d.get('expanded_corpus_fragment'):
+        m = d['expanded_corpus_fragment']['full_test_metrics']
+        corpus = d['expanded_corpus_fragment']['corpus']
+        n = corpus.get('capped_to') or corpus.get('train_pairs')
+        frows.append([f'Same recipe, {n:,} training pairs *(intervention 5)*',
+                      _f(m['validity_rate_raw']), _f(m['exact_match_rate']),
+                      _f(m['mean_tanimoto_to_reference']), _f(m['substructure_rate']),
+                      _f(m['rule_of_three_pass_rate'])])
     if d.get('memorisation_control_fragment'):
         m = d['memorisation_control_fragment']['full_test_metrics']
         frows.append(['Same recipe trained **on the test set** *(control)*',
@@ -364,6 +373,33 @@ def markdown(d):
           f'{_f(m["exact_match_rate"])} of the fragments it was shown. So the recipe does '
           'learn; what the scaffold split removes is the memorisation it was relying on.')
         w('')
+    if d.get('expanded_corpus_fragment'):
+        e = d['expanded_corpus_fragment']
+        corpus = e['corpus']
+        w('### Intervention 5: more data')
+        w('')
+        w('The spec\'s last intervention is more data. Rather than reach for ChEMBL, the '
+          'original corpus was rebuilt with the pipeline that produced it: '
+          '`ml-project/FBDD-discovery.py` ran RDKit\'s BRICS decomposition over a set of '
+          'drug SMILES, and this repository already holds 8,336 of them in the '
+          'classification dataset. Running the same decomposition over those yields '
+          f'{corpus.get("total_molecules", 0):,} molecules and '
+          f'{corpus.get("train_pairs_before_cap") or corpus.get("train_pairs", 0):,} training '
+          'pairs, against 1,223 before — the same procedure, no new dependency, nothing to '
+          'license.')
+        w('')
+        if corpus.get('capped_to'):
+            w(f'Training was capped at {corpus["capped_to"]:,} pairs for compute, still '
+              'roughly sixteen times the original corpus.')
+            w('')
+        if corpus.get('dropped_scaffold_overlap'):
+            w(f'{corpus["dropped_scaffold_overlap"]:,} of the new molecules share a scaffold '
+              'with the held-out validation or test sets and were dropped rather than '
+              'trained on. The test set is the same 22 molecules as every other fragment '
+              'row above, so this is a clean comparison: only the training corpus changed.')
+            w('')
+        w('')
+
     w('The fragment test set is **22 molecules**, because the entire supervised fragment '
       'corpus in this repository is 219 molecules and 1,223 fragment pairs. Treat these '
       'rates as direction, not precision: a single molecule moves any of them by 4.5 '

@@ -229,7 +229,7 @@ def memorisation_control(task, epochs, log=print):
     return record
 
 
-def expanded_fragment_corpus(epochs, log=print):
+def expanded_fragment_corpus(epochs, max_pairs=None, log=print):
     """Intervention 5: the same recipe on ~40x the fragment training data.
 
     Everything else in the fragment diagnosis says the corpus is the problem
@@ -244,9 +244,19 @@ def expanded_fragment_corpus(epochs, log=print):
     from evaluation import expand_fragments as X
 
     parts, stats = X.expanded_split()
-    log('  [fragment/expanded] %s' % json.dumps(stats))
     train_pairs = T.pairs_for('fragment', parts['train'])
     val_pairs = T.pairs_for('fragment', parts['validation'])
+    if max_pairs and len(train_pairs) > max_pairs:
+        # Capped for compute. The question this run answers is whether more data
+        # moves a metric that is currently flat at zero, and a 16x increase
+        # answers that as well as 32x would; the cap is recorded so the number
+        # is not mistaken for the full corpus.
+        import random as _random
+        _random.Random(T.SEED).shuffle(train_pairs)
+        stats['train_pairs_before_cap'] = len(train_pairs)
+        stats['capped_to'] = max_pairs
+        train_pairs = train_pairs[:max_pairs]
+    log('  [fragment/expanded] %s' % json.dumps(stats))
 
     model, history = T.train_model(train_pairs, val_pairs, epochs=epochs,
                                    early_stopping=True, patience=2, log=log)
@@ -269,6 +279,7 @@ def main():
                                            'interventions', 'control', 'expanded', 'all'))
     ap.add_argument('--task', choices=('classification', 'fragment'), required=True)
     ap.add_argument('--epochs', type=int, default=6)
+    ap.add_argument('--max-pairs', type=int, help='cap training pairs (expanded run)')
     args = ap.parse_args()
 
     if args.experiment == 'all':
@@ -280,7 +291,7 @@ def main():
         interventions(args.task, args.epochs, early_stopped_record=curve)
         return
     if args.experiment == 'expanded':
-        expanded_fragment_corpus(args.epochs)
+        expanded_fragment_corpus(args.epochs, args.max_pairs)
         return
     if args.experiment == 'control':
         memorisation_control(args.task, max(args.epochs, 12))

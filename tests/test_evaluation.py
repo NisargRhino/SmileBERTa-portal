@@ -212,6 +212,43 @@ class FragmentMetricTests(unittest.TestCase):
         self.assertEqual(M.tanimoto('c1ccccc1', 'not-a-smiles'), 0.0)
 
 
+class ExpandedCorpusTests(unittest.TestCase):
+    """The expanded fragment corpus must not quietly undo the scaffold split."""
+
+    @classmethod
+    def setUpClass(cls):
+        from evaluation import expand_fragments as X
+        cls.X = X
+        if not os.path.exists(X.OUT_CSV):
+            raise unittest.SkipTest('run evaluation/expand_fragments.py first')
+
+    def test_the_expanded_corpus_contains_the_original(self):
+        original, _ = D.load_fragments()
+        expanded = {r['smiles'] for r in self.X.load_expanded()}
+        missing = [r['smiles'] for r in original if r['smiles'] not in expanded]
+        self.assertEqual(missing, [], f'{len(missing)} original molecules lost')
+
+    def test_test_set_is_unchanged(self):
+        # The whole point of the comparison is that only the training data moved.
+        parts, _ = self.X.expanded_split()
+        mapping = S.load_split(os.path.join(S.SPLIT_DIR, 'fragment_scaffold.csv'))
+        original_test = {s for s, where in mapping.items() if where == 'test'}
+        self.assertEqual({r['smiles'] for r in parts['test']}, original_test)
+
+    def test_no_training_molecule_shares_a_scaffold_with_the_test_set(self):
+        parts, _ = self.X.expanded_split()
+        held = {r['scaffold'] for r in parts['test'] + parts['validation'] if r['scaffold']}
+        leaked = [r['smiles'] for r in parts['train'] if r['scaffold'] and r['scaffold'] in held]
+        self.assertEqual(leaked, [], f'{len(leaked)} training molecules leak a held-out scaffold')
+
+    def test_single_fragment_molecules_are_excluded(self):
+        # A molecule BRICS cannot cleave yields one "fragment" that is the whole
+        # molecule. Training on that teaches the model to echo its input.
+        for rec in self.X.load_expanded():
+            if rec['source'] == 'classification_dataset':
+                self.assertGreaterEqual(len(rec['fragments']), self.X.MIN_FRAGMENTS)
+
+
 class DataTests(unittest.TestCase):
     def test_classification_dataset_matches_the_spec(self):
         records, dropped = D.load_classification()

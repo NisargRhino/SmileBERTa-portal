@@ -160,6 +160,12 @@
     }
     if (d.headline_fragment) add('Transformer, retrained on this split', d.headline_fragment.scaffold.full_test_metrics);
     if (d.shipped) add('Shipped transformer', d.shipped.scaffold.fragment, '(contaminated)');
+    if (d.expanded_corpus_fragment) {
+      const c = d.expanded_corpus_fragment.corpus || {};
+      const n = c.capped_to || c.train_pairs || 0;
+      add(`Same recipe, ${n.toLocaleString()} training pairs`,
+        d.expanded_corpus_fragment.full_test_metrics, '(16× the data)');
+    }
     if (d.memorisation_control_fragment) {
       add('Same recipe, trained on the test set', d.memorisation_control_fragment.full_test_metrics, '(control)');
     }
