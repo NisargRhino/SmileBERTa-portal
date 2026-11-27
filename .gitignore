@@ -17,4 +17,5 @@ corpus/**
 !corpus/*/splits/**
 !corpus/*/results/**
 !corpus/*/manifest.json
+!corpus/*.sh
 .corpus-cache/
