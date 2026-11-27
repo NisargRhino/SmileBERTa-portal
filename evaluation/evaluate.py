@@ -66,17 +66,28 @@ def decode_batch(model, tokenizer, smiles_list, batch_size=32):
 
 # ── Classification ───────────────────────────────────────────────────────────
 
-def _levenshtein(a, b):
-    """Edit distance, matching what predict_drug_classification.py uses."""
-    if a == b:
-        return 0
-    prev = list(range(len(b) + 1))
-    for i, ca in enumerate(a, 1):
-        cur = [i]
-        for j, cb in enumerate(b, 1):
-            cur.append(min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (ca != cb)))
-        prev = cur
-    return prev[-1]
+try:
+    from rapidfuzz.distance import Levenshtein as _RF
+
+    def _levenshtein(a, b):
+        """Edit distance, via the same rapidfuzz the deployed code uses.
+
+        The pure-Python fallback below is correct but roughly a thousand times
+        slower, and the nearest-reference path compares every prediction against
+        25,364 reference fragments.
+        """
+        return _RF.distance(a, b)
+except ImportError:          # pragma: no cover - rapidfuzz is in requirements
+    def _levenshtein(a, b):
+        if a == b:
+            return 0
+        prev = list(range(len(b) + 1))
+        for i, ca in enumerate(a, 1):
+            cur = [i]
+            for j, cb in enumerate(b, 1):
+                cur.append(min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (ca != cb)))
+            prev = cur
+        return prev[-1]
 
 
 def snap(raw, options):
@@ -190,7 +201,11 @@ def evaluate_fragments(model_path=FRAGMENT_MODEL, split_kind='scaffold', subset=
 
 
 def _closest_reference(raw, references):
-    """fragpred.closest_reference_smiles: nearest valid fragment by edit distance."""
+    """fragpred.closest_reference_smiles: nearest valid fragment by edit distance.
+
+    Normalised by the longer string, exactly as `fragpred.string_similarity`
+    does, so this picks the same fragment the deployed fallback would.
+    """
     best, best_sim = None, -1.0
     for ref in references:
         max_len = max(len(raw), len(ref), 1)

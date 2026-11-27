@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Benchmark — SmileBERTa</title>
+  <meta name="description" content="Scaffold-split evaluation of both SmileBERTa models: per-class metrics, fingerprint baselines, the random-vs-scaffold gap, and where each model fails.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    .bm-hero { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin: 22px 0 28px; }
+    .bm-stat { padding: 16px; border-radius: 13px; border: 1px solid var(--border); background: rgba(255,255,255,.02); }
+    .bm-stat .v { font: 700 1.9rem var(--display); color: #fff; letter-spacing: -.03em; line-height: 1.05; }
+    .bm-stat .k { font-size: .74rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-top: 7px; }
+    .bm-stat .s { font-size: .78rem; color: var(--text-2); margin-top: 8px; line-height: 1.45; }
+    .bm-stat.bad { border-color: rgba(248,113,113,.3); background: rgba(248,113,113,.05); }
+    .bm-stat.bad .v { color: #fca5a5; }
+    .bm-stat.good { border-color: rgba(52,211,153,.3); background: rgba(52,211,153,.05); }
+    .gap-bar { display: flex; align-items: center; gap: 10px; margin: 5px 0; font-size: .8rem; }
+    .gap-bar .lbl { width: 128px; color: var(--muted); flex: none; }
+    .gap-bar .track { flex: 1; height: 15px; border-radius: 4px; background: rgba(255,255,255,.05); overflow: hidden; }
+    .gap-bar .fill { height: 100%; border-radius: 4px; }
+    .gap-bar .num { width: 54px; text-align: right; font-family: var(--mono); color: #fff; flex: none; }
+    table.bm td.num, table.bm th.num { text-align: right; font-family: var(--mono); font-size: .8rem; }
+    .pill-row { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0 18px; }
+    .case { border: 1px solid var(--border); border-radius: 12px; padding: 13px 15px; margin-bottom: 10px; }
+    .case h4 { margin: 0 0 4px; font-size: .92rem; }
+    .case .why { font-size: .78rem; color: var(--muted); margin-bottom: 9px; line-height: 1.5; }
+    .case .io { font-family: var(--mono); font-size: .76rem; line-height: 1.7; }
+    .case .io b { color: #fff; font-weight: 500; }
+    #loading { padding: 40px; text-align: center; color: var(--muted); }
+  </style>
+  <script src="assets/js/core.js" defer></script>
+  <script src="assets/js/benchmark.js" defer></script>
+</head>
+<body>
+  <div id="site-nav"></div>
+  <main class="container">
+    <div class="page-head">
+      <div class="crumbs"><a href="./">Home</a><span>/</span><span>Benchmark</span></div>
+      <div class="eyebrow">Evaluation · scaffold split</div>
+      <h1>How well do these models actually work?</h1>
+      <p class="lead">Both SmileBERTa models measured on a Bemis–Murcko scaffold split, against fingerprint baselines, reported per class with the rare classes left in. Including the results that do not flatter us.</p>
+    </div>
+
+    <div class="notice info" style="margin-bottom:22px">
+      <b>Why this page exists.</b> "No published benchmark" was the first item under limitations in our own platform overview. A model you cannot check is a model you cannot trust, and very few small chemistry models publish scaffold-split numbers. These are ours, including the ones that say a model is not working.
+    </div>
+
+    <div id="loading">Loading results…</div>
+    <div id="content" class="hidden">
+      <div class="bm-hero" id="hero"></div>
+
+      <section style="margin-bottom:34px">
+        <h2 style="font-size:1.25rem">The split, and why it changes everything</h2>
+        <p style="font-size:.9rem;color:var(--text-2);line-height:1.65">Molecular datasets are dense with near-duplicate scaffolds. Split them at random and close analogues land on both sides, so a model can score well by recognising a skeleton it has already seen. A <b>scaffold split</b> puts every Bemis–Murcko scaffold entirely on one side of the line. The gap between the two is a direct measure of how much a model was memorising.</p>
+        <div id="split-table"></div>
+        <div id="gap-chart" style="margin-top:20px"></div>
+      </section>
+
+      <section style="margin-bottom:34px">
+        <h2 style="font-size:1.25rem">Drug classification</h2>
+        <p style="font-size:.9rem;color:var(--text-2);line-height:1.65">8,336 compounds, 12 therapeutic categories, 1,350 of them carrying more than one. Every model is measured on the same scaffold-split test set.</p>
+        <div id="cls-summary"></div>
+        <h3 style="font-size:1rem;margin-top:24px">Per class</h3>
+        <p style="font-size:.84rem;color:var(--muted);margin-bottom:10px">Support is the number of test compounds carrying that class. Urological has 48 compounds in the whole dataset; it is reported rather than dropped.</p>
+        <div id="cls-perclass"></div>
+      </section>
+
+      <section style="margin-bottom:34px">
+        <h2 style="font-size:1.25rem">Fragment prediction</h2>
+        <div id="frag-summary"></div>
+      </section>
+
+      <section style="margin-bottom:34px">
+        <h2 style="font-size:1.25rem">Where they fail, by name</h2>
+        <p style="font-size:.9rem;color:var(--text-2);line-height:1.65">Aggregates let you nod along without seeing a wrong answer. These are specific molecules run through the same path the tools use.</p>
+        <div id="cases"></div>
+      </section>
+
+      <section style="margin-bottom:34px">
+        <h2 style="font-size:1.25rem">Reproducing this</h2>
+        <div id="provenance"></div>
+      </section>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+</body>
+</html>

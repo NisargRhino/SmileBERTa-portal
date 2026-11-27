@@ -111,6 +111,7 @@
     { href: 'learn-classification', icon: 'tag', title: 'How classification works', desc: 'From SMILES to therapeutic class' },
     { href: 'learn-docking', icon: 'target', title: 'Docking & scoring', desc: 'Search boxes, Vina scoring, poses' },
     { href: 'learn-forcefields', icon: 'activity', title: 'Force fields', desc: 'MMFF94, UFF and energy minimisation' },
+    { href: 'benchmark', icon: 'gauge', title: 'Model benchmark', desc: 'Scaffold-split numbers for both models, good and bad' },
   ];
 
   // ── HTML helpers ──────────────────────────────────────────────────────────

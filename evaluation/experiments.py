@@ -193,10 +193,46 @@ def interventions(task, epochs, early_stopped_record=None, log=print):
     return out
 
 
+def memorisation_control(task, epochs, log=print):
+    """Train on every split, then score the test set the model has just seen.
+
+    This exists to answer the first objection a reader should raise about a bad
+    scaffold-split number: *was the model simply trained badly?* If the same
+    recipe, given the test molecules, can reproduce them, then the recipe works
+    and what the honest split removed was memorisation. If it cannot, the
+    recipe is the problem and the scaffold number says nothing about the data.
+
+    It is a control, not a result. Its score is meaningless as a measure of
+    anything except capacity to memorise, and it is labelled that way wherever
+    it appears.
+    """
+    part = T.load_task(task, 'scaffold')
+    everything = part['train'] + part['validation'] + part['test']
+    train_pairs = T.pairs_for(task, everything)
+    val_pairs = T.pairs_for(task, part['validation'])
+
+    log('  [%s] memorisation control: %d train pairs (test set included on purpose)'
+        % (task, len(train_pairs)))
+    model, history = T.train_model(train_pairs, val_pairs, epochs=epochs,
+                                   early_stopping=False, log=log)
+    model_dir = os.path.join(CHECKPOINTS, f'{task}_control_memorisation')
+    T.save(model, model_dir)
+    res, summary = _evaluate(task, model_dir, 'scaffold')
+    record = {'task': task, 'name': 'memorisation_control', 'epochs': epochs,
+              'train_pairs': len(train_pairs), 'training': history,
+              'test_seen_during_training': True, 'test': summary,
+              'full_test_metrics': res, 'checkpoint': model_dir,
+              'note': 'the test set was in this model\'s training data; the score measures '
+                      'capacity to memorise, not generalisation'}
+    log('  -> %s' % json.dumps(summary))
+    _write(f'memorisation_control_{task}', record)
+    return record
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('experiment', choices=('headline', 'learning_curve', 'data_scaling',
-                                           'interventions', 'all'))
+                                           'interventions', 'control', 'all'))
     ap.add_argument('--task', choices=('classification', 'fragment'), required=True)
     ap.add_argument('--epochs', type=int, default=6)
     args = ap.parse_args()
@@ -209,6 +245,8 @@ def main():
         data_scaling(args.task, args.epochs, full_record=curve)
         interventions(args.task, args.epochs, early_stopped_record=curve)
         return
+    if args.experiment == 'control':
+        memorisation_control(args.task, max(args.epochs, 12))
     if args.experiment == 'headline':
         headline(args.task, args.epochs)
     if args.experiment == 'learning_curve':

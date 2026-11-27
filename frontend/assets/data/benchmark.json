@@ -1,0 +1,2709 @@
+{
+ "generated": "2026-11-26",
+ "commit": "8d17975730b9",
+ "datasets": {
+  "classification": {
+   "file": "drug_classification_data_df.csv",
+   "sha256_16": "cb11fab86d265da7"
+  },
+  "fragment": {
+   "file": "ml-project/drug_fragments.csv",
+   "sha256_16": "692884ab13d7875a"
+  }
+ },
+ "summary": {
+  "classification": {
+   "compounds": 8336,
+   "dropped": {},
+   "per_label": {
+    "antiinfective": 2923,
+    "antineoplastic": 1642,
+    "cns": 1528,
+    "cardio": 1262,
+    "antiinflammatory": 591,
+    "gastrointestinal": 490,
+    "hematologic": 462,
+    "respiratorysystem": 281,
+    "dermatologic": 226,
+    "reproductivecontrol": 225,
+    "lipidregulating": 203,
+    "urological": 48
+   },
+   "labels_per_compound": {
+    "1": 6986,
+    "2": 1175,
+    "3": 158,
+    "4": 14,
+    "5": 3
+   },
+   "multi_label_compounds": 1350,
+   "distinct_scaffolds": 2530,
+   "acyclic_compounds": 543
+  },
+  "fragments": {
+   "molecules": 219,
+   "fragment_pairs": 1223,
+   "dropped": {},
+   "fragments_per_molecule": 5.58,
+   "distinct_scaffolds": 173
+  }
+ },
+ "splits": {
+  "seed": 20261126,
+  "ratios": [
+   0.8,
+   0.1,
+   0.1
+  ],
+  "files": {
+   "classification_scaffold": {
+    "path": "evaluation/splits/classification_scaffold.csv",
+    "sha256_16": "8896add2516502e2"
+   },
+   "classification_random": {
+    "path": "evaluation/splits/classification_random.csv",
+    "sha256_16": "8217ef9e9260f8a5"
+   },
+   "fragment_scaffold": {
+    "path": "evaluation/splits/fragment_scaffold.csv",
+    "sha256_16": "4e64d73e623317aa"
+   },
+   "fragment_random": {
+    "path": "evaluation/splits/fragment_random.csv",
+    "sha256_16": "bd61af72aea4d15e"
+   }
+  },
+  "reports": {
+   "classification_scaffold": {
+    "kind": "scaffold",
+    "total": 8336,
+    "sizes": {
+     "train": 6652,
+     "validation": 844,
+     "test": 840
+    },
+    "fractions": {
+     "train": 0.798,
+     "validation": 0.1012,
+     "test": 0.1008
+    },
+    "distinct_scaffolds": {
+     "train": 2090,
+     "validation": 217,
+     "test": 225
+    },
+    "shared_scaffolds_train_test": 0,
+    "per_label": {
+     "antiinfective": {
+      "train": 2339,
+      "validation": 292,
+      "test": 292
+     },
+     "antineoplastic": {
+      "train": 1314,
+      "validation": 164,
+      "test": 164
+     },
+     "cns": {
+      "train": 1222,
+      "validation": 153,
+      "test": 153
+     },
+     "cardio": {
+      "train": 1010,
+      "validation": 126,
+      "test": 126
+     },
+     "antiinflammatory": {
+      "train": 456,
+      "validation": 78,
+      "test": 57
+     },
+     "gastrointestinal": {
+      "train": 392,
+      "validation": 49,
+      "test": 49
+     },
+     "hematologic": {
+      "train": 369,
+      "validation": 47,
+      "test": 46
+     },
+     "respiratorysystem": {
+      "train": 225,
+      "validation": 28,
+      "test": 28
+     },
+     "dermatologic": {
+      "train": 180,
+      "validation": 23,
+      "test": 23
+     },
+     "reproductivecontrol": {
+      "train": 179,
+      "validation": 23,
+      "test": 23
+     },
+     "lipidregulating": {
+      "train": 161,
+      "validation": 21,
+      "test": 21
+     },
+     "urological": {
+      "train": 35,
+      "validation": 6,
+      "test": 7
+     }
+    },
+    "scaffold_violations": 0
+   },
+   "classification_random": {
+    "kind": "random",
+    "total": 8336,
+    "sizes": {
+     "train": 6669,
+     "validation": 834,
+     "test": 833
+    },
+    "fractions": {
+     "train": 0.8,
+     "validation": 0.1,
+     "test": 0.0999
+    },
+    "distinct_scaffolds": {
+     "train": 2207,
+     "validation": 538,
+     "test": 547
+    },
+    "shared_scaffolds_train_test": 382,
+    "per_label": {
+     "antiinfective": {
+      "train": 2345,
+      "validation": 300,
+      "test": 278
+     },
+     "antineoplastic": {
+      "train": 1294,
+      "validation": 173,
+      "test": 175
+     },
+     "cns": {
+      "train": 1231,
+      "validation": 133,
+      "test": 164
+     },
+     "cardio": {
+      "train": 1030,
+      "validation": 123,
+      "test": 109
+     },
+     "antiinflammatory": {
+      "train": 475,
+      "validation": 55,
+      "test": 61
+     },
+     "gastrointestinal": {
+      "train": 393,
+      "validation": 54,
+      "test": 43
+     },
+     "hematologic": {
+      "train": 369,
+      "validation": 48,
+      "test": 45
+     },
+     "respiratorysystem": {
+      "train": 220,
+      "validation": 27,
+      "test": 34
+     },
+     "dermatologic": {
+      "train": 178,
+      "validation": 21,
+      "test": 27
+     },
+     "reproductivecontrol": {
+      "train": 176,
+      "validation": 24,
+      "test": 25
+     },
+     "lipidregulating": {
+      "train": 168,
+      "validation": 16,
+      "test": 19
+     },
+     "urological": {
+      "train": 37,
+      "validation": 7,
+      "test": 4
+     }
+    }
+   },
+   "fragment_scaffold": {
+    "kind": "scaffold",
+    "total": 219,
+    "sizes": {
+     "train": 175,
+     "validation": 22,
+     "test": 22
+    },
+    "fractions": {
+     "train": 0.7991,
+     "validation": 0.1005,
+     "test": 0.1005
+    },
+    "distinct_scaffolds": {
+     "train": 136,
+     "validation": 20,
+     "test": 19
+    },
+    "shared_scaffolds_train_test": 0,
+    "scaffold_violations": 0
+   },
+   "fragment_random": {
+    "kind": "random",
+    "total": 219,
+    "sizes": {
+     "train": 175,
+     "validation": 22,
+     "test": 22
+    },
+    "fractions": {
+     "train": 0.7991,
+     "validation": 0.1005,
+     "test": 0.1005
+    },
+    "distinct_scaffolds": {
+     "train": 141,
+     "validation": 21,
+     "test": 22
+    },
+    "shared_scaffolds_train_test": 4
+   }
+  },
+  "dropped": {
+   "classification": {},
+   "fragments": {}
+  }
+ },
+ "baselines": {
+  "scaffold": {
+   "classification": {
+    "majority_class": {
+     "n": 840,
+     "per_class": {
+      "antiinfective": {
+       "precision": 0.3476,
+       "recall": 1.0,
+       "f1": 0.5159,
+       "support": 292,
+       "predicted": 840
+      },
+      "antineoplastic": {
+       "precision": 0.0,
+       "recall": 0.0,
+       "f1": 0.0,
+       "support": 164,
+       "predicted": 0
+      },
+      "cns": {
+       "precision": 0.0,
+       "recall": 0.0,
+       "f1": 0.0,
+       "support": 153,
+       "predicted": 0
+      },
+      "cardio": {
+       "precision": 0.0,
+       "recall": 0.0,
+       "f1": 0.0,
+       "support": 126,
+       "predicted": 0
+      },
+      "antiinflammatory": {
+       "precision": 0.0,
+       "recall": 0.0,
+       "f1": 0.0,
+       "support": 57,
+       "predicted": 0
+      },
+      "gastrointestinal": {
+       "precision": 0.0,
+       "recall": 0.0,
+       "f1": 0.0,
+       "support": 49,
+       "predicted": 0
+      },
+      "hematologic": {
+       "precision": 0.0,
+       "recall": 0.0,
+       "f1": 0.0,
+       "support": 46,
+       "predicted": 0
+      },
+      "respiratorysystem": {
+       "precision": 0.0,
+       "recall": 0.0,
+       "f1": 0.0,
+       "support": 28,
+       "predicted": 0
+      },
+      "dermatologic": {
+       "precision": 0.0,
+       "recall": 0.0,
+       "f1": 0.0,
+       "support": 23,
+       "predicted": 0
+      },
+      "reproductivecontrol": {
+       "precision": 0.0,
+       "recall": 0.0,
+       "f1": 0.0,
+       "support": 23,
+       "predicted": 0
+      },
+      "lipidregulating": {
+       "precision": 0.0,
+       "recall": 0.0,
+       "f1": 0.0,
+       "support": 21,
+       "predicted": 0
+      },
+      "urological": {
+       "precision": 0.0,
+       "recall": 0.0,
+       "f1": 0.0,
+       "support": 7,
+       "predicted": 0
+      }
+     },
+     "macro_f1": 0.043,
+     "micro_f1": 0.3193,
+     "micro_precision": 0.3476,
+     "micro_recall": 0.2952,
+     "subset_accuracy": 0.2857,
+     "any_correct": 0.3476,
+     "hamming_loss": 0.1235,
+     "top_1_accuracy": 0.3476,
+     "top_3_accuracy": 0.6655,
+     "multi_label_subset": {
+      "n": 133,
+      "subset_accuracy": 0.0,
+      "any_correct": 0.391,
+      "hamming_loss": 0.1949
+     },
+     "note": "always predicts antiinfective"
+    },
+    "random_forest_ecfp4": {
+     "n": 840,
+     "per_class": {
+      "antiinfective": {
+       "precision": 0.6836,
+       "recall": 0.8733,
+       "f1": 0.7669,
+       "support": 292,
+       "predicted": 373
+      },
+      "antineoplastic": {
+       "precision": 0.732,
+       "recall": 0.4329,
+       "f1": 0.5441,
+       "support": 164,
+       "predicted": 97
+      },
+      "cns": {
+       "precision": 0.6623,
+       "recall": 0.6536,
+       "f1": 0.6579,
+       "support": 153,
+       "predicted": 151
+      },
+      "cardio": {
+       "precision": 0.6849,
+       "recall": 0.3968,
+       "f1": 0.5025,
+       "support": 126,
+       "predicted": 73
+      },
+      "antiinflammatory": {
+       "precision": 0.7843,
+       "recall": 0.7018,
+       "f1": 0.7407,
+       "support": 57,
+       "predicted": 51
+      },
+      "gastrointestinal": {
+       "precision": 0.3158,
+       "recall": 0.3673,
+       "f1": 0.3396,
+       "support": 49,
+       "predicted": 57
+      },
+      "hematologic": {
+       "precision": 0.7692,
+       "recall": 0.2174,
+       "f1": 0.339,
+       "support": 46,
+       "predicted": 13
+      },
+      "respiratorysystem": {
+       "precision": 0.7692,
+       "recall": 0.3571,
+       "f1": 0.4878,
+       "support": 28,
+       "predicted": 13
+      },
+      "dermatologic": {
+       "precision": 0.9167,
+       "recall": 0.4783,
+       "f1": 0.6286,
+       "support": 23,
+       "predicted": 12
+      },
+      "reproductivecontrol": {
+       "precision": 0.4792,
+       "recall": 1.0,
+       "f1": 0.6479,
+       "support": 23,
+       "predicted": 48
+      },
+      "lipidregulating": {
+       "precision": 0.5185,
+       "recall": 0.6667,
+       "f1": 0.5833,
+       "support": 21,
+       "predicted": 27
+      },
+      "urological": {
+       "precision": 0.5,
+       "recall": 0.4286,
+       "f1": 0.4615,
+       "support": 7,
+       "predicted": 6
+      }
+     },
+     "macro_f1": 0.5583,
+     "micro_f1": 0.6335,
+     "micro_precision": 0.6569,
+     "micro_recall": 0.6117,
+     "subset_accuracy": 0.5345,
+     "any_correct": 0.6881,
+     "hamming_loss": 0.0694,
+     "top_1_accuracy": 0.6881,
+     "top_3_accuracy": 0.8786,
+     "multi_label_subset": {
+      "n": 133,
+      "subset_accuracy": 0.1729,
+      "any_correct": 0.8045,
+      "hamming_loss": 0.1103
+     }
+    },
+    "logistic_regression_ecfp4": {
+     "n": 840,
+     "per_class": {
+      "antiinfective": {
+       "precision": 0.7256,
+       "recall": 0.8151,
+       "f1": 0.7677,
+       "support": 292,
+       "predicted": 328
+      },
+      "antineoplastic": {
+       "precision": 0.4834,
+       "recall": 0.622,
+       "f1": 0.544,
+       "support": 164,
+       "predicted": 211
+      },
+      "cns": {
+       "precision": 0.4778,
+       "recall": 0.5621,
+       "f1": 0.5165,
+       "support": 153,
+       "predicted": 180
+      },
+      "cardio": {
+       "precision": 0.5463,
+       "recall": 0.4683,
+       "f1": 0.5043,
+       "support": 126,
+       "predicted": 108
+      },
+      "antiinflammatory": {
+       "precision": 0.5676,
+       "recall": 0.7368,
+       "f1": 0.6412,
+       "support": 57,
+       "predicted": 74
+      },
+      "gastrointestinal": {
+       "precision": 0.1765,
+       "recall": 0.2449,
+       "f1": 0.2051,
+       "support": 49,
+       "predicted": 68
+      },
+      "hematologic": {
+       "precision": 0.3556,
+       "recall": 0.3478,
+       "f1": 0.3516,
+       "support": 46,
+       "predicted": 45
+      },
+      "respiratorysystem": {
+       "precision": 0.2727,
+       "recall": 0.4286,
+       "f1": 0.3333,
+       "support": 28,
+       "predicted": 44
+      },
+      "dermatologic": {
+       "precision": 0.35,
+       "recall": 0.6087,
+       "f1": 0.4444,
+       "support": 23,
+       "predicted": 40
+      },
+      "reproductivecontrol": {
+       "precision": 0.4118,
+       "recall": 0.913,
+       "f1": 0.5676,
+       "support": 23,
+       "predicted": 51
+      },
+      "lipidregulating": {
+       "precision": 0.7222,
+       "recall": 0.619,
+       "f1": 0.6667,
+       "support": 21,
+       "predicted": 18
+      },
+      "urological": {
+       "precision": 0.6667,
+       "recall": 0.8571,
+       "f1": 0.75,
+       "support": 7,
+       "predicted": 9
+      }
+     },
+     "macro_f1": 0.5244,
+     "micro_f1": 0.5737,
+     "micro_precision": 0.5281,
+     "micro_recall": 0.6279,
+     "subset_accuracy": 0.3964,
+     "any_correct": 0.6762,
+     "hamming_loss": 0.0916,
+     "top_1_accuracy": 0.5964,
+     "top_3_accuracy": 0.7917,
+     "multi_label_subset": {
+      "n": 133,
+      "subset_accuracy": 0.2707,
+      "any_correct": 0.7895,
+      "hamming_loss": 0.1234
+     }
+    },
+    "_split": {
+     "kind": "scaffold",
+     "sizes": {
+      "train": 6652,
+      "validation": 844,
+      "test": 840
+     }
+    }
+   },
+   "fragment": {
+    "nearest_neighbour_tanimoto": {
+     "n": 22,
+     "validity_rate_raw": 1.0,
+     "intervention_rate": 0.0,
+     "empty_output_rate": 0.0,
+     "exact_match_rate": 0.1818,
+     "exact_match_rate_raw_only": 0.1818,
+     "mean_tanimoto_to_reference": 0.3301,
+     "median_tanimoto_to_reference": 0.1786,
+     "rule_of_three_pass_rate": 0.6818,
+     "substructure_rate": 0.1818,
+     "hallucination_rate": 0.8182,
+     "substructure_by_path": {
+      "nearest-neighbour": {
+       "rate": 0.1818,
+       "n": 22
+      }
+     }
+    },
+    "most_common_fragment": {
+     "n": 22,
+     "validity_rate_raw": 1.0,
+     "intervention_rate": 0.0,
+     "empty_output_rate": 0.0,
+     "exact_match_rate": 0.5,
+     "exact_match_rate_raw_only": 0.5,
+     "mean_tanimoto_to_reference": 0.5091,
+     "median_tanimoto_to_reference": 1.0,
+     "rule_of_three_pass_rate": 1.0,
+     "substructure_rate": 0.9545,
+     "hallucination_rate": 0.0455,
+     "substructure_by_path": {
+      "constant": {
+       "rate": 0.9545,
+       "n": 22
+      }
+     },
+     "note": "always predicts 'N'"
+    },
+    "_split": {
+     "kind": "scaffold",
+     "sizes": {
+      "train": 175,
+      "validation": 22,
+      "test": 22
+     }
+    }
+   }
+  },
+  "random": {
+   "classification": {
+    "majority_class": {
+     "n": 833,
+     "per_class": {
+      "antiinfective": {
+       "precision": 0.3337,
+       "recall": 1.0,
+       "f1": 0.5005,
+       "support": 278,
+       "predicted": 833
+      },
+      "antineoplastic": {
+       "precision": 0.0,
+       "recall": 0.0,
+       "f1": 0.0,
+       "support": 175,
+       "predicted": 0
+      },
+      "cns": {
+       "precision": 0.0,
+       "recall": 0.0,
+       "f1": 0.0,
+       "support": 164,
+       "predicted": 0
+      },
+      "cardio": {
+       "precision": 0.0,
+       "recall": 0.0,
+       "f1": 0.0,
+       "support": 109,
+       "predicted": 0
+      },
+      "antiinflammatory": {
+       "precision": 0.0,
+       "recall": 0.0,
+       "f1": 0.0,
+       "support": 61,
+       "predicted": 0
+      },
+      "gastrointestinal": {
+       "precision": 0.0,
+       "recall": 0.0,
+       "f1": 0.0,
+       "support": 43,
+       "predicted": 0
+      },
+      "hematologic": {
+       "precision": 0.0,
+       "recall": 0.0,
+       "f1": 0.0,
+       "support": 45,
+       "predicted": 0
+      },
+      "respiratorysystem": {
+       "precision": 0.0,
+       "recall": 0.0,
+       "f1": 0.0,
+       "support": 34,
+       "predicted": 0
+      },
+      "dermatologic": {
+       "precision": 0.0,
+       "recall": 0.0,
+       "f1": 0.0,
+       "support": 27,
+       "predicted": 0
+      },
+      "reproductivecontrol": {
+       "precision": 0.0,
+       "recall": 0.0,
+       "f1": 0.0,
+       "support": 25,
+       "predicted": 0
+      },
+      "lipidregulating": {
+       "precision": 0.0,
+       "recall": 0.0,
+       "f1": 0.0,
+       "support": 19,
+       "predicted": 0
+      },
+      "urological": {
+       "precision": 0.0,
+       "recall": 0.0,
+       "f1": 0.0,
+       "support": 4,
+       "predicted": 0
+      }
+     },
+     "macro_f1": 0.0417,
+     "micro_f1": 0.306,
+     "micro_precision": 0.3337,
+     "micro_recall": 0.2825,
+     "subset_accuracy": 0.2677,
+     "any_correct": 0.3337,
+     "hamming_loss": 0.1262,
+     "top_1_accuracy": 0.3337,
+     "top_3_accuracy": 0.6903,
+     "multi_label_subset": {
+      "n": 131,
+      "subset_accuracy": 0.0,
+      "any_correct": 0.4198,
+      "hamming_loss": 0.1927
+     },
+     "note": "always predicts antiinfective"
+    },
+    "random_forest_ecfp4": {
+     "n": 833,
+     "per_class": {
+      "antiinfective": {
+       "precision": 0.8699,
+       "recall": 0.9137,
+       "f1": 0.8912,
+       "support": 278,
+       "predicted": 292
+      },
+      "antineoplastic": {
+       "precision": 0.848,
+       "recall": 0.8286,
+       "f1": 0.8382,
+       "support": 175,
+       "predicted": 171
+      },
+      "cns": {
+       "precision": 0.779,
+       "recall": 0.8598,
+       "f1": 0.8174,
+       "support": 164,
+       "predicted": 181
+      },
+      "cardio": {
+       "precision": 0.8632,
+       "recall": 0.7523,
+       "f1": 0.8039,
+       "support": 109,
+       "predicted": 95
+      },
+      "antiinflammatory": {
+       "precision": 0.9245,
+       "recall": 0.8033,
+       "f1": 0.8596,
+       "support": 61,
+       "predicted": 53
+      },
+      "gastrointestinal": {
+       "precision": 0.9688,
+       "recall": 0.7209,
+       "f1": 0.8267,
+       "support": 43,
+       "predicted": 32
+      },
+      "hematologic": {
+       "precision": 0.9032,
+       "recall": 0.6222,
+       "f1": 0.7368,
+       "support": 45,
+       "predicted": 31
+      },
+      "respiratorysystem": {
+       "precision": 0.84,
+       "recall": 0.6176,
+       "f1": 0.7119,
+       "support": 34,
+       "predicted": 25
+      },
+      "dermatologic": {
+       "precision": 0.9412,
+       "recall": 0.5926,
+       "f1": 0.7273,
+       "support": 27,
+       "predicted": 17
+      },
+      "reproductivecontrol": {
+       "precision": 0.913,
+       "recall": 0.84,
+       "f1": 0.875,
+       "support": 25,
+       "predicted": 23
+      },
+      "lipidregulating": {
+       "precision": 1.0,
+       "recall": 0.7368,
+       "f1": 0.8485,
+       "support": 19,
+       "predicted": 14
+      },
+      "urological": {
+       "precision": 1.0,
+       "recall": 0.5,
+       "f1": 0.6667,
+       "support": 4,
+       "predicted": 2
+      }
+     },
+     "macro_f1": 0.8003,
+     "micro_f1": 0.8375,
+     "micro_precision": 0.859,
+     "micro_recall": 0.8171,
+     "subset_accuracy": 0.7899,
+     "any_correct": 0.8643,
+     "hamming_loss": 0.0312,
+     "top_1_accuracy": 0.8595,
+     "top_3_accuracy": 0.9508,
+     "multi_label_subset": {
+      "n": 131,
+      "subset_accuracy": 0.5725,
+      "any_correct": 0.9389,
+      "hamming_loss": 0.0534
+     }
+    },
+    "logistic_regression_ecfp4": {
+     "n": 833,
+     "per_class": {
+      "antiinfective": {
+       "precision": 0.8333,
+       "recall": 0.8813,
+       "f1": 0.8566,
+       "support": 278,
+       "predicted": 294
+      },
+      "antineoplastic": {
+       "precision": 0.7313,
+       "recall": 0.84,
+       "f1": 0.7819,
+       "support": 175,
+       "predicted": 201
+      },
+      "cns": {
+       "precision": 0.6974,
+       "recall": 0.8293,
+       "f1": 0.7577,
+       "support": 164,
+       "predicted": 195
+      },
+      "cardio": {
+       "precision": 0.6316,
+       "recall": 0.8807,
+       "f1": 0.7356,
+       "support": 109,
+       "predicted": 152
+      },
+      "antiinflammatory": {
+       "precision": 0.7391,
+       "recall": 0.8361,
+       "f1": 0.7846,
+       "support": 61,
+       "predicted": 69
+      },
+      "gastrointestinal": {
+       "precision": 0.717,
+       "recall": 0.8837,
+       "f1": 0.7917,
+       "support": 43,
+       "predicted": 53
+      },
+      "hematologic": {
+       "precision": 0.5556,
+       "recall": 0.6667,
+       "f1": 0.6061,
+       "support": 45,
+       "predicted": 54
+      },
+      "respiratorysystem": {
+       "precision": 0.6341,
+       "recall": 0.7647,
+       "f1": 0.6933,
+       "support": 34,
+       "predicted": 41
+      },
+      "dermatologic": {
+       "precision": 0.5806,
+       "recall": 0.6667,
+       "f1": 0.6207,
+       "support": 27,
+       "predicted": 31
+      },
+      "reproductivecontrol": {
+       "precision": 0.7667,
+       "recall": 0.92,
+       "f1": 0.8364,
+       "support": 25,
+       "predicted": 30
+      },
+      "lipidregulating": {
+       "precision": 0.8824,
+       "recall": 0.7895,
+       "f1": 0.8333,
+       "support": 19,
+       "predicted": 17
+      },
+      "urological": {
+       "precision": 1.0,
+       "recall": 0.75,
+       "f1": 0.8571,
+       "support": 4,
+       "predicted": 3
+      }
+     },
+     "macro_f1": 0.7629,
+     "micro_f1": 0.7797,
+     "micro_precision": 0.7263,
+     "micro_recall": 0.8415,
+     "subset_accuracy": 0.6759,
+     "any_correct": 0.8679,
+     "hamming_loss": 0.0468,
+     "top_1_accuracy": 0.8175,
+     "top_3_accuracy": 0.9304,
+     "multi_label_subset": {
+      "n": 131,
+      "subset_accuracy": 0.5954,
+      "any_correct": 0.9313,
+      "hamming_loss": 0.0649
+     }
+    },
+    "_split": {
+     "kind": "random",
+     "sizes": {
+      "train": 6669,
+      "validation": 834,
+      "test": 833
+     }
+    }
+   },
+   "fragment": {
+    "nearest_neighbour_tanimoto": {
+     "n": 22,
+     "validity_rate_raw": 1.0,
+     "intervention_rate": 0.0,
+     "empty_output_rate": 0.0,
+     "exact_match_rate": 0.1818,
+     "exact_match_rate_raw_only": 0.1818,
+     "mean_tanimoto_to_reference": 0.4218,
+     "median_tanimoto_to_reference": 0.3077,
+     "rule_of_three_pass_rate": 0.5455,
+     "substructure_rate": 0.3636,
+     "hallucination_rate": 0.6364,
+     "substructure_by_path": {
+      "nearest-neighbour": {
+       "rate": 0.3636,
+       "n": 22
+      }
+     }
+    },
+    "most_common_fragment": {
+     "n": 22,
+     "validity_rate_raw": 1.0,
+     "intervention_rate": 0.0,
+     "empty_output_rate": 0.0,
+     "exact_match_rate": 0.5455,
+     "exact_match_rate_raw_only": 0.5455,
+     "mean_tanimoto_to_reference": 0.5455,
+     "median_tanimoto_to_reference": 1.0,
+     "rule_of_three_pass_rate": 1.0,
+     "substructure_rate": 0.8636,
+     "hallucination_rate": 0.1364,
+     "substructure_by_path": {
+      "constant": {
+       "rate": 0.8636,
+       "n": 22
+      }
+     },
+     "note": "always predicts 'N'"
+    },
+    "_split": {
+     "kind": "random",
+     "sizes": {
+      "train": 175,
+      "validation": 22,
+      "test": 22
+     }
+    }
+   }
+  }
+ },
+ "shipped": {
+  "scaffold": {
+   "classification": {
+    "n": 840,
+    "per_class": {
+     "antiinfective": {
+      "precision": 0.9631,
+      "recall": 0.9829,
+      "f1": 0.9729,
+      "support": 292,
+      "predicted": 298
+     },
+     "antineoplastic": {
+      "precision": 0.9167,
+      "recall": 0.939,
+      "f1": 0.9277,
+      "support": 164,
+      "predicted": 168
+     },
+     "cns": {
+      "precision": 0.9605,
+      "recall": 0.9542,
+      "f1": 0.9574,
+      "support": 153,
+      "predicted": 152
+     },
+     "cardio": {
+      "precision": 0.9474,
+      "recall": 0.8571,
+      "f1": 0.9,
+      "support": 126,
+      "predicted": 114
+     },
+     "antiinflammatory": {
+      "precision": 1.0,
+      "recall": 0.7544,
+      "f1": 0.86,
+      "support": 57,
+      "predicted": 43
+     },
+     "gastrointestinal": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 49,
+      "predicted": 49
+     },
+     "hematologic": {
+      "precision": 0.74,
+      "recall": 0.8043,
+      "f1": 0.7708,
+      "support": 46,
+      "predicted": 50
+     },
+     "respiratorysystem": {
+      "precision": 0.9286,
+      "recall": 0.4643,
+      "f1": 0.619,
+      "support": 28,
+      "predicted": 14
+     },
+     "dermatologic": {
+      "precision": 0.9474,
+      "recall": 0.7826,
+      "f1": 0.8571,
+      "support": 23,
+      "predicted": 19
+     },
+     "reproductivecontrol": {
+      "precision": 0.9583,
+      "recall": 1.0,
+      "f1": 0.9787,
+      "support": 23,
+      "predicted": 24
+     },
+     "lipidregulating": {
+      "precision": 1.0,
+      "recall": 0.9048,
+      "f1": 0.95,
+      "support": 21,
+      "predicted": 19
+     },
+     "urological": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 7,
+      "predicted": 7
+     }
+    },
+    "macro_f1": 0.8995,
+    "micro_f1": 0.9291,
+    "micro_precision": 0.9446,
+    "micro_recall": 0.9141,
+    "subset_accuracy": 0.9095,
+    "any_correct": 0.9631,
+    "hamming_loss": 0.0137,
+    "top_1_accuracy": 0.9536,
+    "top_3_accuracy": 0.9774,
+    "multi_label_subset": {
+     "n": 133,
+     "subset_accuracy": 0.6541,
+     "any_correct": 0.9774,
+     "hamming_loss": 0.0501
+    },
+    "confusion": {
+     "n": 707,
+     "matrix": {
+      "antiinfective": {
+       "antiinfective": 238,
+       "cardio": 2
+      },
+      "antineoplastic": {
+       "antineoplastic": 109,
+       "cns": 1
+      },
+      "cns": {
+       "cns": 114,
+       "antiinfective": 1
+      },
+      "cardio": {
+       "cardio": 73,
+       "cns": 3,
+       "antiinfective": 2,
+       "antineoplastic": 2
+      },
+      "antiinflammatory": {
+       "antiinflammatory": 27,
+       "antineoplastic": 5,
+       "dermatologic": 1,
+       "cns": 1
+      },
+      "gastrointestinal": {
+       "gastrointestinal": 30,
+       "antiinfective": 2
+      },
+      "hematologic": {
+       "hematologic": 22,
+       "cardio": 2,
+       "antiinfective": 2
+      },
+      "respiratorysystem": {
+       "respiratorysystem": 9
+      },
+      "dermatologic": {
+       "dermatologic": 15,
+       "antineoplastic": 5
+      },
+      "reproductivecontrol": {
+       "reproductivecontrol": 22
+      },
+      "lipidregulating": {
+       "lipidregulating": 17,
+       "antiinfective": 1
+      },
+      "urological": {
+       "urological": 1
+      }
+     }
+    },
+    "raw_output_was_exact_label": 0.8595,
+    "model": "NisargRhino/drug-classification",
+    "split": "classification_scaffold",
+    "subset": "test",
+    "contaminated": true
+   },
+   "fragment": {
+    "n": 22,
+    "validity_rate_raw": 0.4091,
+    "intervention_rate": 0.5909,
+    "empty_output_rate": 0.0,
+    "exact_match_rate": 0.0,
+    "exact_match_rate_raw_only": 0.0,
+    "mean_tanimoto_to_reference": 0.1938,
+    "median_tanimoto_to_reference": 0.1818,
+    "rule_of_three_pass_rate": 0.7727,
+    "substructure_rate": 0.0455,
+    "hallucination_rate": 0.9545,
+    "substructure_by_path": {
+     "model": {
+      "rate": 0.1111,
+      "n": 9
+     },
+     "nearest-reference": {
+      "rate": 0.0,
+      "n": 13
+     }
+    },
+    "model": "NisargRhino/protein-models",
+    "split": "fragment_scaffold",
+    "subset": "test",
+    "contaminated": true
+   }
+  },
+  "random": {
+   "classification": {
+    "n": 833,
+    "per_class": {
+     "antiinfective": {
+      "precision": 0.9676,
+      "recall": 0.9676,
+      "f1": 0.9676,
+      "support": 278,
+      "predicted": 278
+     },
+     "antineoplastic": {
+      "precision": 0.9702,
+      "recall": 0.9314,
+      "f1": 0.9504,
+      "support": 175,
+      "predicted": 168
+     },
+     "cns": {
+      "precision": 0.9747,
+      "recall": 0.939,
+      "f1": 0.9565,
+      "support": 164,
+      "predicted": 158
+     },
+     "cardio": {
+      "precision": 0.8962,
+      "recall": 0.8716,
+      "f1": 0.8837,
+      "support": 109,
+      "predicted": 106
+     },
+     "antiinflammatory": {
+      "precision": 0.9615,
+      "recall": 0.8197,
+      "f1": 0.885,
+      "support": 61,
+      "predicted": 52
+     },
+     "gastrointestinal": {
+      "precision": 0.9545,
+      "recall": 0.9767,
+      "f1": 0.9655,
+      "support": 43,
+      "predicted": 44
+     },
+     "hematologic": {
+      "precision": 0.8696,
+      "recall": 0.8889,
+      "f1": 0.8791,
+      "support": 45,
+      "predicted": 46
+     },
+     "respiratorysystem": {
+      "precision": 0.8966,
+      "recall": 0.7647,
+      "f1": 0.8254,
+      "support": 34,
+      "predicted": 29
+     },
+     "dermatologic": {
+      "precision": 0.92,
+      "recall": 0.8519,
+      "f1": 0.8846,
+      "support": 27,
+      "predicted": 25
+     },
+     "reproductivecontrol": {
+      "precision": 1.0,
+      "recall": 0.8,
+      "f1": 0.8889,
+      "support": 25,
+      "predicted": 20
+     },
+     "lipidregulating": {
+      "precision": 0.9412,
+      "recall": 0.8421,
+      "f1": 0.8889,
+      "support": 19,
+      "predicted": 17
+     },
+     "urological": {
+      "precision": 1.0,
+      "recall": 0.75,
+      "f1": 0.8571,
+      "support": 4,
+      "predicted": 3
+     }
+    },
+    "macro_f1": 0.9027,
+    "micro_f1": 0.9337,
+    "micro_precision": 0.9524,
+    "micro_recall": 0.9157,
+    "subset_accuracy": 0.9148,
+    "any_correct": 0.9676,
+    "hamming_loss": 0.0128,
+    "top_1_accuracy": 0.958,
+    "top_3_accuracy": 0.9844,
+    "multi_label_subset": {
+     "n": 131,
+     "subset_accuracy": 0.6336,
+     "any_correct": 0.9542,
+     "hamming_loss": 0.0534
+    },
+    "confusion": {
+     "n": 702,
+     "matrix": {
+      "antiinfective": {
+       "antiinfective": 219,
+       "cardio": 2,
+       "cns": 1,
+       "antineoplastic": 1
+      },
+      "antineoplastic": {
+       "antineoplastic": 124,
+       "antiinfective": 3,
+       "cardio": 1,
+       "cns": 1
+      },
+      "cns": {
+       "cns": 121,
+       "cardio": 1
+      },
+      "cardio": {
+       "cardio": 73,
+       "antiinfective": 1
+      },
+      "antiinflammatory": {
+       "antiinflammatory": 41,
+       "antineoplastic": 2,
+       "antiinfective": 1,
+       "cardio": 1
+      },
+      "gastrointestinal": {
+       "gastrointestinal": 20,
+       "antiinfective": 1
+      },
+      "hematologic": {
+       "hematologic": 29,
+       "cardio": 1,
+       "antiinfective": 1
+      },
+      "respiratorysystem": {
+       "respiratorysystem": 8
+      },
+      "dermatologic": {
+       "dermatologic": 14,
+       "antineoplastic": 1
+      },
+      "reproductivecontrol": {
+       "reproductivecontrol": 17,
+       "cardio": 2,
+       "antiinfective": 1
+      },
+      "lipidregulating": {
+       "lipidregulating": 12
+      },
+      "urological": {
+       "urological": 2
+      }
+     }
+    },
+    "raw_output_was_exact_label": 0.8583,
+    "model": "NisargRhino/drug-classification",
+    "split": "classification_random",
+    "subset": "test",
+    "contaminated": true
+   },
+   "fragment": {
+    "n": 22,
+    "validity_rate_raw": 0.1818,
+    "intervention_rate": 0.8182,
+    "empty_output_rate": 0.0,
+    "exact_match_rate": 0.0,
+    "exact_match_rate_raw_only": 0.0,
+    "mean_tanimoto_to_reference": 0.2797,
+    "median_tanimoto_to_reference": 0.2333,
+    "rule_of_three_pass_rate": 0.5455,
+    "substructure_rate": 0.1818,
+    "hallucination_rate": 0.8182,
+    "substructure_by_path": {
+     "nearest-reference": {
+      "rate": 0.1111,
+      "n": 18
+     },
+     "model": {
+      "rate": 0.5,
+      "n": 4
+     }
+    },
+    "model": "NisargRhino/protein-models",
+    "split": "fragment_random",
+    "subset": "test",
+    "contaminated": true
+   }
+  }
+ },
+ "headline_classification": null,
+ "headline_fragment": {
+  "scaffold": {
+   "task": "fragment",
+   "split": "scaffold",
+   "name": "learning_curve",
+   "train_fraction": 1.0,
+   "train_pairs": 980,
+   "train_compounds": 175,
+   "config": {
+    "epochs": 6,
+    "early_stopping": false
+   },
+   "class_weighting": false,
+   "training": {
+    "history": [
+     {
+      "epoch": 1,
+      "train_loss": 3.8445,
+      "val_loss": 2.448,
+      "seconds": 24.5
+     },
+     {
+      "epoch": 2,
+      "train_loss": 2.2881,
+      "val_loss": 2.1488,
+      "seconds": 18.5
+     },
+     {
+      "epoch": 3,
+      "train_loss": 2.1111,
+      "val_loss": 2.0968,
+      "seconds": 16.5
+     },
+     {
+      "epoch": 4,
+      "train_loss": 2.0018,
+      "val_loss": 2.0891,
+      "seconds": 15.7
+     },
+     {
+      "epoch": 5,
+      "train_loss": 1.8996,
+      "val_loss": 2.0994,
+      "seconds": 17.2
+     },
+     {
+      "epoch": 6,
+      "train_loss": 1.8041,
+      "val_loss": 2.1158,
+      "seconds": 15.2
+     }
+    ],
+    "best_epoch": 4,
+    "best_val_loss": 2.0891,
+    "trainable_parameters": 44106239
+   },
+   "test": {
+    "validity_rate_raw": 0.0,
+    "exact_match_rate": 0.0,
+    "mean_tanimoto_to_reference": 0.0687,
+    "substructure_rate": 0.0,
+    "rule_of_three_pass_rate": 0.3636
+   },
+   "full_test_metrics": {
+    "n": 22,
+    "validity_rate_raw": 0.0,
+    "intervention_rate": 1.0,
+    "empty_output_rate": 0.0,
+    "exact_match_rate": 0.0,
+    "exact_match_rate_raw_only": 0.0,
+    "mean_tanimoto_to_reference": 0.0687,
+    "median_tanimoto_to_reference": 0.0645,
+    "rule_of_three_pass_rate": 0.3636,
+    "substructure_rate": 0.0,
+    "hallucination_rate": 1.0,
+    "substructure_by_path": {
+     "nearest-reference": {
+      "rate": 0.0,
+      "n": 22
+     }
+    },
+    "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_learning_curve",
+    "split": "fragment_scaffold",
+    "subset": "test",
+    "contaminated": false
+   },
+   "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_learning_curve",
+   "minutes": 1.9,
+   "validation_loss_turns_upward_after_epoch": 4,
+   "doubles_as": [
+    "headline_scaffold",
+    "intervention_1_early_stopping"
+   ]
+  },
+  "random": {
+   "task": "fragment",
+   "split": "random",
+   "name": "headline",
+   "train_fraction": 1.0,
+   "train_pairs": 940,
+   "train_compounds": 175,
+   "config": {
+    "epochs": 6
+   },
+   "class_weighting": false,
+   "training": {
+    "history": [
+     {
+      "epoch": 1,
+      "train_loss": 3.8874,
+      "val_loss": 2.4203,
+      "seconds": 14.0
+     },
+     {
+      "epoch": 2,
+      "train_loss": 2.3282,
+      "val_loss": 2.1795,
+      "seconds": 13.6
+     },
+     {
+      "epoch": 3,
+      "train_loss": 2.1164,
+      "val_loss": 2.1024,
+      "seconds": 13.1
+     },
+     {
+      "epoch": 4,
+      "train_loss": 2.0101,
+      "val_loss": 2.0244,
+      "seconds": 13.0
+     },
+     {
+      "epoch": 5,
+      "train_loss": 1.9088,
+      "val_loss": 2.0376,
+      "seconds": 13.4
+     },
+     {
+      "epoch": 6,
+      "train_loss": 1.8176,
+      "val_loss": 1.9934,
+      "seconds": 14.6
+     }
+    ],
+    "best_epoch": 6,
+    "best_val_loss": 1.9934,
+    "trainable_parameters": 44106239
+   },
+   "test": {
+    "validity_rate_raw": 0.0,
+    "exact_match_rate": 0.0,
+    "mean_tanimoto_to_reference": 0.1154,
+    "substructure_rate": 0.0,
+    "rule_of_three_pass_rate": 0.5455
+   },
+   "full_test_metrics": {
+    "n": 22,
+    "validity_rate_raw": 0.0,
+    "intervention_rate": 1.0,
+    "empty_output_rate": 0.0,
+    "exact_match_rate": 0.0,
+    "exact_match_rate_raw_only": 0.0,
+    "mean_tanimoto_to_reference": 0.1154,
+    "median_tanimoto_to_reference": 0.125,
+    "rule_of_three_pass_rate": 0.5455,
+    "substructure_rate": 0.0,
+    "hallucination_rate": 1.0,
+    "substructure_by_path": {
+     "nearest-reference": {
+      "rate": 0.0,
+      "n": 22
+     }
+    },
+    "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_random_headline",
+    "split": "fragment_random",
+    "subset": "test",
+    "contaminated": false
+   },
+   "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_random_headline",
+   "minutes": 1.4
+  },
+  "gap": {
+   "metric": "exact_match_rate",
+   "random": 0.0,
+   "scaffold": 0.0,
+   "difference": 0.0
+  }
+ },
+ "learning_curve_classification": null,
+ "learning_curve_fragment": {
+  "task": "fragment",
+  "split": "scaffold",
+  "name": "learning_curve",
+  "train_fraction": 1.0,
+  "train_pairs": 980,
+  "train_compounds": 175,
+  "config": {
+   "epochs": 6,
+   "early_stopping": false
+  },
+  "class_weighting": false,
+  "training": {
+   "history": [
+    {
+     "epoch": 1,
+     "train_loss": 3.8445,
+     "val_loss": 2.448,
+     "seconds": 24.5
+    },
+    {
+     "epoch": 2,
+     "train_loss": 2.2881,
+     "val_loss": 2.1488,
+     "seconds": 18.5
+    },
+    {
+     "epoch": 3,
+     "train_loss": 2.1111,
+     "val_loss": 2.0968,
+     "seconds": 16.5
+    },
+    {
+     "epoch": 4,
+     "train_loss": 2.0018,
+     "val_loss": 2.0891,
+     "seconds": 15.7
+    },
+    {
+     "epoch": 5,
+     "train_loss": 1.8996,
+     "val_loss": 2.0994,
+     "seconds": 17.2
+    },
+    {
+     "epoch": 6,
+     "train_loss": 1.8041,
+     "val_loss": 2.1158,
+     "seconds": 15.2
+    }
+   ],
+   "best_epoch": 4,
+   "best_val_loss": 2.0891,
+   "trainable_parameters": 44106239
+  },
+  "test": {
+   "validity_rate_raw": 0.0,
+   "exact_match_rate": 0.0,
+   "mean_tanimoto_to_reference": 0.0687,
+   "substructure_rate": 0.0,
+   "rule_of_three_pass_rate": 0.3636
+  },
+  "full_test_metrics": {
+   "n": 22,
+   "validity_rate_raw": 0.0,
+   "intervention_rate": 1.0,
+   "empty_output_rate": 0.0,
+   "exact_match_rate": 0.0,
+   "exact_match_rate_raw_only": 0.0,
+   "mean_tanimoto_to_reference": 0.0687,
+   "median_tanimoto_to_reference": 0.0645,
+   "rule_of_three_pass_rate": 0.3636,
+   "substructure_rate": 0.0,
+   "hallucination_rate": 1.0,
+   "substructure_by_path": {
+    "nearest-reference": {
+     "rate": 0.0,
+     "n": 22
+    }
+   },
+   "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_learning_curve",
+   "split": "fragment_scaffold",
+   "subset": "test",
+   "contaminated": false
+  },
+  "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_learning_curve",
+  "minutes": 1.9,
+  "validation_loss_turns_upward_after_epoch": 4,
+  "doubles_as": [
+   "headline_scaffold",
+   "intervention_1_early_stopping"
+  ]
+ },
+ "data_scaling_classification": null,
+ "data_scaling_fragment": {
+  "task": "fragment",
+  "points": [
+   {
+    "task": "fragment",
+    "split": "scaffold",
+    "name": "scale_10",
+    "train_fraction": 0.1,
+    "train_pairs": 115,
+    "train_compounds": 18,
+    "config": {
+     "epochs": 6
+    },
+    "class_weighting": false,
+    "training": {
+     "history": [
+      {
+       "epoch": 1,
+       "train_loss": 7.2042,
+       "val_loss": 5.0735,
+       "seconds": 3.2
+      },
+      {
+       "epoch": 2,
+       "train_loss": 4.3943,
+       "val_loss": 4.2411,
+       "seconds": 2.2
+      },
+      {
+       "epoch": 3,
+       "train_loss": 3.7281,
+       "val_loss": 3.5671,
+       "seconds": 2.1
+      },
+      {
+       "epoch": 4,
+       "train_loss": 3.2297,
+       "val_loss": 3.1648,
+       "seconds": 2.8
+      },
+      {
+       "epoch": 5,
+       "train_loss": 2.8629,
+       "val_loss": 3.0844,
+       "seconds": 2.7
+      },
+      {
+       "epoch": 6,
+       "train_loss": 2.5406,
+       "val_loss": 2.8692,
+       "seconds": 2.0
+      }
+     ],
+     "best_epoch": 6,
+     "best_val_loss": 2.8692,
+     "trainable_parameters": 44106239
+    },
+    "test": {
+     "validity_rate_raw": 0.0,
+     "exact_match_rate": 0.0,
+     "mean_tanimoto_to_reference": 0.1194,
+     "substructure_rate": 0.0,
+     "rule_of_three_pass_rate": 0.4091
+    },
+    "full_test_metrics": {
+     "n": 22,
+     "validity_rate_raw": 0.0,
+     "intervention_rate": 1.0,
+     "empty_output_rate": 0.0,
+     "exact_match_rate": 0.0,
+     "exact_match_rate_raw_only": 0.0,
+     "mean_tanimoto_to_reference": 0.1194,
+     "median_tanimoto_to_reference": 0.0909,
+     "rule_of_three_pass_rate": 0.4091,
+     "substructure_rate": 0.0,
+     "hallucination_rate": 1.0,
+     "substructure_by_path": {
+      "nearest-reference": {
+       "rate": 0.0,
+       "n": 22
+      }
+     },
+     "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_scale_10",
+     "split": "fragment_scaffold",
+     "subset": "test",
+     "contaminated": false
+    },
+    "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_scale_10",
+    "minutes": 0.3
+   },
+   {
+    "task": "fragment",
+    "split": "scaffold",
+    "name": "scale_25",
+    "train_fraction": 0.25,
+    "train_pairs": 251,
+    "train_compounds": 44,
+    "config": {
+     "epochs": 6
+    },
+    "class_weighting": false,
+    "training": {
+     "history": [
+      {
+       "epoch": 1,
+       "train_loss": 5.8708,
+       "val_loss": 4.2196,
+       "seconds": 4.7
+      },
+      {
+       "epoch": 2,
+       "train_loss": 3.5791,
+       "val_loss": 3.1468,
+       "seconds": 4.0
+      },
+      {
+       "epoch": 3,
+       "train_loss": 2.8877,
+       "val_loss": 2.7561,
+       "seconds": 4.0
+      },
+      {
+       "epoch": 4,
+       "train_loss": 2.4867,
+       "val_loss": 2.4934,
+       "seconds": 4.0
+      },
+      {
+       "epoch": 5,
+       "train_loss": 2.2473,
+       "val_loss": 2.4077,
+       "seconds": 4.1
+      },
+      {
+       "epoch": 6,
+       "train_loss": 2.1159,
+       "val_loss": 2.3905,
+       "seconds": 4.3
+      }
+     ],
+     "best_epoch": 6,
+     "best_val_loss": 2.3905,
+     "trainable_parameters": 44106239
+    },
+    "test": {
+     "validity_rate_raw": 0.0,
+     "exact_match_rate": 0.0,
+     "mean_tanimoto_to_reference": 0.106,
+     "substructure_rate": 0.0,
+     "rule_of_three_pass_rate": 0.3636
+    },
+    "full_test_metrics": {
+     "n": 22,
+     "validity_rate_raw": 0.0,
+     "intervention_rate": 1.0,
+     "empty_output_rate": 0.0,
+     "exact_match_rate": 0.0,
+     "exact_match_rate_raw_only": 0.0,
+     "mean_tanimoto_to_reference": 0.106,
+     "median_tanimoto_to_reference": 0.1026,
+     "rule_of_three_pass_rate": 0.3636,
+     "substructure_rate": 0.0,
+     "hallucination_rate": 1.0,
+     "substructure_by_path": {
+      "nearest-reference": {
+       "rate": 0.0,
+       "n": 22
+      }
+     },
+     "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_scale_25",
+     "split": "fragment_scaffold",
+     "subset": "test",
+     "contaminated": false
+    },
+    "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_scale_25",
+    "minutes": 0.5
+   },
+   {
+    "task": "fragment",
+    "split": "scaffold",
+    "name": "scale_50",
+    "train_fraction": 0.5,
+    "train_pairs": 491,
+    "train_compounds": 88,
+    "config": {
+     "epochs": 6
+    },
+    "class_weighting": false,
+    "training": {
+     "history": [
+      {
+       "epoch": 1,
+       "train_loss": 4.8613,
+       "val_loss": 3.2038,
+       "seconds": 7.7
+      },
+      {
+       "epoch": 2,
+       "train_loss": 2.729,
+       "val_loss": 2.4925,
+       "seconds": 7.8
+      },
+      {
+       "epoch": 3,
+       "train_loss": 2.3104,
+       "val_loss": 2.2928,
+       "seconds": 7.9
+      },
+      {
+       "epoch": 4,
+       "train_loss": 2.1461,
+       "val_loss": 2.2178,
+       "seconds": 7.7
+      },
+      {
+       "epoch": 5,
+       "train_loss": 1.9992,
+       "val_loss": 2.1762,
+       "seconds": 7.9
+      },
+      {
+       "epoch": 6,
+       "train_loss": 1.884,
+       "val_loss": 2.1954,
+       "seconds": 7.8
+      }
+     ],
+     "best_epoch": 5,
+     "best_val_loss": 2.1762,
+     "trainable_parameters": 44106239
+    },
+    "test": {
+     "validity_rate_raw": 0.0,
+     "exact_match_rate": 0.0,
+     "mean_tanimoto_to_reference": 0.1087,
+     "substructure_rate": 0.0,
+     "rule_of_three_pass_rate": 0.5909
+    },
+    "full_test_metrics": {
+     "n": 22,
+     "validity_rate_raw": 0.0,
+     "intervention_rate": 1.0,
+     "empty_output_rate": 0.0,
+     "exact_match_rate": 0.0,
+     "exact_match_rate_raw_only": 0.0,
+     "mean_tanimoto_to_reference": 0.1087,
+     "median_tanimoto_to_reference": 0.0952,
+     "rule_of_three_pass_rate": 0.5909,
+     "substructure_rate": 0.0,
+     "hallucination_rate": 1.0,
+     "substructure_by_path": {
+      "nearest-reference": {
+       "rate": 0.0,
+       "n": 22
+      }
+     },
+     "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_scale_50",
+     "split": "fragment_scaffold",
+     "subset": "test",
+     "contaminated": false
+    },
+    "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_scale_50",
+    "minutes": 0.8
+   },
+   {
+    "task": "fragment",
+    "split": "scaffold",
+    "name": "learning_curve",
+    "train_fraction": 1.0,
+    "train_pairs": 980,
+    "train_compounds": 175,
+    "config": {
+     "epochs": 6,
+     "early_stopping": false
+    },
+    "class_weighting": false,
+    "training": {
+     "history": [
+      {
+       "epoch": 1,
+       "train_loss": 3.8445,
+       "val_loss": 2.448,
+       "seconds": 24.5
+      },
+      {
+       "epoch": 2,
+       "train_loss": 2.2881,
+       "val_loss": 2.1488,
+       "seconds": 18.5
+      },
+      {
+       "epoch": 3,
+       "train_loss": 2.1111,
+       "val_loss": 2.0968,
+       "seconds": 16.5
+      },
+      {
+       "epoch": 4,
+       "train_loss": 2.0018,
+       "val_loss": 2.0891,
+       "seconds": 15.7
+      },
+      {
+       "epoch": 5,
+       "train_loss": 1.8996,
+       "val_loss": 2.0994,
+       "seconds": 17.2
+      },
+      {
+       "epoch": 6,
+       "train_loss": 1.8041,
+       "val_loss": 2.1158,
+       "seconds": 15.2
+      }
+     ],
+     "best_epoch": 4,
+     "best_val_loss": 2.0891,
+     "trainable_parameters": 44106239
+    },
+    "test": {
+     "validity_rate_raw": 0.0,
+     "exact_match_rate": 0.0,
+     "mean_tanimoto_to_reference": 0.0687,
+     "substructure_rate": 0.0,
+     "rule_of_three_pass_rate": 0.3636
+    },
+    "full_test_metrics": {
+     "n": 22,
+     "validity_rate_raw": 0.0,
+     "intervention_rate": 1.0,
+     "empty_output_rate": 0.0,
+     "exact_match_rate": 0.0,
+     "exact_match_rate_raw_only": 0.0,
+     "mean_tanimoto_to_reference": 0.0687,
+     "median_tanimoto_to_reference": 0.0645,
+     "rule_of_three_pass_rate": 0.3636,
+     "substructure_rate": 0.0,
+     "hallucination_rate": 1.0,
+     "substructure_by_path": {
+      "nearest-reference": {
+       "rate": 0.0,
+       "n": 22
+      }
+     },
+     "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_learning_curve",
+     "split": "fragment_scaffold",
+     "subset": "test",
+     "contaminated": false
+    },
+    "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_learning_curve",
+    "minutes": 1.9,
+    "validation_loss_turns_upward_after_epoch": 4,
+    "doubles_as": [
+     "headline_scaffold",
+     "intervention_1_early_stopping"
+    ]
+   }
+  ],
+  "still_climbing": false
+ },
+ "interventions_classification": null,
+ "interventions_fragment": {
+  "task": "fragment",
+  "steps": [
+   {
+    "task": "fragment",
+    "split": "scaffold",
+    "name": "1_early_stopping",
+    "train_fraction": 1.0,
+    "train_pairs": 980,
+    "train_compounds": 175,
+    "config": {
+     "epochs": 6,
+     "early_stopping": false
+    },
+    "class_weighting": false,
+    "training": {
+     "history": [
+      {
+       "epoch": 1,
+       "train_loss": 3.8445,
+       "val_loss": 2.448,
+       "seconds": 24.5
+      },
+      {
+       "epoch": 2,
+       "train_loss": 2.2881,
+       "val_loss": 2.1488,
+       "seconds": 18.5
+      },
+      {
+       "epoch": 3,
+       "train_loss": 2.1111,
+       "val_loss": 2.0968,
+       "seconds": 16.5
+      },
+      {
+       "epoch": 4,
+       "train_loss": 2.0018,
+       "val_loss": 2.0891,
+       "seconds": 15.7
+      },
+      {
+       "epoch": 5,
+       "train_loss": 1.8996,
+       "val_loss": 2.0994,
+       "seconds": 17.2
+      },
+      {
+       "epoch": 6,
+       "train_loss": 1.8041,
+       "val_loss": 2.1158,
+       "seconds": 15.2
+      }
+     ],
+     "best_epoch": 4,
+     "best_val_loss": 2.0891,
+     "trainable_parameters": 44106239
+    },
+    "test": {
+     "validity_rate_raw": 0.0,
+     "exact_match_rate": 0.0,
+     "mean_tanimoto_to_reference": 0.0687,
+     "substructure_rate": 0.0,
+     "rule_of_three_pass_rate": 0.3636
+    },
+    "full_test_metrics": {
+     "n": 22,
+     "validity_rate_raw": 0.0,
+     "intervention_rate": 1.0,
+     "empty_output_rate": 0.0,
+     "exact_match_rate": 0.0,
+     "exact_match_rate_raw_only": 0.0,
+     "mean_tanimoto_to_reference": 0.0687,
+     "median_tanimoto_to_reference": 0.0645,
+     "rule_of_three_pass_rate": 0.3636,
+     "substructure_rate": 0.0,
+     "hallucination_rate": 1.0,
+     "substructure_by_path": {
+      "nearest-reference": {
+       "rate": 0.0,
+       "n": 22
+      }
+     },
+     "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_learning_curve",
+     "split": "fragment_scaffold",
+     "subset": "test",
+     "contaminated": false
+    },
+    "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_learning_curve",
+    "minutes": 1.9,
+    "validation_loss_turns_upward_after_epoch": 4,
+    "doubles_as": [
+     "headline_scaffold",
+     "intervention_1_early_stopping"
+    ],
+    "note": "the learning-curve run with best-validation weights restored, which is what early stopping selects"
+   },
+   {
+    "task": "fragment",
+    "split": "scaffold",
+    "name": "2_dropout_weight_decay",
+    "train_fraction": 1.0,
+    "train_pairs": 980,
+    "train_compounds": 175,
+    "config": {
+     "epochs": 6,
+     "early_stopping": true,
+     "patience": 2,
+     "dropout": 0.2,
+     "weight_decay": 0.01
+    },
+    "class_weighting": false,
+    "training": {
+     "history": [
+      {
+       "epoch": 1,
+       "train_loss": 3.8761,
+       "val_loss": 2.4862,
+       "seconds": 15.3
+      },
+      {
+       "epoch": 2,
+       "train_loss": 2.3334,
+       "val_loss": 2.2009,
+       "seconds": 15.3
+      },
+      {
+       "epoch": 3,
+       "train_loss": 2.168,
+       "val_loss": 2.1059,
+       "seconds": 14.8
+      },
+      {
+       "epoch": 4,
+       "train_loss": 2.0783,
+       "val_loss": 2.0935,
+       "seconds": 14.9
+      },
+      {
+       "epoch": 5,
+       "train_loss": 1.9997,
+       "val_loss": 2.0784,
+       "seconds": 15.1
+      },
+      {
+       "epoch": 6,
+       "train_loss": 1.9266,
+       "val_loss": 2.079,
+       "seconds": 14.3
+      }
+     ],
+     "best_epoch": 5,
+     "best_val_loss": 2.0784,
+     "trainable_parameters": 44106239
+    },
+    "test": {
+     "validity_rate_raw": 0.0455,
+     "exact_match_rate": 0.0,
+     "mean_tanimoto_to_reference": 0.0866,
+     "substructure_rate": 0.0909,
+     "rule_of_three_pass_rate": 0.7273
+    },
+    "full_test_metrics": {
+     "n": 22,
+     "validity_rate_raw": 0.0455,
+     "intervention_rate": 0.9545,
+     "empty_output_rate": 0.0,
+     "exact_match_rate": 0.0,
+     "exact_match_rate_raw_only": 0.0,
+     "mean_tanimoto_to_reference": 0.0866,
+     "median_tanimoto_to_reference": 0.0926,
+     "rule_of_three_pass_rate": 0.7273,
+     "substructure_rate": 0.0909,
+     "hallucination_rate": 0.9091,
+     "substructure_by_path": {
+      "nearest-reference": {
+       "rate": 0.0476,
+       "n": 21
+      },
+      "model": {
+       "rate": 1.0,
+       "n": 1
+      }
+     },
+     "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_2_dropout_weight_decay",
+     "split": "fragment_scaffold",
+     "subset": "test",
+     "contaminated": false
+    },
+    "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_2_dropout_weight_decay",
+    "minutes": 1.5
+   },
+   {
+    "task": "fragment",
+    "split": "scaffold",
+    "name": "4_freeze_lower_layers",
+    "train_fraction": 1.0,
+    "train_pairs": 980,
+    "train_compounds": 175,
+    "config": {
+     "epochs": 6,
+     "early_stopping": true,
+     "patience": 2,
+     "freeze_below_top": 2
+    },
+    "class_weighting": false,
+    "training": {
+     "history": [
+      {
+       "epoch": 1,
+       "train_loss": 4.8296,
+       "val_loss": 3.1193,
+       "seconds": 9.0
+      },
+      {
+       "epoch": 2,
+       "train_loss": 2.8557,
+       "val_loss": 2.7586,
+       "seconds": 8.3
+      },
+      {
+       "epoch": 3,
+       "train_loss": 2.5838,
+       "val_loss": 2.6533,
+       "seconds": 8.1
+      },
+      {
+       "epoch": 4,
+       "train_loss": 2.4599,
+       "val_loss": 2.6129,
+       "seconds": 8.1
+      },
+      {
+       "epoch": 5,
+       "train_loss": 2.3552,
+       "val_loss": 2.5891,
+       "seconds": 8.0
+      },
+      {
+       "epoch": 6,
+       "train_loss": 2.269,
+       "val_loss": 2.6001,
+       "seconds": 8.1
+      }
+     ],
+     "best_epoch": 5,
+     "best_val_loss": 2.5891,
+     "trainable_parameters": 14768639
+    },
+    "test": {
+     "validity_rate_raw": 0.0,
+     "exact_match_rate": 0.0,
+     "mean_tanimoto_to_reference": 0.0915,
+     "substructure_rate": 0.0,
+     "rule_of_three_pass_rate": 0.6364
+    },
+    "full_test_metrics": {
+     "n": 22,
+     "validity_rate_raw": 0.0,
+     "intervention_rate": 1.0,
+     "empty_output_rate": 0.0,
+     "exact_match_rate": 0.0,
+     "exact_match_rate_raw_only": 0.0,
+     "mean_tanimoto_to_reference": 0.0915,
+     "median_tanimoto_to_reference": 0.0962,
+     "rule_of_three_pass_rate": 0.6364,
+     "substructure_rate": 0.0,
+     "hallucination_rate": 1.0,
+     "substructure_by_path": {
+      "nearest-reference": {
+       "rate": 0.0,
+       "n": 22
+      }
+     },
+     "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_4_freeze_lower_layers",
+     "split": "fragment_scaffold",
+     "subset": "test",
+     "contaminated": false
+    },
+    "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_4_freeze_lower_layers",
+    "minutes": 0.9
+   }
+  ]
+ },
+ "memorisation_control_fragment": {
+  "task": "fragment",
+  "name": "memorisation_control",
+  "epochs": 20,
+  "train_pairs": 1223,
+  "training": {
+   "history": [
+    {
+     "epoch": 1,
+     "train_loss": 3.55,
+     "val_loss": 2.2956,
+     "seconds": 22.3
+    },
+    {
+     "epoch": 2,
+     "train_loss": 2.2125,
+     "val_loss": 1.9912,
+     "seconds": 20.5
+    },
+    {
+     "epoch": 3,
+     "train_loss": 2.0602,
+     "val_loss": 1.8633,
+     "seconds": 22.1
+    },
+    {
+     "epoch": 4,
+     "train_loss": 1.9555,
+     "val_loss": 1.799,
+     "seconds": 22.0
+    },
+    {
+     "epoch": 5,
+     "train_loss": 1.8665,
+     "val_loss": 1.7019,
+     "seconds": 20.4
+    },
+    {
+     "epoch": 6,
+     "train_loss": 1.7858,
+     "val_loss": 1.597,
+     "seconds": 18.1
+    },
+    {
+     "epoch": 7,
+     "train_loss": 1.7053,
+     "val_loss": 1.5278,
+     "seconds": 18.5
+    },
+    {
+     "epoch": 8,
+     "train_loss": 1.6293,
+     "val_loss": 1.4396,
+     "seconds": 17.9
+    },
+    {
+     "epoch": 9,
+     "train_loss": 1.549,
+     "val_loss": 1.3819,
+     "seconds": 17.6
+    },
+    {
+     "epoch": 10,
+     "train_loss": 1.4778,
+     "val_loss": 1.3268,
+     "seconds": 18.7
+    },
+    {
+     "epoch": 11,
+     "train_loss": 1.4429,
+     "val_loss": 1.2718,
+     "seconds": 17.8
+    },
+    {
+     "epoch": 12,
+     "train_loss": 1.378,
+     "val_loss": 1.2437,
+     "seconds": 17.9
+    },
+    {
+     "epoch": 13,
+     "train_loss": 1.3364,
+     "val_loss": 1.195,
+     "seconds": 17.8
+    },
+    {
+     "epoch": 14,
+     "train_loss": 1.296,
+     "val_loss": 1.1798,
+     "seconds": 18.6
+    },
+    {
+     "epoch": 15,
+     "train_loss": 1.264,
+     "val_loss": 1.1557,
+     "seconds": 18.5
+    },
+    {
+     "epoch": 16,
+     "train_loss": 1.2463,
+     "val_loss": 1.1319,
+     "seconds": 18.1
+    },
+    {
+     "epoch": 17,
+     "train_loss": 1.2158,
+     "val_loss": 1.0928,
+     "seconds": 19.2
+    },
+    {
+     "epoch": 18,
+     "train_loss": 1.192,
+     "val_loss": 1.0959,
+     "seconds": 17.8
+    },
+    {
+     "epoch": 19,
+     "train_loss": 1.1817,
+     "val_loss": 1.0758,
+     "seconds": 18.0
+    },
+    {
+     "epoch": 20,
+     "train_loss": 1.1624,
+     "val_loss": 1.0829,
+     "seconds": 17.8
+    }
+   ],
+   "best_epoch": 19,
+   "best_val_loss": 1.0758,
+   "trainable_parameters": 44106239
+  },
+  "test_seen_during_training": true,
+  "test": {
+   "validity_rate_raw": 0.1818,
+   "exact_match_rate": 0.1818,
+   "mean_tanimoto_to_reference": 0.2963,
+   "substructure_rate": 0.1818,
+   "rule_of_three_pass_rate": 0.6818
+  },
+  "full_test_metrics": {
+   "n": 22,
+   "validity_rate_raw": 0.1818,
+   "intervention_rate": 0.8182,
+   "empty_output_rate": 0.0,
+   "exact_match_rate": 0.1818,
+   "exact_match_rate_raw_only": 0.1818,
+   "mean_tanimoto_to_reference": 0.2963,
+   "median_tanimoto_to_reference": 0.1489,
+   "rule_of_three_pass_rate": 0.6818,
+   "substructure_rate": 0.1818,
+   "hallucination_rate": 0.8182,
+   "substructure_by_path": {
+    "nearest-reference": {
+     "rate": 0.0,
+     "n": 18
+    },
+    "model": {
+     "rate": 1.0,
+     "n": 4
+    }
+   },
+   "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_control_memorisation",
+   "split": "fragment_scaffold",
+   "subset": "test",
+   "contaminated": false
+  },
+  "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_control_memorisation",
+  "note": "the test set was in this model's training data; the score measures capacity to memorise, not generalisation"
+ },
+ "memorisation_control_classification": null,
+ "named_examples": {
+  "label": "shipped",
+  "classification_model": "NisargRhino/drug-classification",
+  "fragment_model": "NisargRhino/protein-models",
+  "cases": [
+   {
+    "name": "ciprofloxacin",
+    "smiles": "O=C(O)c1cn(C2CC2)c2cc(N3CCNCC3)c(F)cc2c1=O",
+    "why": "documented failure: a fluoroquinolone antibiotic the classifier has called antineoplastic",
+    "in_dataset": true,
+    "dataset_split": "train",
+    "true_labels": [
+     "antiinfective",
+     "antineoplastic"
+    ],
+    "raw_output": "antiinfective antineoplastic",
+    "snapped_label": "antiinfective antineoplastic",
+    "edit_distance": 0,
+    "predicted": [
+     "antiinfective",
+     "antineoplastic"
+    ],
+    "correct": true,
+    "raw_was_a_valid_label": true,
+    "fragment": {
+     "raw_output": "CC(=O)1cn(C)c2C)(F)cc1=",
+     "valid_smiles": false,
+     "is_substructure_of_input": false,
+     "rule_of_three": false
+    }
+   },
+   {
+    "name": "aspirin",
+    "smiles": "CC(=O)Oc1ccccc1C(=O)O",
+    "why": "small, common, unambiguous anti-inflammatory",
+    "in_dataset": true,
+    "dataset_split": "train",
+    "true_labels": [
+     "antiinflammatory",
+     "cardio",
+     "cns",
+     "hematologic"
+    ],
+    "raw_output": "aetaamataliatf",
+    "snapped_label": "hematologic",
+    "edit_distance": 9,
+    "predicted": [
+     "hematologic"
+    ],
+    "correct": true,
+    "raw_was_a_valid_label": false,
+    "fragment": {
+     "raw_output": "CC(=O)c1ccccc1C",
+     "valid_smiles": true,
+     "is_substructure_of_input": false,
+     "rule_of_three": true
+    }
+   },
+   {
+    "name": "caffeine",
+    "smiles": "Cn1c(=O)c2c(ncn2C)n(C)c1=O",
+    "why": "CNS stimulant with no therapeutic class in the usual sense",
+    "in_dataset": true,
+    "dataset_split": "train",
+    "true_labels": [
+     "cns"
+    ],
+    "raw_output": "cns",
+    "snapped_label": "cns",
+    "edit_distance": 0,
+    "predicted": [
+     "cns"
+    ],
+    "correct": true,
+    "raw_was_a_valid_label": true,
+    "fragment": {
+     "raw_output": "Cn1c(=O)c2c(ncn2C)n(C)1=O",
+     "valid_smiles": false,
+     "is_substructure_of_input": false,
+     "rule_of_three": false
+    }
+   },
+   {
+    "name": "imatinib",
+    "smiles": "Cc1ccc(NC(=O)c2ccc(CN3CCN(C)CC3)cc2)cc1Nc1nccc(-c2cccnc2)n1",
+    "why": "kinase inhibitor, antineoplastic",
+    "in_dataset": true,
+    "dataset_split": "train",
+    "true_labels": [
+     "antineoplastic"
+    ],
+    "raw_output": "antineoplastic",
+    "snapped_label": "antineoplastic",
+    "edit_distance": 0,
+    "predicted": [
+     "antineoplastic"
+    ],
+    "correct": true,
+    "raw_was_a_valid_label": true,
+    "fragment": {
+     "raw_output": "CCc1ccc(C(C)=O)1",
+     "valid_smiles": true,
+     "is_substructure_of_input": false,
+     "rule_of_three": true
+    }
+   },
+   {
+    "name": "atorvastatin",
+    "smiles": "CC(C)c1c(C(=O)Nc2ccccc2)c(-c2ccccc2)c(-c2ccc(F)cc2)n1CC[C@@H](O)C[C@@H](O)CC(=O)O",
+    "why": "lipid-regulating, one of the smaller classes",
+    "in_dataset": true,
+    "dataset_split": "train",
+    "true_labels": [
+     "lipidregulating"
+    ],
+    "raw_output": "lipidregulating",
+    "snapped_label": "lipidregulating",
+    "edit_distance": 0,
+    "predicted": [
+     "lipidregulating"
+    ],
+    "correct": true,
+    "raw_was_a_valid_label": true,
+    "fragment": {
+     "raw_output": "CC(=O)1",
+     "valid_smiles": false,
+     "is_substructure_of_input": false,
+     "rule_of_three": false
+    }
+   },
+   {
+    "name": "tamsulosin",
+    "smiles": "CCOc1ccccc1OCCN[C@@H](C)Cc1ccc(OC)c(S(N)(=O)=O)c1",
+    "why": "urological, the rarest class (48 compounds in total)",
+    "in_dataset": false,
+    "dataset_split": null,
+    "true_labels": null,
+    "raw_output": "urological",
+    "snapped_label": "urological",
+    "edit_distance": 0,
+    "predicted": [
+     "urological"
+    ],
+    "correct": null,
+    "raw_was_a_valid_label": true,
+    "fragment": {
+     "raw_output": "CCOc1ccccc1C",
+     "valid_smiles": true,
+     "is_substructure_of_input": false,
+     "rule_of_three": true
+    }
+   },
+   {
+    "name": "salbutamol",
+    "smiles": "CC(C)(C)NCC(O)c1ccc(O)c(CO)c1",
+    "why": "respiratory, a class the models recall poorly",
+    "in_dataset": true,
+    "dataset_split": "train",
+    "true_labels": [
+     "reproductivecontrol",
+     "respiratorysystem"
+    ],
+    "raw_output": "reproductivecontrol resp",
+    "snapped_label": "reproductivecontrol",
+    "edit_distance": 5,
+    "predicted": [
+     "reproductivecontrol"
+    ],
+    "correct": true,
+    "raw_was_a_valid_label": false,
+    "fragment": {
+     "raw_output": "CCC(O)c1ccc(O)c(CO)c1",
+     "valid_smiles": true,
+     "is_substructure_of_input": false,
+     "rule_of_three": true
+    }
+   }
+  ]
+ }
+}
