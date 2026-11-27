@@ -34,6 +34,10 @@ RDLogger.DisableLog('rdApp.*')
 MIN_LIGAND_HEAVY_ATOMS = 8
 MAX_LIGAND_HEAVY_ATOMS = 100     # above this it is a peptide or a cofactor assembly
 MAX_RESOLUTION = 2.5
+# Ribosomes, capsids and other very large assemblies cost minutes of CPU each
+# and rarely carry a drug-like ligand that this corpus wants. The cap is a
+# throughput decision, and the rejection count records what it costs.
+MAX_STRUCTURE_ATOMS = 30000
 POCKET_RADIUS = 6.5              # Å from any ligand heavy atom
 
 # Cofactors and prosthetic groups. These are genuine ligands with genuine
@@ -250,10 +254,27 @@ def select(pdb_id):
     except FileNotFoundError:
         raise Rejected('no_pdb_format', 'mmCIF-only entry')
     resolution = entry_is_usable(pdb_text)
+    n_atoms = pdb_text.count('\nATOM  ')
+    if n_atoms > MAX_STRUCTURE_ATOMS:
+        raise Rejected('structure_too_large', f'{n_atoms} atoms')
 
     candidates, _parsed = ligand_candidates(pdb_text)
     if not candidates:
         raise Rejected('no_drug_like_ligand')
+
+    # One chemical component per entry. The same ligand bound in four chains is
+    # one observation of a binding mode, not four, and it was going to be
+    # deduplicated by (uniprot, inchikey) anyway - so paying for four pocket
+    # extractions and four interaction fingerprints first is pure waste. 3IQF
+    # produced twelve copies in the pilot.
+    deduped, copies = [], {}
+    for cand in candidates:
+        copies[cand['comp_id']] = copies.get(cand['comp_id'], 0) + 1
+        if copies[cand['comp_id']] == 1:
+            deduped.append(cand)
+    for cand in deduped:
+        cand['copies_in_entry'] = copies[cand['comp_id']]
+    candidates = deduped
 
     out = []
     for cand in candidates:
@@ -287,6 +308,7 @@ def select(pdb_id):
             'smiles': smiles,
             'inchikey': Chem.MolToInchiKey(mol),
             'heavy_atoms': cand['heavy_atoms'],
+            'copies_in_entry': cand.get('copies_in_entry', 1),
             'ligand_atoms': cand['atoms'],
             'ligand_mol': mol,
             'pocket': pocket,

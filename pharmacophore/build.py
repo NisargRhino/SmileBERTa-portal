@@ -13,9 +13,10 @@ first things a reviewer will ask for.
 """
 import argparse
 import json
-import multiprocessing as mp
 import os
 import random
+import subprocess
+import sys
 import time
 from collections import Counter
 
@@ -52,10 +53,16 @@ def done_ids(release):
 def process(pdb_id):
     """Every outcome for one PDB entry: annotated complexes and/or rejections.
 
-    Returns a list of plain dicts, ready to serialise. Exceptions are captured
-    as rejections rather than raised, because one malformed entry must not take
-    down a build that has been running for six hours.
+    Exceptions become rejections rather than propagating: one malformed entry
+    must not take down a build that has been running for hours. Wall-clock
+    runaways are handled by the batch supervisor, not here — a signal cannot
+    interrupt a C extension mid-call, and trying killed workers and hung the
+    pool instead.
     """
+    return _process(pdb_id)
+
+
+def _process(pdb_id):
     out = []
     try:
         found = C.select(pdb_id)
@@ -64,13 +71,18 @@ def process(pdb_id):
     except Exception as e:                        # pragma: no cover - defensive
         return [{'pdb_id': pdb_id, 'rejected': 'error', 'detail': str(e)[:120]}]
 
+    protein_mol = None
     for rec in found:
         if rec.get('rejected'):
             out.append({'pdb_id': pdb_id, 'comp_id': rec.get('comp_id'),
                         'rejected': rec['rejected'], 'detail': rec.get('detail', '')})
             continue
         try:
-            ifp = I.fingerprint(rec['ligand_mol'], rec['pdb_text'])
+            # Prepared once and reused for every ligand in this entry.
+            if protein_mol is None:
+                protein_mol = I.protein_molecule(rec['pdb_text'])
+            ifp = I.fingerprint(rec['ligand_mol'], protein_mol=protein_mol,
+                                pocket=rec['pocket'])
         except Exception as e:
             out.append({'pdb_id': pdb_id, 'comp_id': rec['comp_id'],
                         'rejected': 'interaction_typing_failed', 'detail': str(e)[:120]})
@@ -105,37 +117,91 @@ def process(pdb_id):
     return out
 
 
-def build(release, ids, workers=4, shard_size=500, log=print):
+BATCH_SIZE = int(os.environ.get('SB_BATCH_SIZE', '40'))
+# A batch that overruns this is killed by the operating system, which is the
+# only thing that reliably stops a C extension mid-call. Sized so a normal
+# batch finishes comfortably inside it.
+BATCH_TIMEOUT = int(os.environ.get('SB_BATCH_TIMEOUT', '900'))
+
+
+def run_batch(release, ids, shard):
+    """Process `ids` and append their outcomes to one shard. Runs in its own process."""
+    path = shard_path(release, shard)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, 'a') as handle:
+        for pdb_id in ids:
+            for record in process(pdb_id):
+                handle.write(json.dumps(record) + '\n')
+            handle.flush()
+
+
+def build(release, ids, workers=4, log=print):
+    """Supervise batch subprocesses.
+
+    Deliberately boring. An earlier version used multiprocessing.Pool with a
+    signal-based per-entry timeout; it hung twice, because SIGALRM cannot
+    interrupt RDKit or ProLIF mid-call and firing it near a pipe write kills the
+    worker, after which imap_unordered waits for a result that never comes.
+
+    Here each batch is an independent process that the OS can terminate
+    unconditionally. A killed batch loses only its in-flight entries, which are
+    simply retried on the next pass, because the records on disk are what define
+    progress.
+    """
     os.makedirs(os.path.join(release, 'records'), exist_ok=True)
-    sources.sifts_mapping()   # one download, before the workers fork
+    sources.sifts_mapping()            # one download before any child starts
     already = done_ids(release)
     todo = [i for i in ids if i not in already]
     log(f'{len(ids)} candidates, {len(already)} already done, {len(todo)} to process')
     if not todo:
         return summarise(release)
 
-    index = len([n for n in os.listdir(os.path.join(release, 'records'))
-                 if n.endswith('.jsonl')])
+    existing = len([n for n in os.listdir(os.path.join(release, 'records'))
+                    if n.endswith('.jsonl')])
+    batches = [todo[i:i + BATCH_SIZE] for i in range(0, len(todo), BATCH_SIZE)]
+    log(f'{len(batches)} batches of up to {BATCH_SIZE}, {workers} at a time')
+
     started = time.time()
-    written = 0
-    handle = open(shard_path(release, index), 'a')
-    try:
-        with mp.Pool(workers) as pool:
-            for n, records in enumerate(pool.imap_unordered(process, todo, chunksize=1), 1):
-                for rec in records:
-                    handle.write(json.dumps(rec) + '\n')
-                written += 1
-                if written % shard_size == 0:
-                    handle.close()
-                    index += 1
-                    handle = open(shard_path(release, index), 'a')
-                if n % 25 == 0:
-                    handle.flush()
-                    rate = n / max(time.time() - started, 1e-6)
-                    remaining = (len(todo) - n) / max(rate, 1e-9) / 60
-                    log(f'  {n}/{len(todo)}  {rate*60:.0f}/min  ~{remaining:.0f} min left')
-    finally:
-        handle.close()
+    completed = timed_out = 0
+    ids_file_dir = os.path.join(release, 'batches')
+    os.makedirs(ids_file_dir, exist_ok=True)
+
+    def launch(index, batch):
+        ids_path = os.path.join(ids_file_dir, f'{index:05d}.json')
+        with open(ids_path, 'w') as f:
+            json.dump(batch, f)
+        return subprocess.Popen(
+            [sys.executable, '-m', 'pharmacophore.build', '--release', release,
+             '--run-batch', ids_path, '--shard', str(existing + index)],
+            cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            env={**os.environ, 'PYTHONPATH': ROOT})
+
+    running = {}
+    queue = list(enumerate(batches))
+    while queue or running:
+        while queue and len(running) < workers:
+            index, batch = queue.pop(0)
+            running[launch(index, batch)] = (index, time.time())
+        time.sleep(2)
+        for proc in list(running):
+            index, began = running[proc]
+            if proc.poll() is not None:
+                del running[proc]
+                completed += 1
+            elif time.time() - began > BATCH_TIMEOUT:
+                proc.kill()
+                del running[proc]
+                completed += 1
+                timed_out += 1
+                log(f'  batch {index} exceeded {BATCH_TIMEOUT}s and was killed')
+        if completed and completed % 5 == 0:
+            entries = len(done_ids(release)) - len(already)
+            rate = entries / max(time.time() - started, 1e-6) * 60
+            left = (len(todo) - entries) / max(rate, 1e-9)
+            log(f'  {entries}/{len(todo)} entries  {rate:.0f}/min  ~{left/60:.1f} h left'
+                + (f'  ({timed_out} batches killed)' if timed_out else ''))
+            time.sleep(3)          # so the modulo does not log repeatedly
+    log(f'done: {completed} batches, {timed_out} killed')
     return summarise(release)
 
 
@@ -200,7 +266,14 @@ def main():
     ap.add_argument('--ids', nargs='*', help='explicit PDB IDs instead of a search')
     ap.add_argument('--summarise-only', action='store_true')
     ap.add_argument('--shuffle-seed', type=int, default=20261126)
+    ap.add_argument('--run-batch', help='internal: process the ids in this file')
+    ap.add_argument('--shard', type=int, default=0)
     args = ap.parse_args()
+
+    if args.run_batch:
+        with open(args.run_batch) as f:
+            run_batch(args.release, json.load(f), args.shard)
+        return
 
     if args.summarise_only:
         print(json.dumps(summarise(args.release), indent=2))

@@ -105,7 +105,8 @@ def ligand_molecule(rdkit_mol, protonate=True):
     return plf.Molecule.from_rdkit(mol), mol
 
 
-def fingerprint(ligand_mol, protein_pdb_text, interactions=None, protonate=True):
+def fingerprint(ligand_mol, protein_pdb_text=None, interactions=None, protonate=True,
+                protein_mol=None, pocket=None):
     """Per-atom interactions for one complex.
 
     Returns a dict with:
@@ -121,7 +122,11 @@ def fingerprint(ligand_mol, protein_pdb_text, interactions=None, protonate=True)
     import prolif as plf
 
     names = interactions or INTERACTIONS
-    protein = protein_molecule(protein_pdb_text, protonate=protonate)
+    # The protein can be prepared once per entry and reused for every ligand in
+    # it. Protonating a 10,000-atom structure and rebuilding its RDKit molecule
+    # for each of a dozen ligand copies is what left one worker at full CPU for
+    # ten minutes on a single entry during the pilot.
+    protein = protein_mol or protein_molecule(protein_pdb_text, protonate=protonate)
     lig_plf, protonated = ligand_molecule(ligand_mol, protonate=protonate)
 
     fp = plf.Fingerprint(names)
@@ -129,6 +134,16 @@ def fingerprint(ligand_mol, protein_pdb_text, interactions=None, protonate=True)
 
     heavy_index = _heavy_atom_map(protonated, ligand_mol)
     per_atom, contacts, by_type = {}, [], {}
+    # Salt bridges and pi-stacking come from the geometric detectors, since the
+    # library's versions cannot fire on a protein parsed from a PDB file.
+    if pocket:
+        for extra in ionic_and_pi_contacts(protonated, pocket):
+            mapped = sorted({heavy_index.get(i, i) for i in extra['ligand_atoms']})
+            extra = dict(extra, ligand_atoms=[i for i in mapped if i < ligand_mol.GetNumAtoms()])
+            contacts.append(extra)
+            by_type[extra['type']] = by_type.get(extra['type'], 0) + 1
+            for idx in extra['ligand_atoms']:
+                per_atom.setdefault(idx, {}).setdefault(extra['type'], []).append(extra['residue'])
     for (_lres, pres), data in (fp.ifp[0] if fp.ifp else {}).items():
         residue = str(pres)
         for name, metas in data.items():
@@ -188,3 +203,123 @@ def pocket_feature_profile(result, interactions=None):
     """
     names = interactions or INTERACTIONS
     return {name: result['by_type'].get(name, 0) for name in names}
+
+
+# ── Ionic and aromatic interactions, which ProLIF cannot see here ────────────
+# A PDB file carries no bond orders, so nothing perceives Phe, Tyr, Trp or His
+# rings as aromatic from coordinates alone — a protein built from one has zero
+# aromatic atoms, and ProLIF's PiStacking and Cationic/Anionic detectors
+# therefore never fire. Across 42 pilot complexes they fired exactly zero times,
+# including on 3PTB, whose benzamidine-Asp189 salt bridge is the most cited
+# interaction in the structure.
+#
+# These two detectors fill that gap. They are deliberate hand-rolled geometry,
+# against the spec's own preference for a maintained library, because the
+# alternative is a pharmacophore corpus that silently contains no salt bridges
+# and no pi-stacking. Both are typed from residue and atom names, which is
+# unambiguous for the standard amino acids, and both are validated against
+# complexes whose interactions are documented.
+
+# Charged groups at pH 7.4, by residue and the atoms carrying the charge.
+PROTEIN_ANIONS = {'ASP': ('OD1', 'OD2'), 'GLU': ('OE1', 'OE2')}
+PROTEIN_CATIONS = {'LYS': ('NZ',), 'ARG': ('NE', 'NH1', 'NH2')}
+# Aromatic rings by atom name. Histidine is included as an aromatic ring even
+# though it is left uncharged: ring geometry does not depend on protonation.
+PROTEIN_RINGS = {
+    'PHE': [('CG', 'CD1', 'CD2', 'CE1', 'CE2', 'CZ')],
+    'TYR': [('CG', 'CD1', 'CD2', 'CE1', 'CE2', 'CZ')],
+    'HIS': [('CG', 'ND1', 'CD2', 'CE1', 'NE2')],
+    'TRP': [('CD2', 'CE2', 'CE3', 'CZ2', 'CZ3', 'CH2'),
+            ('CG', 'CD1', 'CD2', 'NE1', 'CE2')],
+}
+IONIC_CUTOFF = 5.0        # Å between charged centres
+PI_CENTROID_CUTOFF = 5.5  # Å between ring centroids
+PI_ANGLE_FACE = 30.0      # degrees: face-to-face stacking
+PI_ANGLE_EDGE = 60.0      # degrees: beyond this, edge-to-face
+
+
+def _residue_atoms(pocket):
+    """{(resname, chain, resseq): {atom name: xyz}} from a pocket mapping."""
+    out = {}
+    for key, atoms in pocket.items():
+        out[key] = {a['name'].strip().upper(): np.array(a['xyz']) for a in atoms}
+    return out
+
+
+def _ring_geometry(points):
+    centroid = points.mean(axis=0)
+    # Normal from the plane of best fit; the smallest singular vector is the
+    # direction of least spread, which for a planar ring is its normal.
+    normal = np.linalg.svd(points - centroid)[2][-1]
+    return centroid, normal / np.linalg.norm(normal)
+
+
+def _angle_between(a, b):
+    cos = abs(float(np.dot(a, b)))
+    return float(np.degrees(np.arccos(min(1.0, max(-1.0, cos)))))
+
+
+def ionic_and_pi_contacts(ligand_mol, pocket):
+    """Salt bridges, pi-stacking and cation-pi for one complex.
+
+    `ligand_mol` must carry real bond orders and formal charges — it comes from
+    the chemical-component definition and is protonated at pH 7.4, so aromatic
+    rings and charges are known on the ligand side. Only the protein side needs
+    name-based typing.
+
+    Returned in the same shape as ProLIF's contacts so the two merge cleanly.
+    """
+    contacts = []
+    conf = ligand_mol.GetConformer()
+    coords = {i: np.array(list(conf.GetAtomPosition(i)))
+              for i in range(ligand_mol.GetNumAtoms())}
+    heavy = {i for i, a in enumerate(ligand_mol.GetAtoms()) if a.GetAtomicNum() > 1}
+
+    lig_cations = [i for i in heavy if ligand_mol.GetAtomWithIdx(i).GetFormalCharge() > 0]
+    lig_anions = [i for i in heavy if ligand_mol.GetAtomWithIdx(i).GetFormalCharge() < 0]
+    lig_rings = []
+    for ring in ligand_mol.GetRingInfo().AtomRings():
+        if all(ligand_mol.GetAtomWithIdx(i).GetIsAromatic() for i in ring):
+            lig_rings.append((ring, *_ring_geometry(np.array([coords[i] for i in ring]))))
+
+    residues = _residue_atoms(pocket)
+    for (resname, chain, resseq), atoms in residues.items():
+        label = f'{resname}{resseq}.{chain}'
+
+        # Salt bridges, named as ProLIF names them: the interaction is reported
+        # from the ligand's point of view.
+        for group, lig_atoms, name in ((PROTEIN_ANIONS, lig_cations, 'Cationic'),
+                                       (PROTEIN_CATIONS, lig_anions, 'Anionic')):
+            for atom_name in group.get(resname, ()):
+                if atom_name not in atoms:
+                    continue
+                for i in lig_atoms:
+                    d = float(np.linalg.norm(coords[i] - atoms[atom_name]))
+                    if d <= IONIC_CUTOFF:
+                        contacts.append({'type': name, 'residue': label,
+                                         'distance': round(d, 2), 'ligand_atoms': [i]})
+
+        # Pi-stacking and cation-pi.
+        for ring_names in PROTEIN_RINGS.get(resname, ()):
+            if not all(n in atoms for n in ring_names):
+                continue
+            prot_centroid, prot_normal = _ring_geometry(
+                np.array([atoms[n] for n in ring_names]))
+            for ring, lig_centroid, lig_normal in lig_rings:
+                d = float(np.linalg.norm(lig_centroid - prot_centroid))
+                if d > PI_CENTROID_CUTOFF:
+                    continue
+                angle = _angle_between(lig_normal, prot_normal)
+                kind = ('FaceToFace' if angle <= PI_ANGLE_FACE
+                        else 'EdgeToFace' if angle >= PI_ANGLE_EDGE else None)
+                if kind:
+                    contacts.append({'type': 'PiStacking', 'residue': label,
+                                     'distance': round(d, 2),
+                                     'ligand_atoms': sorted(ring),
+                                     'geometry': kind, 'angle': round(angle, 1)})
+            for i in lig_cations:
+                d = float(np.linalg.norm(coords[i] - prot_centroid))
+                if d <= PI_CENTROID_CUTOFF:
+                    contacts.append({'type': 'PiCation', 'residue': label,
+                                     'distance': round(d, 2), 'ligand_atoms': [i]})
+    return contacts
