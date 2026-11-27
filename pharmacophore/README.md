@@ -62,20 +62,55 @@ PYTHONPATH=. python3 -m pharmacophore.splits  --release corpus/v1
 PYTHONPATH=. python3 -m pharmacophore.dataset --release corpus/v1
 PYTHONPATH=. python3 -m pharmacophore.baselines --release corpus/v1
 PYTHONPATH=. python3 -m pharmacophore.train   --release corpus/v1 --epochs 30
+PYTHONPATH=. python3 -m pharmacophore.figures --release corpus/v1
 ```
 
-A smoke test of the whole chain on 97 training complexes completed, and the
-ablation gate fired correctly: *"removing the pocket costs only 0.0147, below
-the 0.02 margin: the model is predicting from the ligand alone."* Expected at
-that size — the question is whether it still says that at 17,000 complexes, and
-that is the single most important number this project will produce.
+`corpus/overnight.sh` runs that chain on a loop while the build continues,
+committing each cycle's splits, results and figures, so an interrupted night
+still leaves a complete and self-consistent set of numbers.
+
+### Does the pocket contribute? The ablation at 21,000 complexes
+
+At 97 complexes the gate said the pocket was being ignored. At scale the random
+forest disagrees in all three regimes, most strongly in the one that
+memorisation cannot explain:
+
+| Regime | prior | RF ligand | RF +pocket | delta | verdict |
+| --- | --- | --- | --- | --- | --- |
+| `unseen_ligand` | 0.5571 | 0.6249 | 0.6794 | **+0.0545** | uses the pocket |
+| `unseen_protein` | 0.6400 | 0.6676 | 0.7034 | **+0.0358** | uses the pocket |
+| `both_unseen` | 0.5561 | 0.6066 | 0.6623 | **+0.0557** | uses the pocket |
+
+**The transformer does not agree, and that is the open question.** On
+`unseen_ligand` it reaches 0.7973 with the pocket and 0.7911 without — a delta
+of 0.0070, below the margin, so its gate still reads "predicting from the ligand
+alone" even though the forest's reads the opposite on the same split.
+
+Two readings, with different fixes, which is why neither has been applied yet:
+
+1. The transformer's ligand-only arm is already far stronger than the forest's
+   (0.79 against 0.62). Self-attention extracts most of what the molecule alone
+   can say, so the pocket's *marginal* contribution is genuinely small even
+   though the pocket carries real information — which is what the forest, a
+   weaker ligand-only model, is able to show.
+2. The conditioning is too weak. The pocket vector is projected and **added
+   identically to every atom**, so it can shift all atoms together but cannot
+   express that *this* atom faces *that* residue. Cross-attention from atoms to
+   pocket residues would, at the cost of making the no-pocket ablation a
+   different architecture rather than one flag.
+
+Note also that `unseen_protein` has the *highest* frequency prior at 0.6400.
+Held-out proteins are easier for a context-free baseline than held-out
+chemistries, because the per-atom label distribution is more stable across
+proteins than across scaffolds. Worth stating in the paper.
 
 ### The GPU moment
 
-Not yet. Everything above runs on CPU or MPS. The GPU becomes worth renting when
-the corpus is large enough for the training arms to take hours rather than
-seconds — roughly once `both_unseen` has a few hundred test complexes, which
-needs ~30,000 complexes because that regime is intrinsically ~1% of the corpus.
+Everything above runs on CPU or MPS; an epoch on 13,956 training complexes takes
+about 20 seconds on MPS, so the bottleneck is still the corpus, not the compute.
+The GPU becomes worth renting once `both_unseen` has a few hundred test
+complexes — that regime is intrinsically ~1% of the corpus and currently has 77,
+so it needs the build to finish.
 
 ## Running it
 
@@ -143,6 +178,31 @@ the entry it was working on.
 
 `no_drug_like_ligand` dominating is expected and correct: most PDB entries with a
 non-polymer entity carry only ions, waters or buffer components.
+## Two bugs found at scale that small runs hid
+
+**The resolution gate was passing everything.** `REMARK 2` reads
+`REMARK   2 RESOLUTION.    2.00 ANGSTROMS.`, and splitting the whole line finds
+the remark number `2` before the actual figure, so every structure in the PDB
+came back as exactly 2.0 Å and the ≤ 2.5 Å limit never rejected anything. It
+surfaced only because a figure of the resolution distribution was a single bar.
+The corpus is **not** contaminated — all 21,401 kept complexes check out against
+the wwPDB bulk index, because the candidate query already filters on resolution
+at the RCSB end, so the gate was redundant as well as broken. Resolution now
+comes from `sources.resolution_index()`, one cached download of `resolu.idx`
+rather than a hundred thousand entry-API calls, and the figures prefer it over
+the stored value so existing records are repaired for reporting without a
+rebuild. True median is 1.9 Å.
+
+**RDKit's recursion was killing the interpreter.** `MolOps::getMolFrags` walks
+the molecular graph recursively and ProLIF calls it when converting a receptor;
+on a large protein that runs off the 8 MB main-thread stack and the process dies
+with `SIGBUS`, which no Python handler can intercept. It cost a whole batch
+every few minutes. A thread's stack size is settable where the main thread's is
+not, so `run_batch` now runs the work on a thread with a 512 MB stack
+(`SB_STACK_BYTES`). Entries are also logged to `corpus/v1/attempts/` *before*
+their work begins, so an entry that kills the interpreter twice is recorded as
+`crashed_during_processing` instead of being retried forever.
+
 ## Known biases, recorded rather than hidden
 
 - **Acyclic ligands are excluded.** The artefact filter requires a ring, because
@@ -167,6 +227,13 @@ non-polymer entity carry only ions, waters or buffer components.
 | `protonate.py` | pH 7.4 hydrogens with residue numbering preserved |
 | `interactions.py` | Per-atom typed interaction fingerprints (ProLIF) |
 | `build.py` | Resumable parallel orchestrator and manifest |
+| `splits.py` | Three held-out regimes with a leak check |
+| `dataset.py` | Per-atom features, pocket descriptors, label matrices |
+| `metrics.py` | Per-type AUC/AP/P/R/F1 and the ablation verdict |
+| `baselines.py` | Frequency prior and random forests, with and without pocket |
+| `model.py` | Pocket-conditioned set transformer over ligand atoms |
+| `train.py` | Training with the three arms wired as gates |
+| `figures.py` | Figures and analytics; each PNG beside the JSON it plots |
 | `expand_fragments.py` | BRICS corpus expansion (from the benchmark work) |
 
 `sources.py` is the single place every data source's licence is declared, so
