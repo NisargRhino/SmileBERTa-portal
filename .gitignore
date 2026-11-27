@@ -9,3 +9,5 @@ smileberta.db
 
 # Local model checkpoints from evaluation/experiments.py (hundreds of MB each)
 evaluation/checkpoints/
+corpus/
+.corpus-cache/
