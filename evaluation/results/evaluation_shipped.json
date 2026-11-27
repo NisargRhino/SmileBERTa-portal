@@ -1,0 +1,391 @@
+{
+  "scaffold": {
+    "classification": {
+      "n": 840,
+      "per_class": {
+        "antiinfective": {
+          "precision": 0.9631,
+          "recall": 0.9829,
+          "f1": 0.9729,
+          "support": 292,
+          "predicted": 298
+        },
+        "antineoplastic": {
+          "precision": 0.9167,
+          "recall": 0.939,
+          "f1": 0.9277,
+          "support": 164,
+          "predicted": 168
+        },
+        "cns": {
+          "precision": 0.9605,
+          "recall": 0.9542,
+          "f1": 0.9574,
+          "support": 153,
+          "predicted": 152
+        },
+        "cardio": {
+          "precision": 0.9474,
+          "recall": 0.8571,
+          "f1": 0.9,
+          "support": 126,
+          "predicted": 114
+        },
+        "antiinflammatory": {
+          "precision": 1.0,
+          "recall": 0.7544,
+          "f1": 0.86,
+          "support": 57,
+          "predicted": 43
+        },
+        "gastrointestinal": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 49,
+          "predicted": 49
+        },
+        "hematologic": {
+          "precision": 0.74,
+          "recall": 0.8043,
+          "f1": 0.7708,
+          "support": 46,
+          "predicted": 50
+        },
+        "respiratorysystem": {
+          "precision": 0.9286,
+          "recall": 0.4643,
+          "f1": 0.619,
+          "support": 28,
+          "predicted": 14
+        },
+        "dermatologic": {
+          "precision": 0.9474,
+          "recall": 0.7826,
+          "f1": 0.8571,
+          "support": 23,
+          "predicted": 19
+        },
+        "reproductivecontrol": {
+          "precision": 0.9583,
+          "recall": 1.0,
+          "f1": 0.9787,
+          "support": 23,
+          "predicted": 24
+        },
+        "lipidregulating": {
+          "precision": 1.0,
+          "recall": 0.9048,
+          "f1": 0.95,
+          "support": 21,
+          "predicted": 19
+        },
+        "urological": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 7,
+          "predicted": 7
+        }
+      },
+      "macro_f1": 0.8995,
+      "micro_f1": 0.9291,
+      "micro_precision": 0.9446,
+      "micro_recall": 0.9141,
+      "subset_accuracy": 0.9095,
+      "any_correct": 0.9631,
+      "hamming_loss": 0.0137,
+      "top_1_accuracy": 0.9536,
+      "top_3_accuracy": 0.9774,
+      "multi_label_subset": {
+        "n": 133,
+        "subset_accuracy": 0.6541,
+        "any_correct": 0.9774,
+        "hamming_loss": 0.0501
+      },
+      "confusion": {
+        "n": 707,
+        "matrix": {
+          "antiinfective": {
+            "antiinfective": 238,
+            "cardio": 2
+          },
+          "antineoplastic": {
+            "antineoplastic": 109,
+            "cns": 1
+          },
+          "cns": {
+            "cns": 114,
+            "antiinfective": 1
+          },
+          "cardio": {
+            "cardio": 73,
+            "cns": 3,
+            "antiinfective": 2,
+            "antineoplastic": 2
+          },
+          "antiinflammatory": {
+            "antiinflammatory": 27,
+            "antineoplastic": 5,
+            "dermatologic": 1,
+            "cns": 1
+          },
+          "gastrointestinal": {
+            "gastrointestinal": 30,
+            "antiinfective": 2
+          },
+          "hematologic": {
+            "hematologic": 22,
+            "cardio": 2,
+            "antiinfective": 2
+          },
+          "respiratorysystem": {
+            "respiratorysystem": 9
+          },
+          "dermatologic": {
+            "dermatologic": 15,
+            "antineoplastic": 5
+          },
+          "reproductivecontrol": {
+            "reproductivecontrol": 22
+          },
+          "lipidregulating": {
+            "lipidregulating": 17,
+            "antiinfective": 1
+          },
+          "urological": {
+            "urological": 1
+          }
+        }
+      },
+      "raw_output_was_exact_label": 0.8595,
+      "model": "NisargRhino/drug-classification",
+      "split": "classification_scaffold",
+      "subset": "test",
+      "contaminated": true
+    },
+    "fragment": {
+      "n": 22,
+      "validity_rate_raw": 0.4091,
+      "intervention_rate": 0.5909,
+      "empty_output_rate": 0.0,
+      "exact_match_rate": 0.0,
+      "exact_match_rate_raw_only": 0.0,
+      "mean_tanimoto_to_reference": 0.1938,
+      "median_tanimoto_to_reference": 0.1818,
+      "rule_of_three_pass_rate": 0.7727,
+      "substructure_rate": 0.0455,
+      "hallucination_rate": 0.9545,
+      "substructure_by_path": {
+        "model": {
+          "rate": 0.1111,
+          "n": 9
+        },
+        "nearest-reference": {
+          "rate": 0.0,
+          "n": 13
+        }
+      },
+      "model": "NisargRhino/protein-models",
+      "split": "fragment_scaffold",
+      "subset": "test",
+      "contaminated": true
+    }
+  },
+  "random": {
+    "classification": {
+      "n": 833,
+      "per_class": {
+        "antiinfective": {
+          "precision": 0.9676,
+          "recall": 0.9676,
+          "f1": 0.9676,
+          "support": 278,
+          "predicted": 278
+        },
+        "antineoplastic": {
+          "precision": 0.9702,
+          "recall": 0.9314,
+          "f1": 0.9504,
+          "support": 175,
+          "predicted": 168
+        },
+        "cns": {
+          "precision": 0.9747,
+          "recall": 0.939,
+          "f1": 0.9565,
+          "support": 164,
+          "predicted": 158
+        },
+        "cardio": {
+          "precision": 0.8962,
+          "recall": 0.8716,
+          "f1": 0.8837,
+          "support": 109,
+          "predicted": 106
+        },
+        "antiinflammatory": {
+          "precision": 0.9615,
+          "recall": 0.8197,
+          "f1": 0.885,
+          "support": 61,
+          "predicted": 52
+        },
+        "gastrointestinal": {
+          "precision": 0.9545,
+          "recall": 0.9767,
+          "f1": 0.9655,
+          "support": 43,
+          "predicted": 44
+        },
+        "hematologic": {
+          "precision": 0.8696,
+          "recall": 0.8889,
+          "f1": 0.8791,
+          "support": 45,
+          "predicted": 46
+        },
+        "respiratorysystem": {
+          "precision": 0.8966,
+          "recall": 0.7647,
+          "f1": 0.8254,
+          "support": 34,
+          "predicted": 29
+        },
+        "dermatologic": {
+          "precision": 0.92,
+          "recall": 0.8519,
+          "f1": 0.8846,
+          "support": 27,
+          "predicted": 25
+        },
+        "reproductivecontrol": {
+          "precision": 1.0,
+          "recall": 0.8,
+          "f1": 0.8889,
+          "support": 25,
+          "predicted": 20
+        },
+        "lipidregulating": {
+          "precision": 0.9412,
+          "recall": 0.8421,
+          "f1": 0.8889,
+          "support": 19,
+          "predicted": 17
+        },
+        "urological": {
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "support": 4,
+          "predicted": 3
+        }
+      },
+      "macro_f1": 0.9027,
+      "micro_f1": 0.9337,
+      "micro_precision": 0.9524,
+      "micro_recall": 0.9157,
+      "subset_accuracy": 0.9148,
+      "any_correct": 0.9676,
+      "hamming_loss": 0.0128,
+      "top_1_accuracy": 0.958,
+      "top_3_accuracy": 0.9844,
+      "multi_label_subset": {
+        "n": 131,
+        "subset_accuracy": 0.6336,
+        "any_correct": 0.9542,
+        "hamming_loss": 0.0534
+      },
+      "confusion": {
+        "n": 702,
+        "matrix": {
+          "antiinfective": {
+            "antiinfective": 219,
+            "cardio": 2,
+            "cns": 1,
+            "antineoplastic": 1
+          },
+          "antineoplastic": {
+            "antineoplastic": 124,
+            "antiinfective": 3,
+            "cardio": 1,
+            "cns": 1
+          },
+          "cns": {
+            "cns": 121,
+            "cardio": 1
+          },
+          "cardio": {
+            "cardio": 73,
+            "antiinfective": 1
+          },
+          "antiinflammatory": {
+            "antiinflammatory": 41,
+            "antineoplastic": 2,
+            "antiinfective": 1,
+            "cardio": 1
+          },
+          "gastrointestinal": {
+            "gastrointestinal": 20,
+            "antiinfective": 1
+          },
+          "hematologic": {
+            "hematologic": 29,
+            "cardio": 1,
+            "antiinfective": 1
+          },
+          "respiratorysystem": {
+            "respiratorysystem": 8
+          },
+          "dermatologic": {
+            "dermatologic": 14,
+            "antineoplastic": 1
+          },
+          "reproductivecontrol": {
+            "reproductivecontrol": 17,
+            "cardio": 2,
+            "antiinfective": 1
+          },
+          "lipidregulating": {
+            "lipidregulating": 12
+          },
+          "urological": {
+            "urological": 2
+          }
+        }
+      },
+      "raw_output_was_exact_label": 0.8583,
+      "model": "NisargRhino/drug-classification",
+      "split": "classification_random",
+      "subset": "test",
+      "contaminated": true
+    },
+    "fragment": {
+      "n": 22,
+      "validity_rate_raw": 0.1818,
+      "intervention_rate": 0.8182,
+      "empty_output_rate": 0.0,
+      "exact_match_rate": 0.0,
+      "exact_match_rate_raw_only": 0.0,
+      "mean_tanimoto_to_reference": 0.2797,
+      "median_tanimoto_to_reference": 0.2333,
+      "rule_of_three_pass_rate": 0.5455,
+      "substructure_rate": 0.1818,
+      "hallucination_rate": 0.8182,
+      "substructure_by_path": {
+        "nearest-reference": {
+          "rate": 0.1111,
+          "n": 18
+        },
+        "model": {
+          "rate": 0.5,
+          "n": 4
+        }
+      },
+      "model": "NisargRhino/protein-models",
+      "split": "fragment_random",
+      "subset": "test",
+      "contaminated": true
+    }
+  }
+}

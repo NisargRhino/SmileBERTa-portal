@@ -1,0 +1,284 @@
+{
+  "task": "fragment",
+  "steps": [
+    {
+      "task": "fragment",
+      "split": "scaffold",
+      "name": "1_early_stopping",
+      "train_fraction": 1.0,
+      "train_pairs": 980,
+      "train_compounds": 175,
+      "config": {
+        "epochs": 6,
+        "early_stopping": false
+      },
+      "class_weighting": false,
+      "training": {
+        "history": [
+          {
+            "epoch": 1,
+            "train_loss": 3.8445,
+            "val_loss": 2.448,
+            "seconds": 24.5
+          },
+          {
+            "epoch": 2,
+            "train_loss": 2.2881,
+            "val_loss": 2.1488,
+            "seconds": 18.5
+          },
+          {
+            "epoch": 3,
+            "train_loss": 2.1111,
+            "val_loss": 2.0968,
+            "seconds": 16.5
+          },
+          {
+            "epoch": 4,
+            "train_loss": 2.0018,
+            "val_loss": 2.0891,
+            "seconds": 15.7
+          },
+          {
+            "epoch": 5,
+            "train_loss": 1.8996,
+            "val_loss": 2.0994,
+            "seconds": 17.2
+          },
+          {
+            "epoch": 6,
+            "train_loss": 1.8041,
+            "val_loss": 2.1158,
+            "seconds": 15.2
+          }
+        ],
+        "best_epoch": 4,
+        "best_val_loss": 2.0891,
+        "trainable_parameters": 44106239
+      },
+      "test": {
+        "validity_rate_raw": 0.0,
+        "exact_match_rate": 0.0,
+        "mean_tanimoto_to_reference": 0.0687,
+        "substructure_rate": 0.0,
+        "rule_of_three_pass_rate": 0.3636
+      },
+      "full_test_metrics": {
+        "n": 22,
+        "validity_rate_raw": 0.0,
+        "intervention_rate": 1.0,
+        "empty_output_rate": 0.0,
+        "exact_match_rate": 0.0,
+        "exact_match_rate_raw_only": 0.0,
+        "mean_tanimoto_to_reference": 0.0687,
+        "median_tanimoto_to_reference": 0.0645,
+        "rule_of_three_pass_rate": 0.3636,
+        "substructure_rate": 0.0,
+        "hallucination_rate": 1.0,
+        "substructure_by_path": {
+          "nearest-reference": {
+            "rate": 0.0,
+            "n": 22
+          }
+        },
+        "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_learning_curve",
+        "split": "fragment_scaffold",
+        "subset": "test",
+        "contaminated": false
+      },
+      "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_learning_curve",
+      "minutes": 1.9,
+      "validation_loss_turns_upward_after_epoch": 4,
+      "doubles_as": [
+        "headline_scaffold",
+        "intervention_1_early_stopping"
+      ],
+      "note": "the learning-curve run with best-validation weights restored, which is what early stopping selects"
+    },
+    {
+      "task": "fragment",
+      "split": "scaffold",
+      "name": "2_dropout_weight_decay",
+      "train_fraction": 1.0,
+      "train_pairs": 980,
+      "train_compounds": 175,
+      "config": {
+        "epochs": 6,
+        "early_stopping": true,
+        "patience": 2,
+        "dropout": 0.2,
+        "weight_decay": 0.01
+      },
+      "class_weighting": false,
+      "training": {
+        "history": [
+          {
+            "epoch": 1,
+            "train_loss": 3.8761,
+            "val_loss": 2.4862,
+            "seconds": 15.3
+          },
+          {
+            "epoch": 2,
+            "train_loss": 2.3334,
+            "val_loss": 2.2009,
+            "seconds": 15.3
+          },
+          {
+            "epoch": 3,
+            "train_loss": 2.168,
+            "val_loss": 2.1059,
+            "seconds": 14.8
+          },
+          {
+            "epoch": 4,
+            "train_loss": 2.0783,
+            "val_loss": 2.0935,
+            "seconds": 14.9
+          },
+          {
+            "epoch": 5,
+            "train_loss": 1.9997,
+            "val_loss": 2.0784,
+            "seconds": 15.1
+          },
+          {
+            "epoch": 6,
+            "train_loss": 1.9266,
+            "val_loss": 2.079,
+            "seconds": 14.3
+          }
+        ],
+        "best_epoch": 5,
+        "best_val_loss": 2.0784,
+        "trainable_parameters": 44106239
+      },
+      "test": {
+        "validity_rate_raw": 0.0455,
+        "exact_match_rate": 0.0,
+        "mean_tanimoto_to_reference": 0.0866,
+        "substructure_rate": 0.0909,
+        "rule_of_three_pass_rate": 0.7273
+      },
+      "full_test_metrics": {
+        "n": 22,
+        "validity_rate_raw": 0.0455,
+        "intervention_rate": 0.9545,
+        "empty_output_rate": 0.0,
+        "exact_match_rate": 0.0,
+        "exact_match_rate_raw_only": 0.0,
+        "mean_tanimoto_to_reference": 0.0866,
+        "median_tanimoto_to_reference": 0.0926,
+        "rule_of_three_pass_rate": 0.7273,
+        "substructure_rate": 0.0909,
+        "hallucination_rate": 0.9091,
+        "substructure_by_path": {
+          "nearest-reference": {
+            "rate": 0.0476,
+            "n": 21
+          },
+          "model": {
+            "rate": 1.0,
+            "n": 1
+          }
+        },
+        "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_2_dropout_weight_decay",
+        "split": "fragment_scaffold",
+        "subset": "test",
+        "contaminated": false
+      },
+      "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_2_dropout_weight_decay",
+      "minutes": 1.5
+    },
+    {
+      "task": "fragment",
+      "split": "scaffold",
+      "name": "4_freeze_lower_layers",
+      "train_fraction": 1.0,
+      "train_pairs": 980,
+      "train_compounds": 175,
+      "config": {
+        "epochs": 6,
+        "early_stopping": true,
+        "patience": 2,
+        "freeze_below_top": 2
+      },
+      "class_weighting": false,
+      "training": {
+        "history": [
+          {
+            "epoch": 1,
+            "train_loss": 4.8296,
+            "val_loss": 3.1193,
+            "seconds": 9.0
+          },
+          {
+            "epoch": 2,
+            "train_loss": 2.8557,
+            "val_loss": 2.7586,
+            "seconds": 8.3
+          },
+          {
+            "epoch": 3,
+            "train_loss": 2.5838,
+            "val_loss": 2.6533,
+            "seconds": 8.1
+          },
+          {
+            "epoch": 4,
+            "train_loss": 2.4599,
+            "val_loss": 2.6129,
+            "seconds": 8.1
+          },
+          {
+            "epoch": 5,
+            "train_loss": 2.3552,
+            "val_loss": 2.5891,
+            "seconds": 8.0
+          },
+          {
+            "epoch": 6,
+            "train_loss": 2.269,
+            "val_loss": 2.6001,
+            "seconds": 8.1
+          }
+        ],
+        "best_epoch": 5,
+        "best_val_loss": 2.5891,
+        "trainable_parameters": 14768639
+      },
+      "test": {
+        "validity_rate_raw": 0.0,
+        "exact_match_rate": 0.0,
+        "mean_tanimoto_to_reference": 0.0915,
+        "substructure_rate": 0.0,
+        "rule_of_three_pass_rate": 0.6364
+      },
+      "full_test_metrics": {
+        "n": 22,
+        "validity_rate_raw": 0.0,
+        "intervention_rate": 1.0,
+        "empty_output_rate": 0.0,
+        "exact_match_rate": 0.0,
+        "exact_match_rate_raw_only": 0.0,
+        "mean_tanimoto_to_reference": 0.0915,
+        "median_tanimoto_to_reference": 0.0962,
+        "rule_of_three_pass_rate": 0.6364,
+        "substructure_rate": 0.0,
+        "hallucination_rate": 1.0,
+        "substructure_by_path": {
+          "nearest-reference": {
+            "rate": 0.0,
+            "n": 22
+          }
+        },
+        "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_4_freeze_lower_layers",
+        "split": "fragment_scaffold",
+        "subset": "test",
+        "contaminated": false
+      },
+      "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_4_freeze_lower_layers",
+      "minutes": 0.9
+    }
+  ]
+}

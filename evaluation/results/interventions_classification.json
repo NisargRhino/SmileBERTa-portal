@@ -1,0 +1,1054 @@
+{
+  "task": "classification",
+  "steps": [
+    {
+      "task": "classification",
+      "split": "scaffold",
+      "name": "1_early_stopping",
+      "train_fraction": 1.0,
+      "train_pairs": 6652,
+      "train_compounds": 6652,
+      "config": {
+        "epochs": 6,
+        "early_stopping": false
+      },
+      "class_weighting": false,
+      "training": {
+        "history": [
+          {
+            "epoch": 1,
+            "train_loss": 2.1181,
+            "val_loss": 1.4723,
+            "seconds": 109.1
+          },
+          {
+            "epoch": 2,
+            "train_loss": 1.3032,
+            "val_loss": 1.4242,
+            "seconds": 102.1
+          },
+          {
+            "epoch": 3,
+            "train_loss": 1.0992,
+            "val_loss": 1.3536,
+            "seconds": 115.7
+          },
+          {
+            "epoch": 4,
+            "train_loss": 0.8939,
+            "val_loss": 1.3731,
+            "seconds": 102.4
+          },
+          {
+            "epoch": 5,
+            "train_loss": 0.7451,
+            "val_loss": 1.5,
+            "seconds": 526.0
+          },
+          {
+            "epoch": 6,
+            "train_loss": 0.6092,
+            "val_loss": 1.6074,
+            "seconds": 541.2
+          }
+        ],
+        "best_epoch": 3,
+        "best_val_loss": 1.3536,
+        "trainable_parameters": 44106239
+      },
+      "test": {
+        "macro_f1": 0.2292,
+        "micro_f1": 0.3482,
+        "top_3_accuracy": 0.6429,
+        "subset_accuracy": 0.0464,
+        "any_correct": 0.5714,
+        "hamming_loss": 0.1938
+      },
+      "full_test_metrics": {
+        "n": 840,
+        "per_class": {
+          "antiinfective": {
+            "precision": 0.4322,
+            "recall": 0.9281,
+            "f1": 0.5898,
+            "support": 292,
+            "predicted": 627
+          },
+          "antineoplastic": {
+            "precision": 0.2465,
+            "recall": 0.8476,
+            "f1": 0.3819,
+            "support": 164,
+            "predicted": 564
+          },
+          "cns": {
+            "precision": 0.5,
+            "recall": 0.1046,
+            "f1": 0.173,
+            "support": 153,
+            "predicted": 32
+          },
+          "cardio": {
+            "precision": 0.1739,
+            "recall": 0.0635,
+            "f1": 0.093,
+            "support": 126,
+            "predicted": 46
+          },
+          "antiinflammatory": {
+            "precision": 0.073,
+            "recall": 0.5789,
+            "f1": 0.1297,
+            "support": 57,
+            "predicted": 452
+          },
+          "gastrointestinal": {
+            "precision": 0.1831,
+            "recall": 0.2653,
+            "f1": 0.2167,
+            "support": 49,
+            "predicted": 71
+          },
+          "hematologic": {
+            "precision": 0.4118,
+            "recall": 0.1522,
+            "f1": 0.2222,
+            "support": 46,
+            "predicted": 17
+          },
+          "respiratorysystem": {
+            "precision": 0.1111,
+            "recall": 0.3571,
+            "f1": 0.1695,
+            "support": 28,
+            "predicted": 90
+          },
+          "dermatologic": {
+            "precision": 0.037,
+            "recall": 0.0435,
+            "f1": 0.04,
+            "support": 23,
+            "predicted": 27
+          },
+          "reproductivecontrol": {
+            "precision": 0.2609,
+            "recall": 0.7826,
+            "f1": 0.3913,
+            "support": 23,
+            "predicted": 69
+          },
+          "lipidregulating": {
+            "precision": 0.4286,
+            "recall": 0.2857,
+            "f1": 0.3429,
+            "support": 21,
+            "predicted": 14
+          },
+          "urological": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 7,
+            "predicted": 0
+          }
+        },
+        "macro_f1": 0.2292,
+        "micro_f1": 0.3482,
+        "micro_precision": 0.2598,
+        "micro_recall": 0.5278,
+        "subset_accuracy": 0.0464,
+        "any_correct": 0.5714,
+        "hamming_loss": 0.1938,
+        "top_1_accuracy": 0.3893,
+        "top_3_accuracy": 0.6429,
+        "multi_label_subset": {
+          "n": 133,
+          "subset_accuracy": 0.0752,
+          "any_correct": 0.5564,
+          "hamming_loss": 0.2174
+        },
+        "confusion": {
+          "n": 707,
+          "matrix": {
+            "antiinfective": {
+              "antiinfective": 230,
+              "antineoplastic": 9,
+              "lipidregulating": 1
+            },
+            "antineoplastic": {
+              "antiinfective": 87,
+              "antineoplastic": 19,
+              "gastrointestinal": 2,
+              "reproductivecontrol": 2
+            },
+            "cns": {
+              "antiinfective": 72,
+              "antineoplastic": 18,
+              "cardio": 13,
+              "antiinflammatory": 4,
+              "gastrointestinal": 4,
+              "respiratorysystem": 3,
+              "cns": 1
+            },
+            "cardio": {
+              "antiinfective": 47,
+              "antineoplastic": 15,
+              "dermatologic": 5,
+              "gastrointestinal": 3,
+              "cardio": 3,
+              "reproductivecontrol": 3,
+              "antiinflammatory": 2,
+              "lipidregulating": 1,
+              "respiratorysystem": 1
+            },
+            "antiinflammatory": {
+              "antiinfective": 23,
+              "antineoplastic": 7,
+              "antiinflammatory": 3,
+              "reproductivecontrol": 1
+            },
+            "gastrointestinal": {
+              "antiinfective": 29,
+              "antiinflammatory": 2,
+              "gastrointestinal": 1
+            },
+            "hematologic": {
+              "antiinfective": 19,
+              "cardio": 3,
+              "antiinflammatory": 2,
+              "antineoplastic": 1,
+              "gastrointestinal": 1
+            },
+            "respiratorysystem": {
+              "antiinfective": 4,
+              "antineoplastic": 2,
+              "cns": 1,
+              "cardio": 1,
+              "reproductivecontrol": 1
+            },
+            "dermatologic": {
+              "antiinfective": 16,
+              "antiinflammatory": 1,
+              "antineoplastic": 1,
+              "gastrointestinal": 1,
+              "respiratorysystem": 1
+            },
+            "reproductivecontrol": {
+              "reproductivecontrol": 18,
+              "antiinfective": 3,
+              "antineoplastic": 1
+            },
+            "lipidregulating": {
+              "antiinfective": 8,
+              "cardio": 6,
+              "gastrointestinal": 2,
+              "antineoplastic": 1,
+              "antiinflammatory": 1
+            },
+            "urological": {
+              "antiinfective": 1
+            }
+          }
+        },
+        "raw_output_was_exact_label": 0.0,
+        "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/classification_scaffold_learning_curve",
+        "split": "classification_scaffold",
+        "subset": "test",
+        "contaminated": false
+      },
+      "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/classification_scaffold_learning_curve",
+      "minutes": 28.4,
+      "validation_loss_turns_upward_after_epoch": 3,
+      "doubles_as": [
+        "headline_scaffold",
+        "intervention_1_early_stopping"
+      ],
+      "note": "the learning-curve run with best-validation weights restored, which is what early stopping selects"
+    },
+    {
+      "task": "classification",
+      "split": "scaffold",
+      "name": "2_dropout_weight_decay",
+      "train_fraction": 1.0,
+      "train_pairs": 6652,
+      "train_compounds": 6652,
+      "config": {
+        "epochs": 6,
+        "early_stopping": true,
+        "patience": 2,
+        "dropout": 0.2,
+        "weight_decay": 0.01
+      },
+      "class_weighting": false,
+      "training": {
+        "history": [
+          {
+            "epoch": 1,
+            "train_loss": 2.1834,
+            "val_loss": 1.5291,
+            "seconds": 112.6
+          },
+          {
+            "epoch": 2,
+            "train_loss": 1.3859,
+            "val_loss": 1.4356,
+            "seconds": 113.8
+          },
+          {
+            "epoch": 3,
+            "train_loss": 1.226,
+            "val_loss": 1.3774,
+            "seconds": 111.5
+          },
+          {
+            "epoch": 4,
+            "train_loss": 1.0725,
+            "val_loss": 1.3553,
+            "seconds": 109.4
+          },
+          {
+            "epoch": 5,
+            "train_loss": 0.9552,
+            "val_loss": 1.441,
+            "seconds": 109.4
+          },
+          {
+            "epoch": 6,
+            "train_loss": 0.8388,
+            "val_loss": 1.5062,
+            "seconds": 106.4
+          }
+        ],
+        "best_epoch": 4,
+        "best_val_loss": 1.3553,
+        "trainable_parameters": 44106239
+      },
+      "test": {
+        "macro_f1": 0.2214,
+        "micro_f1": 0.3457,
+        "top_3_accuracy": 0.6595,
+        "subset_accuracy": 0.0762,
+        "any_correct": 0.5226,
+        "hamming_loss": 0.1784
+      },
+      "full_test_metrics": {
+        "n": 840,
+        "per_class": {
+          "antiinfective": {
+            "precision": 0.502,
+            "recall": 0.839,
+            "f1": 0.6282,
+            "support": 292,
+            "predicted": 488
+          },
+          "antineoplastic": {
+            "precision": 0.2612,
+            "recall": 0.7134,
+            "f1": 0.3824,
+            "support": 164,
+            "predicted": 448
+          },
+          "cns": {
+            "precision": 0.3214,
+            "recall": 0.0588,
+            "f1": 0.0994,
+            "support": 153,
+            "predicted": 28
+          },
+          "cardio": {
+            "precision": 0.2564,
+            "recall": 0.1587,
+            "f1": 0.1961,
+            "support": 126,
+            "predicted": 78
+          },
+          "antiinflammatory": {
+            "precision": 0.0714,
+            "recall": 0.5088,
+            "f1": 0.1253,
+            "support": 57,
+            "predicted": 406
+          },
+          "gastrointestinal": {
+            "precision": 0.1889,
+            "recall": 0.3469,
+            "f1": 0.2446,
+            "support": 49,
+            "predicted": 90
+          },
+          "hematologic": {
+            "precision": 0.4286,
+            "recall": 0.1304,
+            "f1": 0.2,
+            "support": 46,
+            "predicted": 14
+          },
+          "respiratorysystem": {
+            "precision": 0.0543,
+            "recall": 0.1786,
+            "f1": 0.0833,
+            "support": 28,
+            "predicted": 92
+          },
+          "dermatologic": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 23,
+            "predicted": 11
+          },
+          "reproductivecontrol": {
+            "precision": 0.2836,
+            "recall": 0.8261,
+            "f1": 0.4222,
+            "support": 23,
+            "predicted": 67
+          },
+          "lipidregulating": {
+            "precision": 0.2162,
+            "recall": 0.381,
+            "f1": 0.2759,
+            "support": 21,
+            "predicted": 37
+          },
+          "urological": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 7,
+            "predicted": 0
+          }
+        },
+        "macro_f1": 0.2214,
+        "micro_f1": 0.3457,
+        "micro_precision": 0.27,
+        "micro_recall": 0.4803,
+        "subset_accuracy": 0.0762,
+        "any_correct": 0.5226,
+        "hamming_loss": 0.1784,
+        "top_1_accuracy": 0.3845,
+        "top_3_accuracy": 0.6595,
+        "multi_label_subset": {
+          "n": 133,
+          "subset_accuracy": 0.0977,
+          "any_correct": 0.5564,
+          "hamming_loss": 0.2061
+        },
+        "confusion": {
+          "n": 707,
+          "matrix": {
+            "antiinfective": {
+              "antiinfective": 209,
+              "antineoplastic": 16,
+              "antiinflammatory": 7,
+              "cardio": 3,
+              "respiratorysystem": 2,
+              "gastrointestinal": 2,
+              "lipidregulating": 1
+            },
+            "antineoplastic": {
+              "antiinfective": 69,
+              "antineoplastic": 24,
+              "antiinflammatory": 8,
+              "cardio": 6,
+              "respiratorysystem": 2,
+              "reproductivecontrol": 1
+            },
+            "cns": {
+              "antiinfective": 37,
+              "antiinflammatory": 27,
+              "cardio": 18,
+              "antineoplastic": 17,
+              "respiratorysystem": 6,
+              "gastrointestinal": 5,
+              "cns": 4,
+              "reproductivecontrol": 1
+            },
+            "cardio": {
+              "antiinfective": 41,
+              "gastrointestinal": 12,
+              "antiinflammatory": 10,
+              "antineoplastic": 7,
+              "cardio": 6,
+              "respiratorysystem": 2,
+              "reproductivecontrol": 1,
+              "lipidregulating": 1
+            },
+            "antiinflammatory": {
+              "antiinfective": 11,
+              "antiinflammatory": 10,
+              "antineoplastic": 6,
+              "respiratorysystem": 2,
+              "lipidregulating": 2,
+              "cardio": 1,
+              "gastrointestinal": 1,
+              "dermatologic": 1
+            },
+            "gastrointestinal": {
+              "antiinfective": 16,
+              "gastrointestinal": 7,
+              "cardio": 5,
+              "antiinflammatory": 4
+            },
+            "hematologic": {
+              "antiinfective": 12,
+              "cardio": 7,
+              "antiinflammatory": 5,
+              "respiratorysystem": 1,
+              "lipidregulating": 1
+            },
+            "respiratorysystem": {
+              "antiinfective": 4,
+              "reproductivecontrol": 2,
+              "gastrointestinal": 2,
+              "cns": 1
+            },
+            "dermatologic": {
+              "antiinfective": 10,
+              "cardio": 5,
+              "antineoplastic": 3,
+              "antiinflammatory": 1,
+              "respiratorysystem": 1
+            },
+            "reproductivecontrol": {
+              "reproductivecontrol": 19,
+              "cardio": 1,
+              "antiinflammatory": 1,
+              "antiinfective": 1
+            },
+            "lipidregulating": {
+              "cardio": 8,
+              "antiinfective": 5,
+              "cns": 1,
+              "gastrointestinal": 1,
+              "antiinflammatory": 1,
+              "antineoplastic": 1,
+              "reproductivecontrol": 1
+            },
+            "urological": {
+              "gastrointestinal": 1
+            }
+          }
+        },
+        "raw_output_was_exact_label": 0.0,
+        "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/classification_scaffold_2_dropout_weight_decay",
+        "split": "classification_scaffold",
+        "subset": "test",
+        "contaminated": false
+      },
+      "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/classification_scaffold_2_dropout_weight_decay",
+      "minutes": 11.2
+    },
+    {
+      "task": "classification",
+      "split": "scaffold",
+      "name": "3_class_weighting",
+      "train_fraction": 1.0,
+      "train_pairs": 6652,
+      "train_compounds": 6652,
+      "config": {
+        "epochs": 6,
+        "early_stopping": true,
+        "patience": 2
+      },
+      "class_weighting": true,
+      "training": {
+        "history": [
+          {
+            "epoch": 1,
+            "train_loss": 2.2763,
+            "val_loss": 1.4723,
+            "seconds": 107.5
+          },
+          {
+            "epoch": 2,
+            "train_loss": 1.4513,
+            "val_loss": 1.4242,
+            "seconds": 104.5
+          },
+          {
+            "epoch": 3,
+            "train_loss": 1.2342,
+            "val_loss": 1.3536,
+            "seconds": 106.3
+          },
+          {
+            "epoch": 4,
+            "train_loss": 1.0121,
+            "val_loss": 1.3731,
+            "seconds": 108.3
+          },
+          {
+            "epoch": 5,
+            "train_loss": 0.8363,
+            "val_loss": 1.4991,
+            "seconds": 109.3
+          }
+        ],
+        "best_epoch": 3,
+        "best_val_loss": 1.3536,
+        "trainable_parameters": 44106239
+      },
+      "test": {
+        "macro_f1": 0.2292,
+        "micro_f1": 0.3482,
+        "top_3_accuracy": 0.6429,
+        "subset_accuracy": 0.0464,
+        "any_correct": 0.5714,
+        "hamming_loss": 0.1938
+      },
+      "full_test_metrics": {
+        "n": 840,
+        "per_class": {
+          "antiinfective": {
+            "precision": 0.4322,
+            "recall": 0.9281,
+            "f1": 0.5898,
+            "support": 292,
+            "predicted": 627
+          },
+          "antineoplastic": {
+            "precision": 0.2465,
+            "recall": 0.8476,
+            "f1": 0.3819,
+            "support": 164,
+            "predicted": 564
+          },
+          "cns": {
+            "precision": 0.5,
+            "recall": 0.1046,
+            "f1": 0.173,
+            "support": 153,
+            "predicted": 32
+          },
+          "cardio": {
+            "precision": 0.1739,
+            "recall": 0.0635,
+            "f1": 0.093,
+            "support": 126,
+            "predicted": 46
+          },
+          "antiinflammatory": {
+            "precision": 0.073,
+            "recall": 0.5789,
+            "f1": 0.1297,
+            "support": 57,
+            "predicted": 452
+          },
+          "gastrointestinal": {
+            "precision": 0.1831,
+            "recall": 0.2653,
+            "f1": 0.2167,
+            "support": 49,
+            "predicted": 71
+          },
+          "hematologic": {
+            "precision": 0.4118,
+            "recall": 0.1522,
+            "f1": 0.2222,
+            "support": 46,
+            "predicted": 17
+          },
+          "respiratorysystem": {
+            "precision": 0.1111,
+            "recall": 0.3571,
+            "f1": 0.1695,
+            "support": 28,
+            "predicted": 90
+          },
+          "dermatologic": {
+            "precision": 0.037,
+            "recall": 0.0435,
+            "f1": 0.04,
+            "support": 23,
+            "predicted": 27
+          },
+          "reproductivecontrol": {
+            "precision": 0.2609,
+            "recall": 0.7826,
+            "f1": 0.3913,
+            "support": 23,
+            "predicted": 69
+          },
+          "lipidregulating": {
+            "precision": 0.4286,
+            "recall": 0.2857,
+            "f1": 0.3429,
+            "support": 21,
+            "predicted": 14
+          },
+          "urological": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 7,
+            "predicted": 0
+          }
+        },
+        "macro_f1": 0.2292,
+        "micro_f1": 0.3482,
+        "micro_precision": 0.2598,
+        "micro_recall": 0.5278,
+        "subset_accuracy": 0.0464,
+        "any_correct": 0.5714,
+        "hamming_loss": 0.1938,
+        "top_1_accuracy": 0.3893,
+        "top_3_accuracy": 0.6429,
+        "multi_label_subset": {
+          "n": 133,
+          "subset_accuracy": 0.0752,
+          "any_correct": 0.5564,
+          "hamming_loss": 0.2174
+        },
+        "confusion": {
+          "n": 707,
+          "matrix": {
+            "antiinfective": {
+              "antiinfective": 230,
+              "antineoplastic": 9,
+              "lipidregulating": 1
+            },
+            "antineoplastic": {
+              "antiinfective": 87,
+              "antineoplastic": 19,
+              "gastrointestinal": 2,
+              "reproductivecontrol": 2
+            },
+            "cns": {
+              "antiinfective": 72,
+              "antineoplastic": 18,
+              "cardio": 13,
+              "antiinflammatory": 4,
+              "gastrointestinal": 4,
+              "respiratorysystem": 3,
+              "cns": 1
+            },
+            "cardio": {
+              "antiinfective": 47,
+              "antineoplastic": 15,
+              "dermatologic": 5,
+              "gastrointestinal": 3,
+              "cardio": 3,
+              "reproductivecontrol": 3,
+              "antiinflammatory": 2,
+              "lipidregulating": 1,
+              "respiratorysystem": 1
+            },
+            "antiinflammatory": {
+              "antiinfective": 23,
+              "antineoplastic": 7,
+              "antiinflammatory": 3,
+              "reproductivecontrol": 1
+            },
+            "gastrointestinal": {
+              "antiinfective": 29,
+              "antiinflammatory": 2,
+              "gastrointestinal": 1
+            },
+            "hematologic": {
+              "antiinfective": 19,
+              "cardio": 3,
+              "antiinflammatory": 2,
+              "antineoplastic": 1,
+              "gastrointestinal": 1
+            },
+            "respiratorysystem": {
+              "antiinfective": 4,
+              "antineoplastic": 2,
+              "cns": 1,
+              "cardio": 1,
+              "reproductivecontrol": 1
+            },
+            "dermatologic": {
+              "antiinfective": 16,
+              "antiinflammatory": 1,
+              "antineoplastic": 1,
+              "gastrointestinal": 1,
+              "respiratorysystem": 1
+            },
+            "reproductivecontrol": {
+              "reproductivecontrol": 18,
+              "antiinfective": 3,
+              "antineoplastic": 1
+            },
+            "lipidregulating": {
+              "antiinfective": 8,
+              "cardio": 6,
+              "gastrointestinal": 2,
+              "antineoplastic": 1,
+              "antiinflammatory": 1
+            },
+            "urological": {
+              "antiinfective": 1
+            }
+          }
+        },
+        "raw_output_was_exact_label": 0.0,
+        "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/classification_scaffold_3_class_weighting",
+        "split": "classification_scaffold",
+        "subset": "test",
+        "contaminated": false
+      },
+      "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/classification_scaffold_3_class_weighting",
+      "minutes": 9.1
+    },
+    {
+      "task": "classification",
+      "split": "scaffold",
+      "name": "4_freeze_lower_layers",
+      "train_fraction": 1.0,
+      "train_pairs": 6652,
+      "train_compounds": 6652,
+      "config": {
+        "epochs": 6,
+        "early_stopping": true,
+        "patience": 2,
+        "freeze_below_top": 2
+      },
+      "class_weighting": false,
+      "training": {
+        "history": [
+          {
+            "epoch": 1,
+            "train_loss": 3.2931,
+            "val_loss": 2.3955,
+            "seconds": 65.1
+          },
+          {
+            "epoch": 2,
+            "train_loss": 2.1555,
+            "val_loss": 2.0338,
+            "seconds": 62.9
+          },
+          {
+            "epoch": 3,
+            "train_loss": 1.8638,
+            "val_loss": 1.8966,
+            "seconds": 61.5
+          },
+          {
+            "epoch": 4,
+            "train_loss": 1.6769,
+            "val_loss": 1.7786,
+            "seconds": 58.9
+          },
+          {
+            "epoch": 5,
+            "train_loss": 1.5481,
+            "val_loss": 1.7509,
+            "seconds": 58.7
+          },
+          {
+            "epoch": 6,
+            "train_loss": 1.4249,
+            "val_loss": 1.7132,
+            "seconds": 59.4
+          }
+        ],
+        "best_epoch": 6,
+        "best_val_loss": 1.7132,
+        "trainable_parameters": 14768639
+      },
+      "test": {
+        "macro_f1": 0.2142,
+        "micro_f1": 0.3453,
+        "top_3_accuracy": 0.65,
+        "subset_accuracy": 0.0571,
+        "any_correct": 0.5702,
+        "hamming_loss": 0.1994
+      },
+      "full_test_metrics": {
+        "n": 840,
+        "per_class": {
+          "antiinfective": {
+            "precision": 0.4104,
+            "recall": 0.9486,
+            "f1": 0.5729,
+            "support": 292,
+            "predicted": 675
+          },
+          "antineoplastic": {
+            "precision": 0.25,
+            "recall": 0.872,
+            "f1": 0.3886,
+            "support": 164,
+            "predicted": 572
+          },
+          "cns": {
+            "precision": 0.6429,
+            "recall": 0.1176,
+            "f1": 0.1989,
+            "support": 153,
+            "predicted": 28
+          },
+          "cardio": {
+            "precision": 0.3571,
+            "recall": 0.0397,
+            "f1": 0.0714,
+            "support": 126,
+            "predicted": 14
+          },
+          "antiinflammatory": {
+            "precision": 0.066,
+            "recall": 0.614,
+            "f1": 0.1193,
+            "support": 57,
+            "predicted": 530
+          },
+          "gastrointestinal": {
+            "precision": 0.25,
+            "recall": 0.449,
+            "f1": 0.3212,
+            "support": 49,
+            "predicted": 88
+          },
+          "hematologic": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 46,
+            "predicted": 8
+          },
+          "respiratorysystem": {
+            "precision": 0.0735,
+            "recall": 0.1786,
+            "f1": 0.1042,
+            "support": 28,
+            "predicted": 68
+          },
+          "dermatologic": {
+            "precision": 0.1212,
+            "recall": 0.1739,
+            "f1": 0.1429,
+            "support": 23,
+            "predicted": 33
+          },
+          "reproductivecontrol": {
+            "precision": 0.413,
+            "recall": 0.8261,
+            "f1": 0.5507,
+            "support": 23,
+            "predicted": 46
+          },
+          "lipidregulating": {
+            "precision": 0.1053,
+            "recall": 0.0952,
+            "f1": 0.1,
+            "support": 21,
+            "predicted": 19
+          },
+          "urological": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 7,
+            "predicted": 0
+          }
+        },
+        "macro_f1": 0.2142,
+        "micro_f1": 0.3453,
+        "micro_precision": 0.2547,
+        "micro_recall": 0.5359,
+        "subset_accuracy": 0.0571,
+        "any_correct": 0.5702,
+        "hamming_loss": 0.1994,
+        "top_1_accuracy": 0.3893,
+        "top_3_accuracy": 0.65,
+        "multi_label_subset": {
+          "n": 133,
+          "subset_accuracy": 0.0677,
+          "any_correct": 0.5639,
+          "hamming_loss": 0.218
+        },
+        "confusion": {
+          "n": 707,
+          "matrix": {
+            "antiinfective": {
+              "antiinfective": 230,
+              "antineoplastic": 7,
+              "gastrointestinal": 2,
+              "antiinflammatory": 1
+            },
+            "antineoplastic": {
+              "antiinfective": 96,
+              "antineoplastic": 11,
+              "antiinflammatory": 2,
+              "gastrointestinal": 1
+            },
+            "cns": {
+              "antiinfective": 89,
+              "antineoplastic": 10,
+              "reproductivecontrol": 5,
+              "cardio": 3,
+              "antiinflammatory": 3,
+              "gastrointestinal": 2,
+              "hematologic": 1,
+              "respiratorysystem": 1,
+              "cns": 1
+            },
+            "cardio": {
+              "antiinfective": 63,
+              "antineoplastic": 7,
+              "antiinflammatory": 6,
+              "cns": 1,
+              "reproductivecontrol": 1,
+              "cardio": 1,
+              "gastrointestinal": 1
+            },
+            "antiinflammatory": {
+              "antiinfective": 17,
+              "antiinflammatory": 7,
+              "antineoplastic": 7,
+              "reproductivecontrol": 1,
+              "respiratorysystem": 1,
+              "gastrointestinal": 1
+            },
+            "gastrointestinal": {
+              "antiinfective": 17,
+              "gastrointestinal": 8,
+              "reproductivecontrol": 4,
+              "antineoplastic": 2,
+              "cardio": 1
+            },
+            "hematologic": {
+              "antiinfective": 22,
+              "antiinflammatory": 3,
+              "cardio": 1
+            },
+            "respiratorysystem": {
+              "antiinfective": 7,
+              "antiinflammatory": 2
+            },
+            "dermatologic": {
+              "antiinfective": 17,
+              "reproductivecontrol": 2,
+              "antineoplastic": 1
+            },
+            "reproductivecontrol": {
+              "reproductivecontrol": 18,
+              "antiinfective": 2,
+              "respiratorysystem": 1,
+              "antiinflammatory": 1
+            },
+            "lipidregulating": {
+              "antiinfective": 15,
+              "gastrointestinal": 1,
+              "respiratorysystem": 1,
+              "lipidregulating": 1
+            },
+            "urological": {
+              "antiinfective": 1
+            }
+          }
+        },
+        "raw_output_was_exact_label": 0.0,
+        "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/classification_scaffold_4_freeze_lower_layers",
+        "split": "classification_scaffold",
+        "subset": "test",
+        "contaminated": false
+      },
+      "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/classification_scaffold_4_freeze_lower_layers",
+      "minutes": 6.3
+    }
+  ]
+}

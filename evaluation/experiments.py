@@ -229,10 +229,44 @@ def memorisation_control(task, epochs, log=print):
     return record
 
 
+def expanded_fragment_corpus(epochs, log=print):
+    """Intervention 5: the same recipe on ~40x the fragment training data.
+
+    Everything else in the fragment diagnosis says the corpus is the problem
+    rather than the architecture. This is the test of that claim: same model,
+    same recipe, same 22-molecule test set, with the training set rebuilt by
+    running the original BRICS pipeline over the 8,336 drugs in the
+    classification dataset.
+
+    Molecules sharing a scaffold with the held-out set are excluded from
+    training, so the comparison is against the same honest test it always was.
+    """
+    from evaluation import expand_fragments as X
+
+    parts, stats = X.expanded_split()
+    log('  [fragment/expanded] %s' % json.dumps(stats))
+    train_pairs = T.pairs_for('fragment', parts['train'])
+    val_pairs = T.pairs_for('fragment', parts['validation'])
+
+    model, history = T.train_model(train_pairs, val_pairs, epochs=epochs,
+                                   early_stopping=True, patience=2, log=log)
+    model_dir = os.path.join(CHECKPOINTS, 'fragment_expanded')
+    T.save(model, model_dir)
+    res, summary = _evaluate('fragment', model_dir, 'scaffold')
+    record = {'task': 'fragment', 'name': 'expanded_corpus', 'corpus': stats,
+              'train_pairs': len(train_pairs), 'training': history,
+              'test': summary, 'full_test_metrics': res, 'checkpoint': model_dir,
+              'note': 'same recipe and same 22-molecule scaffold test set as the other '
+                      'fragment runs; only the training corpus changed'}
+    log('  -> %s' % json.dumps(summary))
+    _write('expanded_corpus_fragment', record)
+    return record
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('experiment', choices=('headline', 'learning_curve', 'data_scaling',
-                                           'interventions', 'control', 'all'))
+                                           'interventions', 'control', 'expanded', 'all'))
     ap.add_argument('--task', choices=('classification', 'fragment'), required=True)
     ap.add_argument('--epochs', type=int, default=6)
     args = ap.parse_args()
@@ -244,6 +278,9 @@ def main():
         headline(args.task, args.epochs, scaffold_record=curve)
         data_scaling(args.task, args.epochs, full_record=curve)
         interventions(args.task, args.epochs, early_stopped_record=curve)
+        return
+    if args.experiment == 'expanded':
+        expanded_fragment_corpus(args.epochs)
         return
     if args.experiment == 'control':
         memorisation_control(args.task, max(args.epochs, 12))
