@@ -124,15 +124,80 @@ BATCH_SIZE = int(os.environ.get('SB_BATCH_SIZE', '40'))
 BATCH_TIMEOUT = int(os.environ.get('SB_BATCH_TIMEOUT', '900'))
 
 
-def run_batch(release, ids, shard):
-    """Process `ids` and append their outcomes to one shard. Runs in its own process."""
+# RDKit's GetMolFrags walks the molecular graph recursively, and ProLIF calls it
+# when it converts a receptor to RDKit. On a large protein that recursion is deep
+# enough to run off the 8 MB main-thread stack and the process dies with SIGBUS
+# before any Python handler can see it — observed as repeated "Python quit
+# unexpectedly" crashes, roughly one every few minutes, each costing a whole
+# batch. A thread's stack size is settable where the main thread's is not, so the
+# work runs on a thread with a stack large enough for the deepest protein.
+STACK_BYTES = int(os.environ.get('SB_STACK_BYTES', str(512 * 1024 * 1024)))
+
+# Attempts before an entry is written off as fatal. Two, not one: a batch killed
+# by the timeout or by a closed laptop also leaves an attempt behind, and those
+# deserve a genuine retry.
+MAX_ATTEMPTS = int(os.environ.get('SB_MAX_ATTEMPTS', '2'))
+
+
+def attempts_path(release, shard):
+    return os.path.join(release, 'attempts', f'{shard:04d}.log')
+
+
+def attempt_counts(release):
+    """How many times each PDB ID has been started, across every run."""
+    counts = Counter()
+    directory = os.path.join(release, 'attempts')
+    if not os.path.isdir(directory):
+        return counts
+    for name in os.listdir(directory):
+        if not name.endswith('.log'):
+            continue
+        try:
+            with open(os.path.join(directory, name)) as handle:
+                for line in handle:
+                    pdb_id = line.strip()
+                    if pdb_id:
+                        counts[pdb_id] += 1
+        except OSError:
+            continue
+    return counts
+
+
+def _process_batch(release, ids, shard):
     path = shard_path(release, shard)
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, 'a') as handle:
+    attempts = attempts_path(release, shard)
+    os.makedirs(os.path.dirname(attempts), exist_ok=True)
+    with open(path, 'a') as handle, open(attempts, 'a') as attempt_log:
         for pdb_id in ids:
+            # Written and flushed *before* the work, so an entry that kills the
+            # interpreter outright still leaves a trace. Without it a crashing
+            # structure is indistinguishable from one never reached, and every
+            # restart would hit it again forever.
+            attempt_log.write(pdb_id + '\n')
+            attempt_log.flush()
             for record in process(pdb_id):
                 handle.write(json.dumps(record) + '\n')
             handle.flush()
+
+
+def run_batch(release, ids, shard):
+    """Process `ids` and append their outcomes to one shard. Runs in its own process."""
+    import threading
+    threading.stack_size(STACK_BYTES)
+    failure = {}
+
+    def target():
+        try:
+            _process_batch(release, ids, shard)
+        except BaseException as exc:          # re-raised on the main thread below
+            failure['exc'] = exc
+
+    worker = threading.Thread(target=target)
+    worker.start()
+    worker.join()
+    if 'exc' in failure:
+        raise failure['exc']
 
 
 def build(release, ids, workers=4, log=print):
@@ -151,6 +216,26 @@ def build(release, ids, workers=4, log=print):
     os.makedirs(os.path.join(release, 'records'), exist_ok=True)
     sources.sifts_mapping()            # one download before any child starts
     already = done_ids(release)
+
+    # An entry that has been started twice and still has no record did not merely
+    # get interrupted — it took the interpreter down with it. Record it as such
+    # and stop retrying: one more attempt would cost another batch and teach us
+    # nothing. These are counted in the manifest like any other rejection, so the
+    # loss stays visible rather than becoming a silent gap in the corpus.
+    attempts = attempt_counts(release)
+    crashed = sorted(i for i in ids
+                     if i not in already and attempts.get(i, 0) >= MAX_ATTEMPTS)
+    if crashed:
+        os.makedirs(os.path.join(release, 'records'), exist_ok=True)
+        with open(shard_path(release, 9999), 'a') as handle:
+            for pdb_id in crashed:
+                handle.write(json.dumps({
+                    'pdb_id': pdb_id, 'rejected': 'crashed_during_processing',
+                    'detail': f'started {attempts[pdb_id]} times without completing',
+                }) + '\n')
+        log(f'{len(crashed)} entries crashed the interpreter and are now recorded as such')
+        already |= set(crashed)
+
     todo = [i for i in ids if i not in already]
     log(f'{len(ids)} candidates, {len(already)} already done, {len(todo)} to process')
     if not todo:
