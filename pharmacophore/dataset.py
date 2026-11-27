@@ -66,12 +66,32 @@ def atom_features(mol, idx):
 
 
 def pocket_features(record):
-    """A protein-side descriptor computable without the ligand.
+    """A protein-side descriptor, as independent of the ligand as this corpus allows.
 
-    Every field here must be derivable from the pocket alone. Anything computed
-    from the bound complex — pocket volume measured around the ligand, for
-    instance — encodes the ligand's size and would make the no-pocket ablation
-    look healthy while the model quietly cheats.
+    Every field must be derivable from the pocket rather than from the bound
+    complex. Anything computed around the ligand encodes the ligand's size and
+    would make the no-pocket ablation look healthy while the model quietly
+    cheats.
+
+    **The raw residue count used to be the first field and has been removed.**
+    The pocket is defined as residues within 6.5 A of a ligand heavy atom, so
+    that count correlates with ligand heavy-atom count at r = 0.64 across 25,811
+    complexes — a volume measured around the ligand, which is precisely what the
+    paragraph above forbids. It mattered because the per-atom ligand-only arm
+    carries no global size feature, so the count handed the pocket arm something
+    about the ligand that its control could not see.
+
+    Measured before removing it, on `unseen_protein`: ligand only 0.6246, pocket
+    with every feature 0.6782, pocket without the count 0.6678, and the count on
+    its own 0.6098 — *below* the ligand-only arm. So the effect was never the
+    leak. Dropping the count costs 0.0104 macro AUC and leaves a +0.0432
+    ablation delta that rests on composition rather than on size.
+
+    What remains are fractions, which are invariant to how many residues line
+    the site. They are still computed over a ligand-defined neighbourhood, so
+    they are not fully ligand-independent: scoring a genuinely apo protein needs
+    a pocket finder to define the site first, and that distribution shift is
+    untested. See the README.
     """
     residues = [r.split()[0] for r in record.get('pocket_residues', []) if r.split()]
     counts = Counter(residues)
@@ -83,7 +103,6 @@ def pocket_features(record):
     negative = sum(counts[r] for r in ('ASP', 'GLU'))
     polar = sum(counts[r] for r in ('SER', 'THR', 'ASN', 'GLN', 'TYR', 'CYS'))
     return [
-        len(residues),
         hydrophobic / total, aromatic / total, positive / total,
         negative / total, polar / total,
         (positive - negative) / total,

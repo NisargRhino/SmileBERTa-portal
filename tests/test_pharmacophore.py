@@ -223,6 +223,42 @@ class PromiscuousSubsetTests(unittest.TestCase):
         self.assertEqual(int(D.atom_mask(examples, {'AAA'}).sum()), 0)
 
 
+class PocketFeatureIndependenceTests(unittest.TestCase):
+    """Pocket features must not encode how big the ligand is.
+
+    The pocket is residues within 6.5 A of a ligand heavy atom, so any feature
+    that scales with the number of those residues is a ligand-size proxy: across
+    25,811 complexes the residue count correlates with ligand heavy atoms at
+    r = 0.64. The per-atom ligand-only arm has no global size feature, so such a
+    proxy would give the pocket arm something its own control cannot see.
+    """
+
+    @staticmethod
+    def _record(n_residues):
+        # Same composition at two very different pocket sizes. A ligand twice
+        # the size touches roughly twice the residues, so this is the shape of
+        # the confound.
+        pattern = ['ALA A%d', 'PHE A%d', 'LYS A%d', 'ASP A%d', 'SER A%d']
+        residues = [pattern[i % 5] % i for i in range(n_residues)]
+        return {'pocket_residues': residues}
+
+    def test_pocket_size_does_not_change_the_descriptor(self):
+        from pharmacophore import dataset as D
+        small = D.pocket_features(self._record(10))
+        large = D.pocket_features(self._record(40))
+        self.assertEqual(len(small), len(large))
+        for a, b in zip(small, large):
+            self.assertAlmostEqual(a, b, places=6,
+                                   msg='a pocket feature scales with pocket size, '
+                                       'which tracks ligand size')
+
+    def test_composition_still_registers(self):
+        from pharmacophore import dataset as D
+        charged = D.pocket_features({'pocket_residues': ['ASP A1', 'GLU A2']})
+        greasy = D.pocket_features({'pocket_residues': ['LEU A1', 'ILE A2']})
+        self.assertNotEqual(charged, greasy)
+
+
 class MacroSupportFloorTests(unittest.TestCase):
     """A type with a handful of positives must not swing the headline number."""
 
