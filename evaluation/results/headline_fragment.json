@@ -1,0 +1,188 @@
+{
+  "scaffold": {
+    "task": "fragment",
+    "split": "scaffold",
+    "name": "learning_curve",
+    "train_fraction": 1.0,
+    "train_pairs": 980,
+    "train_compounds": 175,
+    "config": {
+      "epochs": 6,
+      "early_stopping": false
+    },
+    "class_weighting": false,
+    "training": {
+      "history": [
+        {
+          "epoch": 1,
+          "train_loss": 3.8445,
+          "val_loss": 2.448,
+          "seconds": 24.5
+        },
+        {
+          "epoch": 2,
+          "train_loss": 2.2881,
+          "val_loss": 2.1488,
+          "seconds": 18.5
+        },
+        {
+          "epoch": 3,
+          "train_loss": 2.1111,
+          "val_loss": 2.0968,
+          "seconds": 16.5
+        },
+        {
+          "epoch": 4,
+          "train_loss": 2.0018,
+          "val_loss": 2.0891,
+          "seconds": 15.7
+        },
+        {
+          "epoch": 5,
+          "train_loss": 1.8996,
+          "val_loss": 2.0994,
+          "seconds": 17.2
+        },
+        {
+          "epoch": 6,
+          "train_loss": 1.8041,
+          "val_loss": 2.1158,
+          "seconds": 15.2
+        }
+      ],
+      "best_epoch": 4,
+      "best_val_loss": 2.0891,
+      "trainable_parameters": 44106239
+    },
+    "test": {
+      "validity_rate_raw": 0.0,
+      "exact_match_rate": 0.0,
+      "mean_tanimoto_to_reference": 0.0687,
+      "substructure_rate": 0.0,
+      "rule_of_three_pass_rate": 0.3636
+    },
+    "full_test_metrics": {
+      "n": 22,
+      "validity_rate_raw": 0.0,
+      "intervention_rate": 1.0,
+      "empty_output_rate": 0.0,
+      "exact_match_rate": 0.0,
+      "exact_match_rate_raw_only": 0.0,
+      "mean_tanimoto_to_reference": 0.0687,
+      "median_tanimoto_to_reference": 0.0645,
+      "rule_of_three_pass_rate": 0.3636,
+      "substructure_rate": 0.0,
+      "hallucination_rate": 1.0,
+      "substructure_by_path": {
+        "nearest-reference": {
+          "rate": 0.0,
+          "n": 22
+        }
+      },
+      "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_learning_curve",
+      "split": "fragment_scaffold",
+      "subset": "test",
+      "contaminated": false
+    },
+    "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_learning_curve",
+    "minutes": 1.9,
+    "validation_loss_turns_upward_after_epoch": 4,
+    "doubles_as": [
+      "headline_scaffold",
+      "intervention_1_early_stopping"
+    ]
+  },
+  "random": {
+    "task": "fragment",
+    "split": "random",
+    "name": "headline",
+    "train_fraction": 1.0,
+    "train_pairs": 940,
+    "train_compounds": 175,
+    "config": {
+      "epochs": 6
+    },
+    "class_weighting": false,
+    "training": {
+      "history": [
+        {
+          "epoch": 1,
+          "train_loss": 3.8874,
+          "val_loss": 2.4203,
+          "seconds": 14.0
+        },
+        {
+          "epoch": 2,
+          "train_loss": 2.3282,
+          "val_loss": 2.1795,
+          "seconds": 13.6
+        },
+        {
+          "epoch": 3,
+          "train_loss": 2.1164,
+          "val_loss": 2.1024,
+          "seconds": 13.1
+        },
+        {
+          "epoch": 4,
+          "train_loss": 2.0101,
+          "val_loss": 2.0244,
+          "seconds": 13.0
+        },
+        {
+          "epoch": 5,
+          "train_loss": 1.9088,
+          "val_loss": 2.0376,
+          "seconds": 13.4
+        },
+        {
+          "epoch": 6,
+          "train_loss": 1.8176,
+          "val_loss": 1.9934,
+          "seconds": 14.6
+        }
+      ],
+      "best_epoch": 6,
+      "best_val_loss": 1.9934,
+      "trainable_parameters": 44106239
+    },
+    "test": {
+      "validity_rate_raw": 0.0,
+      "exact_match_rate": 0.0,
+      "mean_tanimoto_to_reference": 0.1154,
+      "substructure_rate": 0.0,
+      "rule_of_three_pass_rate": 0.5455
+    },
+    "full_test_metrics": {
+      "n": 22,
+      "validity_rate_raw": 0.0,
+      "intervention_rate": 1.0,
+      "empty_output_rate": 0.0,
+      "exact_match_rate": 0.0,
+      "exact_match_rate_raw_only": 0.0,
+      "mean_tanimoto_to_reference": 0.1154,
+      "median_tanimoto_to_reference": 0.125,
+      "rule_of_three_pass_rate": 0.5455,
+      "substructure_rate": 0.0,
+      "hallucination_rate": 1.0,
+      "substructure_by_path": {
+        "nearest-reference": {
+          "rate": 0.0,
+          "n": 22
+        }
+      },
+      "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_random_headline",
+      "split": "fragment_random",
+      "subset": "test",
+      "contaminated": false
+    },
+    "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_random_headline",
+    "minutes": 1.4
+  },
+  "gap": {
+    "metric": "exact_match_rate",
+    "random": 0.0,
+    "scaffold": 0.0,
+    "difference": 0.0
+  }
+}

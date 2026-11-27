@@ -1,0 +1,238 @@
+{
+  "seed": 20261126,
+  "ratios": [
+    0.8,
+    0.1,
+    0.1
+  ],
+  "files": {
+    "classification_scaffold": {
+      "path": "evaluation/splits/classification_scaffold.csv",
+      "sha256_16": "8896add2516502e2"
+    },
+    "classification_random": {
+      "path": "evaluation/splits/classification_random.csv",
+      "sha256_16": "8217ef9e9260f8a5"
+    },
+    "fragment_scaffold": {
+      "path": "evaluation/splits/fragment_scaffold.csv",
+      "sha256_16": "4e64d73e623317aa"
+    },
+    "fragment_random": {
+      "path": "evaluation/splits/fragment_random.csv",
+      "sha256_16": "bd61af72aea4d15e"
+    }
+  },
+  "reports": {
+    "classification_scaffold": {
+      "kind": "scaffold",
+      "total": 8336,
+      "sizes": {
+        "train": 6652,
+        "validation": 844,
+        "test": 840
+      },
+      "fractions": {
+        "train": 0.798,
+        "validation": 0.1012,
+        "test": 0.1008
+      },
+      "distinct_scaffolds": {
+        "train": 2090,
+        "validation": 217,
+        "test": 225
+      },
+      "shared_scaffolds_train_test": 0,
+      "per_label": {
+        "antiinfective": {
+          "train": 2339,
+          "validation": 292,
+          "test": 292
+        },
+        "antineoplastic": {
+          "train": 1314,
+          "validation": 164,
+          "test": 164
+        },
+        "cns": {
+          "train": 1222,
+          "validation": 153,
+          "test": 153
+        },
+        "cardio": {
+          "train": 1010,
+          "validation": 126,
+          "test": 126
+        },
+        "antiinflammatory": {
+          "train": 456,
+          "validation": 78,
+          "test": 57
+        },
+        "gastrointestinal": {
+          "train": 392,
+          "validation": 49,
+          "test": 49
+        },
+        "hematologic": {
+          "train": 369,
+          "validation": 47,
+          "test": 46
+        },
+        "respiratorysystem": {
+          "train": 225,
+          "validation": 28,
+          "test": 28
+        },
+        "dermatologic": {
+          "train": 180,
+          "validation": 23,
+          "test": 23
+        },
+        "reproductivecontrol": {
+          "train": 179,
+          "validation": 23,
+          "test": 23
+        },
+        "lipidregulating": {
+          "train": 161,
+          "validation": 21,
+          "test": 21
+        },
+        "urological": {
+          "train": 35,
+          "validation": 6,
+          "test": 7
+        }
+      },
+      "scaffold_violations": 0
+    },
+    "classification_random": {
+      "kind": "random",
+      "total": 8336,
+      "sizes": {
+        "train": 6669,
+        "validation": 834,
+        "test": 833
+      },
+      "fractions": {
+        "train": 0.8,
+        "validation": 0.1,
+        "test": 0.0999
+      },
+      "distinct_scaffolds": {
+        "train": 2207,
+        "validation": 538,
+        "test": 547
+      },
+      "shared_scaffolds_train_test": 382,
+      "per_label": {
+        "antiinfective": {
+          "train": 2345,
+          "validation": 300,
+          "test": 278
+        },
+        "antineoplastic": {
+          "train": 1294,
+          "validation": 173,
+          "test": 175
+        },
+        "cns": {
+          "train": 1231,
+          "validation": 133,
+          "test": 164
+        },
+        "cardio": {
+          "train": 1030,
+          "validation": 123,
+          "test": 109
+        },
+        "antiinflammatory": {
+          "train": 475,
+          "validation": 55,
+          "test": 61
+        },
+        "gastrointestinal": {
+          "train": 393,
+          "validation": 54,
+          "test": 43
+        },
+        "hematologic": {
+          "train": 369,
+          "validation": 48,
+          "test": 45
+        },
+        "respiratorysystem": {
+          "train": 220,
+          "validation": 27,
+          "test": 34
+        },
+        "dermatologic": {
+          "train": 178,
+          "validation": 21,
+          "test": 27
+        },
+        "reproductivecontrol": {
+          "train": 176,
+          "validation": 24,
+          "test": 25
+        },
+        "lipidregulating": {
+          "train": 168,
+          "validation": 16,
+          "test": 19
+        },
+        "urological": {
+          "train": 37,
+          "validation": 7,
+          "test": 4
+        }
+      }
+    },
+    "fragment_scaffold": {
+      "kind": "scaffold",
+      "total": 219,
+      "sizes": {
+        "train": 175,
+        "validation": 22,
+        "test": 22
+      },
+      "fractions": {
+        "train": 0.7991,
+        "validation": 0.1005,
+        "test": 0.1005
+      },
+      "distinct_scaffolds": {
+        "train": 136,
+        "validation": 20,
+        "test": 19
+      },
+      "shared_scaffolds_train_test": 0,
+      "scaffold_violations": 0
+    },
+    "fragment_random": {
+      "kind": "random",
+      "total": 219,
+      "sizes": {
+        "train": 175,
+        "validation": 22,
+        "test": 22
+      },
+      "fractions": {
+        "train": 0.7991,
+        "validation": 0.1005,
+        "test": 0.1005
+      },
+      "distinct_scaffolds": {
+        "train": 141,
+        "validation": 21,
+        "test": 22
+      },
+      "shared_scaffolds_train_test": 4
+    }
+  },
+  "dropped": {
+    "classification": {},
+    "fragments": {}
+  }
+}

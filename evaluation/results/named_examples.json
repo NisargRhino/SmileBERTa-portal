@@ -1,0 +1,179 @@
+{
+  "label": "shipped",
+  "classification_model": "NisargRhino/drug-classification",
+  "fragment_model": "NisargRhino/protein-models",
+  "cases": [
+    {
+      "name": "ciprofloxacin",
+      "smiles": "O=C(O)c1cn(C2CC2)c2cc(N3CCNCC3)c(F)cc2c1=O",
+      "why": "documented failure: a fluoroquinolone antibiotic the classifier has called antineoplastic",
+      "in_dataset": true,
+      "dataset_split": "train",
+      "true_labels": [
+        "antiinfective",
+        "antineoplastic"
+      ],
+      "raw_output": "antiinfective antineoplastic",
+      "snapped_label": "antiinfective antineoplastic",
+      "edit_distance": 0,
+      "predicted": [
+        "antiinfective",
+        "antineoplastic"
+      ],
+      "correct": true,
+      "raw_was_a_valid_label": true,
+      "fragment": {
+        "raw_output": "CC(=O)1cn(C)c2C)(F)cc1=",
+        "valid_smiles": false,
+        "is_substructure_of_input": false,
+        "rule_of_three": false
+      }
+    },
+    {
+      "name": "aspirin",
+      "smiles": "CC(=O)Oc1ccccc1C(=O)O",
+      "why": "small, common, unambiguous anti-inflammatory",
+      "in_dataset": true,
+      "dataset_split": "train",
+      "true_labels": [
+        "antiinflammatory",
+        "cardio",
+        "cns",
+        "hematologic"
+      ],
+      "raw_output": "aetaamataliatf",
+      "snapped_label": "hematologic",
+      "edit_distance": 9,
+      "predicted": [
+        "hematologic"
+      ],
+      "correct": true,
+      "raw_was_a_valid_label": false,
+      "fragment": {
+        "raw_output": "CC(=O)c1ccccc1C",
+        "valid_smiles": true,
+        "is_substructure_of_input": false,
+        "rule_of_three": true
+      }
+    },
+    {
+      "name": "caffeine",
+      "smiles": "Cn1c(=O)c2c(ncn2C)n(C)c1=O",
+      "why": "CNS stimulant with no therapeutic class in the usual sense",
+      "in_dataset": true,
+      "dataset_split": "train",
+      "true_labels": [
+        "cns"
+      ],
+      "raw_output": "cns",
+      "snapped_label": "cns",
+      "edit_distance": 0,
+      "predicted": [
+        "cns"
+      ],
+      "correct": true,
+      "raw_was_a_valid_label": true,
+      "fragment": {
+        "raw_output": "Cn1c(=O)c2c(ncn2C)n(C)1=O",
+        "valid_smiles": false,
+        "is_substructure_of_input": false,
+        "rule_of_three": false
+      }
+    },
+    {
+      "name": "imatinib",
+      "smiles": "Cc1ccc(NC(=O)c2ccc(CN3CCN(C)CC3)cc2)cc1Nc1nccc(-c2cccnc2)n1",
+      "why": "kinase inhibitor, antineoplastic",
+      "in_dataset": true,
+      "dataset_split": "train",
+      "true_labels": [
+        "antineoplastic"
+      ],
+      "raw_output": "antineoplastic",
+      "snapped_label": "antineoplastic",
+      "edit_distance": 0,
+      "predicted": [
+        "antineoplastic"
+      ],
+      "correct": true,
+      "raw_was_a_valid_label": true,
+      "fragment": {
+        "raw_output": "CCc1ccc(C(C)=O)1",
+        "valid_smiles": true,
+        "is_substructure_of_input": false,
+        "rule_of_three": true
+      }
+    },
+    {
+      "name": "atorvastatin",
+      "smiles": "CC(C)c1c(C(=O)Nc2ccccc2)c(-c2ccccc2)c(-c2ccc(F)cc2)n1CC[C@@H](O)C[C@@H](O)CC(=O)O",
+      "why": "lipid-regulating, one of the smaller classes",
+      "in_dataset": true,
+      "dataset_split": "train",
+      "true_labels": [
+        "lipidregulating"
+      ],
+      "raw_output": "lipidregulating",
+      "snapped_label": "lipidregulating",
+      "edit_distance": 0,
+      "predicted": [
+        "lipidregulating"
+      ],
+      "correct": true,
+      "raw_was_a_valid_label": true,
+      "fragment": {
+        "raw_output": "CC(=O)1",
+        "valid_smiles": false,
+        "is_substructure_of_input": false,
+        "rule_of_three": false
+      }
+    },
+    {
+      "name": "tamsulosin",
+      "smiles": "CCOc1ccccc1OCCN[C@@H](C)Cc1ccc(OC)c(S(N)(=O)=O)c1",
+      "why": "urological, the rarest class (48 compounds in total)",
+      "in_dataset": false,
+      "dataset_split": null,
+      "true_labels": null,
+      "raw_output": "urological",
+      "snapped_label": "urological",
+      "edit_distance": 0,
+      "predicted": [
+        "urological"
+      ],
+      "correct": null,
+      "raw_was_a_valid_label": true,
+      "fragment": {
+        "raw_output": "CCOc1ccccc1C",
+        "valid_smiles": true,
+        "is_substructure_of_input": false,
+        "rule_of_three": true
+      }
+    },
+    {
+      "name": "salbutamol",
+      "smiles": "CC(C)(C)NCC(O)c1ccc(O)c(CO)c1",
+      "why": "respiratory, a class the models recall poorly",
+      "in_dataset": true,
+      "dataset_split": "train",
+      "true_labels": [
+        "reproductivecontrol",
+        "respiratorysystem"
+      ],
+      "raw_output": "reproductivecontrol resp",
+      "snapped_label": "reproductivecontrol",
+      "edit_distance": 5,
+      "predicted": [
+        "reproductivecontrol"
+      ],
+      "correct": true,
+      "raw_was_a_valid_label": false,
+      "fragment": {
+        "raw_output": "CCC(O)c1ccc(O)c(CO)c1",
+        "valid_smiles": true,
+        "is_substructure_of_input": false,
+        "rule_of_three": true
+      }
+    }
+  ]
+}

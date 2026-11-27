@@ -1,0 +1,89 @@
+{
+  "task": "fragment",
+  "name": "expanded_corpus",
+  "corpus": {
+    "dropped_scaffold_overlap": 15,
+    "train_molecules": 7557,
+    "validation_molecules": 22,
+    "test_molecules": 22,
+    "train_pairs": 38433,
+    "train_pairs_before_cap": 38433,
+    "capped_to": 20000
+  },
+  "train_pairs": 20000,
+  "training": {
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 2.3462,
+        "val_loss": 2.0041,
+        "seconds": 325.3
+      },
+      {
+        "epoch": 2,
+        "train_loss": 2.047,
+        "val_loss": 1.9611,
+        "seconds": 325.1
+      },
+      {
+        "epoch": 3,
+        "train_loss": 1.9196,
+        "val_loss": 1.9051,
+        "seconds": 308.9
+      },
+      {
+        "epoch": 4,
+        "train_loss": 1.8065,
+        "val_loss": 1.9259,
+        "seconds": 301.7
+      },
+      {
+        "epoch": 5,
+        "train_loss": 1.7065,
+        "val_loss": 1.8946,
+        "seconds": 329.9
+      },
+      {
+        "epoch": 6,
+        "train_loss": 1.6097,
+        "val_loss": 1.9015,
+        "seconds": 328.9
+      }
+    ],
+    "best_epoch": 5,
+    "best_val_loss": 1.8946,
+    "trainable_parameters": 44106239
+  },
+  "test": {
+    "validity_rate_raw": 0.0,
+    "exact_match_rate": 0.0,
+    "mean_tanimoto_to_reference": 0.0762,
+    "substructure_rate": 0.0,
+    "rule_of_three_pass_rate": 0.8182
+  },
+  "full_test_metrics": {
+    "n": 22,
+    "validity_rate_raw": 0.0,
+    "intervention_rate": 1.0,
+    "empty_output_rate": 0.0,
+    "exact_match_rate": 0.0,
+    "exact_match_rate_raw_only": 0.0,
+    "mean_tanimoto_to_reference": 0.0762,
+    "median_tanimoto_to_reference": 0.0732,
+    "rule_of_three_pass_rate": 0.8182,
+    "substructure_rate": 0.0,
+    "hallucination_rate": 1.0,
+    "substructure_by_path": {
+      "nearest-reference": {
+        "rate": 0.0,
+        "n": 22
+      }
+    },
+    "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_expanded",
+    "split": "fragment_scaffold",
+    "subset": "test",
+    "contaminated": false
+  },
+  "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_expanded",
+  "note": "same recipe and same 22-molecule scaffold test set as the other fragment runs; only the training corpus changed"
+}

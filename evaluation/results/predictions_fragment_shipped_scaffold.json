@@ -1,0 +1,296 @@
+[
+  {
+    "smiles": "CN(C)CC=CC(=O)Nc1cc2c(Nc3ccc(F)c(Cl)c3)ncnc2cc1OC1CCOC1",
+    "references": [
+      "[16*]c1ccc(F)c(Cl)c1",
+      "[5*]N(C)C",
+      "[14*]c1ncnc2cc([16*])c([16*])cc12",
+      "[15*]C1CCOC1",
+      "[3*]O[3*]",
+      "[4*]CC[7*]",
+      "[5*]N[5*]",
+      "[1*]C(=O)C[7*]"
+    ],
+    "raw": "CNc1cc2c(C)ncnc2cc1C",
+    "prediction": "CNc1cc2c(C)ncnc2cc1C",
+    "correction": null
+  },
+  {
+    "smiles": "CN(C)c1nc(N(C)C)nc(N(C)C)n1",
+    "references": [
+      "[5*]N(C)C",
+      "[14*]c1nc([14*])nc([14*])n1"
+    ],
+    "raw": "CN(nc)N(nc)N)nc(C)1",
+    "prediction": "Cc1cc(N(C)C)nc(C)n1",
+    "correction": "nearest-reference"
+  },
+  {
+    "smiles": "NCC(=O)CCC(=O)O",
+    "references": [
+      "NCC(=O)CCC(=O)O"
+    ],
+    "raw": "CC",
+    "prediction": "CC",
+    "correction": null
+  },
+  {
+    "smiles": "[As+3].[As+3].[O-2].[O-2].[O-2]",
+    "references": [
+      "[As+3].[As+3].[O-2].[O-2].[O-2]"
+    ],
+    "raw": "CCCCCCO",
+    "prediction": "CCCCCCO",
+    "correction": null
+  },
+  {
+    "smiles": "CS(=O)(=O)c1ccc(Oc2cc(F)cc(C#N)c2)c2c1C(O)C(F)C2F",
+    "references": [
+      "[16*]c1cc(F)cc(C#N)c1",
+      "[16*]c1ccc(S(C)(=O)=O)c2c1C(F)C(F)C2O",
+      "[3*]O[3*]"
+    ],
+    "raw": "Cc1cc(F)C(C#N)c1",
+    "prediction": "Cc1cc(F)C(C#N)c1",
+    "correction": null
+  },
+  {
+    "smiles": "Cl[Pt]Cl.N.N",
+    "references": [
+      "Cl[Pt]Cl.N.N"
+    ],
+    "raw": "CN",
+    "prediction": "CN",
+    "correction": null
+  },
+  {
+    "smiles": "CC(Oc1cc(-c2cnn(C3CCNCC3)c2)cnc1N)c1c(Cl)ccc(F)c1Cl",
+    "references": [
+      "[16*]c1cnc(N)c([16*])c1",
+      "[3*]O[3*]",
+      "[15*]C1CCNCC1",
+      "[4*]C([8*])C",
+      "[16*]c1c(Cl)ccc(F)c1Cl",
+      "[9*]n1cc([16*])cn1"
+    ],
+    "raw": "Cc(cc(c)c(Cl)ccc(F)c1",
+    "prediction": "Cc1cc(F)c(C)c(F)c1",
+    "correction": "nearest-reference"
+  },
+  {
+    "smiles": "CCNCCc1ccc(CN(CC)c2cc(OC)ccc2C2CCc3cc(O)ccc3C2)cc1",
+    "references": [
+      "[5*]N([5*])[5*]",
+      "[16*]c1ccc([16*])c([16*])c1",
+      "[4*]C[8*]",
+      "[15*]C1CCc2cc(O)ccc2C1",
+      "[16*]c1ccc([16*])cc1",
+      "[4*]CC",
+      "[5*]N[5*]",
+      "[3*]OC",
+      "[4*]CC[8*]"
+    ],
+    "raw": "COc(CCcc1CCc",
+    "prediction": "Cc1cn(C)cc1C#N",
+    "correction": "nearest-reference"
+  },
+  {
+    "smiles": "COC(=O)NC(C)CNc1nccc(-c2cn(C(C)C)nc2-c2cc(Cl)cc(NS(C)(=O)=O)c2F)n1",
+    "references": [
+      "[8*]C(C)C",
+      "[14*]c1ccnc([14*])n1",
+      "[4*]CC([4*])C",
+      "[12*]S(C)(=O)=O",
+      "[16*]c1cc(Cl)cc([16*])c1F",
+      "[9*]n1cc([16*])c([14*])n1",
+      "[5*]N[5*]",
+      "[3*]OC",
+      "[1*]C([1*])=O"
+    ],
+    "raw": "CNc1cc(C)c(C",
+    "prediction": "CNc1scc(C)c1C",
+    "correction": "nearest-reference"
+  },
+  {
+    "smiles": "COc1cc(OC)cc(N(CCNC(C)C)c2ccc3ncc(-c4cnn(C)c4)nc3c2)c1",
+    "references": [
+      "[5*]N([5*])[5*]",
+      "[4*]C(C)C",
+      "[16*]c1cnn(C)c1",
+      "[14*]c1cnc2ccc([16*])cc2n1",
+      "[16*]c1cc([16*])cc([16*])c1",
+      "[4*]CC[4*]",
+      "[5*]N[5*]",
+      "[3*]OC"
+    ],
+    "raw": "Cc1cc(ccc)cc2CC)2c1",
+    "prediction": "Cc1cc(C)cc(C)c1",
+    "correction": "nearest-reference"
+  },
+  {
+    "smiles": "C#Cc1cccc(Nc2ncnc3cc(OCCOC)c(OCCOC)cc23)c1",
+    "references": [
+      "[4*]CC[4*]",
+      "[3*]OC",
+      "[3*]O[3*]",
+      "[16*]c1cccc(C#C)c1",
+      "[5*]N[5*]",
+      "[14*]c1ncnc2cc([16*])c([16*])cc12"
+    ],
+    "raw": "C#Cc1cccc(C)c1",
+    "prediction": "C#Cc1cccc(C)c1",
+    "correction": null
+  },
+  {
+    "smiles": "Cc1cnc(Nc2ccc(OCCN3CCCC3)cc2)nc1Nc1cccc(S(=O)(=O)NC(C)(C)C)c1",
+    "references": [
+      "[4*]C(C)(C)C",
+      "[4*]CC[4*]",
+      "[16*]c1ccc([16*])cc1",
+      "[5*]N1CCCC1",
+      "[14*]c1ncc(C)c([14*])n1",
+      "[3*]O[3*]",
+      "[5*]N[5*]",
+      "[12*]S(=O)(=O)c1cccc([16*])c1"
+    ],
+    "raw": "Cc1ccc(C)cc1",
+    "prediction": "Cc1ccc(C)cc1",
+    "correction": null
+  },
+  {
+    "smiles": "CNC(=O)c1c(C)oc2cc(Oc3ncnc4cc(OC)c(OC)cc34)ccc12",
+    "references": [
+      "[5*]NC",
+      "[3*]O[3*]",
+      "[3*]OC",
+      "[1*]C([6*])=O",
+      "[16*]c1ccc2c([16*])c(C)oc2c1",
+      "[14*]c1ncnc2cc([16*])c([16*])cc12"
+    ],
+    "raw": "COc1cc2c(c))C2ccccc",
+    "prediction": "COc1ccc(C)c2ccccc12",
+    "correction": "nearest-reference"
+  },
+  {
+    "smiles": "NC(=O)NO",
+    "references": [
+      "NC(=O)NO"
+    ],
+    "raw": "CCCCCCCC",
+    "prediction": "CCCCCCCC",
+    "correction": null
+  },
+  {
+    "smiles": "CCC(Nc1ncnc2nc[nH]c12)c1nc2cccc(F)c2c(=O)n1-c1ccccc1",
+    "references": [
+      "[9*]n1c([14*])nc2cccc(F)c2c1=O",
+      "[16*]c1ccccc1",
+      "[5*]N[5*]",
+      "[14*]c1ncnc2nc[nH]c12",
+      "[4*]C([8*])CC"
+    ],
+    "raw": "CCC(C)c1nc2cccc(F)c2c(=O)n1C",
+    "prediction": "CCC(C)c1nc2cccc(F)c2c(=O)n1C",
+    "correction": null
+  },
+  {
+    "smiles": "N#Cc1ccc(C(c2ccc(C#N)cc2)n2cncn2)cc1",
+    "references": [
+      "[8*]C([8*])[8*]",
+      "[9*]n1cncn1",
+      "[16*]c1ccc(C#N)cc1"
+    ],
+    "raw": "CC(c1ccc(C#N)C11c1ccc(ccc#N)cc1",
+    "prediction": "CC(c1ccc(C#N)cc1)c1ccc(C#N)cc1",
+    "correction": "nearest-reference"
+  },
+  {
+    "smiles": "CN(Cc1cnc2nc(N)nc(N)c2n1)c1ccc(C(=O)NC(CCC(=O)O)C(=O)O)cc1",
+    "references": [
+      "[4*]C(CCC(=O)O)C(=O)O",
+      "[16*]c1ccc([16*])cc1",
+      "[14*]c1cnc2nc(N)nc(N)c2n1",
+      "[4*]C[8*]",
+      "[5*]N[5*]",
+      "[5*]N([5*])C",
+      "[1*]C([6*])=O"
+    ],
+    "raw": "CCc1cnc2nc1N)nc(N)n1",
+    "prediction": "CCc1cnc2nc(N)nc(N)c2n1",
+    "correction": "nearest-reference"
+  },
+  {
+    "smiles": "CC(=O)c1c(C)c2cnc(Nc3ccc(N4CCNCC4)cn3)nc2n(C2CCCC2)c1=O",
+    "references": [
+      "[9*]n1c(=O)c([16*])c(C)c2cnc([14*])nc21",
+      "[15*]C1CCCC1",
+      "[6*]C(C)=O",
+      "[5*]N[5*]",
+      "[5*]N1CCNCC1",
+      "[14*]c1ccc([16*])cn1"
+    ],
+    "raw": "CC(=O)1(c=",
+    "prediction": "CC(=O)C(C)=O",
+    "correction": "nearest-reference"
+  },
+  {
+    "smiles": "Cc1nc2ccc(CN(C)c3ccc(C(=O)NC(CCC(=O)O)C(=O)O)s3)cc2c(=O)[nH]1",
+    "references": [
+      "[4*]C(CCC(=O)O)C(=O)O",
+      "[14*]c1ccc([14*])s1",
+      "[4*]C[8*]",
+      "[16*]c1ccc2nc(C)[nH]c(=O)c2c1",
+      "[5*]N[5*]",
+      "[5*]N([5*])C",
+      "[1*]C([6*])=O"
+    ],
+    "raw": "CCc1O)nc1ccc)nH(=C)[nHc",
+    "prediction": "CC(=O)c1ccc2nc(C)cn2c1",
+    "correction": "nearest-reference"
+  },
+  {
+    "smiles": "CN(C)C(=O)c1cc2cnc(Nc3ccc(N4CCNCC4)cn3)nc2n1C1CCCC1",
+    "references": [
+      "[15*]C1CCCC1",
+      "[1*]C([6*])=O",
+      "[5*]N[5*]",
+      "[5*]N(C)C",
+      "[9*]n1c([14*])cc2cnc([14*])nc21",
+      "[5*]N1CCNCC1",
+      "[14*]c1ccc([16*])cn1"
+    ],
+    "raw": "CC(=O)1",
+    "prediction": "CC(=O)C",
+    "correction": "nearest-reference"
+  },
+  {
+    "smiles": "COc1ccc(CN2C3CC2CN(c2ccc(-c4cc(OCC(C)(C)O)cn5ncc(C#N)c45)cn2)C3)cn1",
+    "references": [
+      "[5*]N1CC2CC(C1)N2[5*]",
+      "[4*]C[8*]",
+      "[16*]c1cc([16*])c2c(C#N)cnn2c1",
+      "[4*]CC(C)(C)O",
+      "[3*]O[3*]",
+      "[3*]OC",
+      "[14*]c1ccc([16*])cn1"
+    ],
+    "raw": "Cc1ccc(C)cn2(C#N",
+    "prediction": "COc1ccc(C)nc1C#N",
+    "correction": "nearest-reference"
+  },
+  {
+    "smiles": "CC(C)Oc1ccc(-c2nn(C(C)c3oc4ccc(F)cc4c(=O)c3-c3cccc(F)c3)c3ncnc(N)c23)cc1F",
+    "references": [
+      "[16*]c1cccc(F)c1",
+      "[4*]C(C)C",
+      "[9*]n1nc([14*])c2c(N)ncnc21",
+      "[3*]O[3*]",
+      "[16*]c1ccc([16*])c(F)c1",
+      "[14*]c1oc2ccc(F)cc2c(=O)c1[16*]",
+      "[8*]C([8*])C"
+    ],
+    "raw": "Cc1nn(c)c2ccc(F)cc",
+    "prediction": "Cc1nn(C)c2ccc(F)cc12",
+    "correction": "nearest-reference"
+  }
+]

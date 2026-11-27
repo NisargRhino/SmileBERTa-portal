@@ -1,0 +1,360 @@
+{
+  "task": "fragment",
+  "points": [
+    {
+      "task": "fragment",
+      "split": "scaffold",
+      "name": "scale_10",
+      "train_fraction": 0.1,
+      "train_pairs": 115,
+      "train_compounds": 18,
+      "config": {
+        "epochs": 6
+      },
+      "class_weighting": false,
+      "training": {
+        "history": [
+          {
+            "epoch": 1,
+            "train_loss": 7.2042,
+            "val_loss": 5.0735,
+            "seconds": 3.2
+          },
+          {
+            "epoch": 2,
+            "train_loss": 4.3943,
+            "val_loss": 4.2411,
+            "seconds": 2.2
+          },
+          {
+            "epoch": 3,
+            "train_loss": 3.7281,
+            "val_loss": 3.5671,
+            "seconds": 2.1
+          },
+          {
+            "epoch": 4,
+            "train_loss": 3.2297,
+            "val_loss": 3.1648,
+            "seconds": 2.8
+          },
+          {
+            "epoch": 5,
+            "train_loss": 2.8629,
+            "val_loss": 3.0844,
+            "seconds": 2.7
+          },
+          {
+            "epoch": 6,
+            "train_loss": 2.5406,
+            "val_loss": 2.8692,
+            "seconds": 2.0
+          }
+        ],
+        "best_epoch": 6,
+        "best_val_loss": 2.8692,
+        "trainable_parameters": 44106239
+      },
+      "test": {
+        "validity_rate_raw": 0.0,
+        "exact_match_rate": 0.0,
+        "mean_tanimoto_to_reference": 0.1194,
+        "substructure_rate": 0.0,
+        "rule_of_three_pass_rate": 0.4091
+      },
+      "full_test_metrics": {
+        "n": 22,
+        "validity_rate_raw": 0.0,
+        "intervention_rate": 1.0,
+        "empty_output_rate": 0.0,
+        "exact_match_rate": 0.0,
+        "exact_match_rate_raw_only": 0.0,
+        "mean_tanimoto_to_reference": 0.1194,
+        "median_tanimoto_to_reference": 0.0909,
+        "rule_of_three_pass_rate": 0.4091,
+        "substructure_rate": 0.0,
+        "hallucination_rate": 1.0,
+        "substructure_by_path": {
+          "nearest-reference": {
+            "rate": 0.0,
+            "n": 22
+          }
+        },
+        "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_scale_10",
+        "split": "fragment_scaffold",
+        "subset": "test",
+        "contaminated": false
+      },
+      "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_scale_10",
+      "minutes": 0.3
+    },
+    {
+      "task": "fragment",
+      "split": "scaffold",
+      "name": "scale_25",
+      "train_fraction": 0.25,
+      "train_pairs": 251,
+      "train_compounds": 44,
+      "config": {
+        "epochs": 6
+      },
+      "class_weighting": false,
+      "training": {
+        "history": [
+          {
+            "epoch": 1,
+            "train_loss": 5.8708,
+            "val_loss": 4.2196,
+            "seconds": 4.7
+          },
+          {
+            "epoch": 2,
+            "train_loss": 3.5791,
+            "val_loss": 3.1468,
+            "seconds": 4.0
+          },
+          {
+            "epoch": 3,
+            "train_loss": 2.8877,
+            "val_loss": 2.7561,
+            "seconds": 4.0
+          },
+          {
+            "epoch": 4,
+            "train_loss": 2.4867,
+            "val_loss": 2.4934,
+            "seconds": 4.0
+          },
+          {
+            "epoch": 5,
+            "train_loss": 2.2473,
+            "val_loss": 2.4077,
+            "seconds": 4.1
+          },
+          {
+            "epoch": 6,
+            "train_loss": 2.1159,
+            "val_loss": 2.3905,
+            "seconds": 4.3
+          }
+        ],
+        "best_epoch": 6,
+        "best_val_loss": 2.3905,
+        "trainable_parameters": 44106239
+      },
+      "test": {
+        "validity_rate_raw": 0.0,
+        "exact_match_rate": 0.0,
+        "mean_tanimoto_to_reference": 0.106,
+        "substructure_rate": 0.0,
+        "rule_of_three_pass_rate": 0.3636
+      },
+      "full_test_metrics": {
+        "n": 22,
+        "validity_rate_raw": 0.0,
+        "intervention_rate": 1.0,
+        "empty_output_rate": 0.0,
+        "exact_match_rate": 0.0,
+        "exact_match_rate_raw_only": 0.0,
+        "mean_tanimoto_to_reference": 0.106,
+        "median_tanimoto_to_reference": 0.1026,
+        "rule_of_three_pass_rate": 0.3636,
+        "substructure_rate": 0.0,
+        "hallucination_rate": 1.0,
+        "substructure_by_path": {
+          "nearest-reference": {
+            "rate": 0.0,
+            "n": 22
+          }
+        },
+        "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_scale_25",
+        "split": "fragment_scaffold",
+        "subset": "test",
+        "contaminated": false
+      },
+      "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_scale_25",
+      "minutes": 0.5
+    },
+    {
+      "task": "fragment",
+      "split": "scaffold",
+      "name": "scale_50",
+      "train_fraction": 0.5,
+      "train_pairs": 491,
+      "train_compounds": 88,
+      "config": {
+        "epochs": 6
+      },
+      "class_weighting": false,
+      "training": {
+        "history": [
+          {
+            "epoch": 1,
+            "train_loss": 4.8613,
+            "val_loss": 3.2038,
+            "seconds": 7.7
+          },
+          {
+            "epoch": 2,
+            "train_loss": 2.729,
+            "val_loss": 2.4925,
+            "seconds": 7.8
+          },
+          {
+            "epoch": 3,
+            "train_loss": 2.3104,
+            "val_loss": 2.2928,
+            "seconds": 7.9
+          },
+          {
+            "epoch": 4,
+            "train_loss": 2.1461,
+            "val_loss": 2.2178,
+            "seconds": 7.7
+          },
+          {
+            "epoch": 5,
+            "train_loss": 1.9992,
+            "val_loss": 2.1762,
+            "seconds": 7.9
+          },
+          {
+            "epoch": 6,
+            "train_loss": 1.884,
+            "val_loss": 2.1954,
+            "seconds": 7.8
+          }
+        ],
+        "best_epoch": 5,
+        "best_val_loss": 2.1762,
+        "trainable_parameters": 44106239
+      },
+      "test": {
+        "validity_rate_raw": 0.0,
+        "exact_match_rate": 0.0,
+        "mean_tanimoto_to_reference": 0.1087,
+        "substructure_rate": 0.0,
+        "rule_of_three_pass_rate": 0.5909
+      },
+      "full_test_metrics": {
+        "n": 22,
+        "validity_rate_raw": 0.0,
+        "intervention_rate": 1.0,
+        "empty_output_rate": 0.0,
+        "exact_match_rate": 0.0,
+        "exact_match_rate_raw_only": 0.0,
+        "mean_tanimoto_to_reference": 0.1087,
+        "median_tanimoto_to_reference": 0.0952,
+        "rule_of_three_pass_rate": 0.5909,
+        "substructure_rate": 0.0,
+        "hallucination_rate": 1.0,
+        "substructure_by_path": {
+          "nearest-reference": {
+            "rate": 0.0,
+            "n": 22
+          }
+        },
+        "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_scale_50",
+        "split": "fragment_scaffold",
+        "subset": "test",
+        "contaminated": false
+      },
+      "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_scale_50",
+      "minutes": 0.8
+    },
+    {
+      "task": "fragment",
+      "split": "scaffold",
+      "name": "learning_curve",
+      "train_fraction": 1.0,
+      "train_pairs": 980,
+      "train_compounds": 175,
+      "config": {
+        "epochs": 6,
+        "early_stopping": false
+      },
+      "class_weighting": false,
+      "training": {
+        "history": [
+          {
+            "epoch": 1,
+            "train_loss": 3.8445,
+            "val_loss": 2.448,
+            "seconds": 24.5
+          },
+          {
+            "epoch": 2,
+            "train_loss": 2.2881,
+            "val_loss": 2.1488,
+            "seconds": 18.5
+          },
+          {
+            "epoch": 3,
+            "train_loss": 2.1111,
+            "val_loss": 2.0968,
+            "seconds": 16.5
+          },
+          {
+            "epoch": 4,
+            "train_loss": 2.0018,
+            "val_loss": 2.0891,
+            "seconds": 15.7
+          },
+          {
+            "epoch": 5,
+            "train_loss": 1.8996,
+            "val_loss": 2.0994,
+            "seconds": 17.2
+          },
+          {
+            "epoch": 6,
+            "train_loss": 1.8041,
+            "val_loss": 2.1158,
+            "seconds": 15.2
+          }
+        ],
+        "best_epoch": 4,
+        "best_val_loss": 2.0891,
+        "trainable_parameters": 44106239
+      },
+      "test": {
+        "validity_rate_raw": 0.0,
+        "exact_match_rate": 0.0,
+        "mean_tanimoto_to_reference": 0.0687,
+        "substructure_rate": 0.0,
+        "rule_of_three_pass_rate": 0.3636
+      },
+      "full_test_metrics": {
+        "n": 22,
+        "validity_rate_raw": 0.0,
+        "intervention_rate": 1.0,
+        "empty_output_rate": 0.0,
+        "exact_match_rate": 0.0,
+        "exact_match_rate_raw_only": 0.0,
+        "mean_tanimoto_to_reference": 0.0687,
+        "median_tanimoto_to_reference": 0.0645,
+        "rule_of_three_pass_rate": 0.3636,
+        "substructure_rate": 0.0,
+        "hallucination_rate": 1.0,
+        "substructure_by_path": {
+          "nearest-reference": {
+            "rate": 0.0,
+            "n": 22
+          }
+        },
+        "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_learning_curve",
+        "split": "fragment_scaffold",
+        "subset": "test",
+        "contaminated": false
+      },
+      "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/fragment_scaffold_learning_curve",
+      "minutes": 1.9,
+      "validation_loss_turns_upward_after_epoch": 4,
+      "doubles_as": [
+        "headline_scaffold",
+        "intervention_1_early_stopping"
+      ]
+    }
+  ],
+  "still_climbing": false
+}
