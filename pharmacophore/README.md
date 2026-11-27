@@ -247,6 +247,31 @@ not, so `run_batch` now runs the work on a thread with a 512 MB stack
 their work begins, so an entry that kills the interpreter twice is recorded as
 `crashed_during_processing` instead of being retried forever.
 
+## The gap between this corpus and the reverse direction
+
+The product claim is "give us a protein, we tell you which fragments fit it".
+Everything measured here is one step short of that, and the step is worth
+stating plainly rather than discovering during a demo.
+
+**The pocket is defined by the ligand.** `complexes.pocket_residues` takes every
+residue within 6.5 Å of a ligand heavy atom, so a pocket only exists here
+because something was already bound in it. For a genuinely apo protein the site
+has to be found first, by fpocket or an equivalent, and nothing in this corpus
+validates that the descriptor computed over a *predicted* pocket behaves like
+one computed over a crystallographic one. That distribution shift is untested
+and is the main thing standing between these numbers and the advertised
+feature.
+
+**One consequence has already been measured and fixed.** The descriptor used to
+begin with the raw residue count, which is a volume measured around the ligand:
+it tracks ligand heavy-atom count at r = 0.64 over 25,811 complexes, and the
+per-atom ligand-only control has no global size feature to match it. Removing it
+cost 0.0104 macro AUC and left the ablation delta at +0.0432, because the count
+on its own scored *below* the ligand-only arm — the pocket effect was never the
+leak. The remaining features are fractions and are invariant to pocket size, but
+they are still computed over a ligand-defined neighbourhood, so they are less
+ligand-dependent rather than ligand-independent.
+
 ## Known biases, recorded rather than hidden
 
 - **Acyclic ligands are excluded.** The artefact filter requires a ring, because
