@@ -1,0 +1,45 @@
+# Environment for the pharmacophore corpus and the evaluation suite.
+#
+# Build it OUTSIDE the repository. The repo lives in iCloud-synced ~/Documents,
+# where evicted files block on download and `import rdkit` has taken over five
+# minutes from an in-repo venv — which makes a working test suite look like a
+# hang. Anywhere on local disk is fine:
+#
+#   /opt/homebrew/bin/python3.12 -m venv ~/.venvs/smileberta
+#   ~/.venvs/smileberta/bin/pip install -r pharmacophore/requirements-corpus.txt
+#   PYTHONPATH=. ~/.venvs/smileberta/bin/python -m pharmacophore.build --release corpus/v1
+#
+# Python 3.12, not 3.13: rdkit 2023.9.6 (the version the API pins) has no 3.13
+# wheels, and matching the deployed version keeps corpus chemistry identical to
+# what the site computes.
+
+# Chemistry. Pinned to the version in requirements-render.txt so that a SMILES
+# canonicalised here is canonicalised the same way in production.
+rdkit==2023.9.6
+numpy==1.26.4
+scipy==1.13.1
+scikit-learn==1.5.2
+
+# scipy>=1.14 requires numpy>=2, which rdkit 2023.9.6 and torch 2.4.1 are not
+# built against. Raising either without raising all three segfaults on import,
+# so these three move together or not at all.
+
+# Interaction fingerprints: the typed pharmacophore labels.
+prolif==2.2.3
+MDAnalysis==2.11.0
+
+# Protonation at pH 7.4. Without hydrogens no hydrogen bond is detectable, and
+# the docking service already depends on this for receptor preparation.
+openbabel-wheel==3.1.1.23
+
+# Models and the evaluation suite.
+torch==2.4.1
+transformers==4.43.3
+rapidfuzz==3.10.1
+pandas==2.2.2
+matplotlib==3.9.2
+
+# Structure handling for mmCIF-only entries, which the PDB-format path rejects.
+# Roughly a quarter of candidate entries in the alphabetical head were
+# mmCIF-only, so this is how that loss gets recovered later.
+gemmi
