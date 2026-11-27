@@ -5,7 +5,7 @@ actually makes, built to replace docking scores as the fragment model's
 supervision. See `PHARMACOPHORE_DATA_TASK.md` for the spec and
 `BENCHMARK.md` for why the old approach is being replaced.
 
-## State as of 2026-11-27, 10:30
+## State as of 2026-11-27, 12:15
 
 **Full pipeline built; corpus build 44% done and still running** under a watchdog
 that has not had to intervene — the health log shows an unbroken five-minute
@@ -14,10 +14,10 @@ cadence from 00:20 to 10:31 with 7 processes alive throughout.
 | | |
 | --- | --- |
 | Candidate entries | 139,597 (X-ray, ≤ 2.5 Å, has a non-polymer entity) |
-| Entries processed | 61,078 (44%) |
-| **Complexes kept** | **20,982** |
-| Unique proteins / ligands | 5,102 / 12,709 |
-| Labelled heavy atoms | 521,265, of which 30.7% carry a contact |
+| Entries processed | see `corpus/v1/figures/RESULTS.md`, regenerated each cycle |
+| **Complexes kept** | 21,000+ and growing; 20,982 at the 10:30 snapshot |
+| Unique proteins / ligands | 5,102 / 12,709 at that snapshot |
+| Labelled heavy atoms | 521,265 at that snapshot, 30.7% carrying a contact |
 | Build rate | ~115 entries/min, 6 concurrent batches |
 | Records | `corpus/v1/records/*.jsonl` (gitignored), one line per complex |
 | Health log | `corpus/v1/health.log` — a snapshot every 5 minutes |
@@ -69,22 +69,66 @@ PYTHONPATH=. python3 -m pharmacophore.figures --release corpus/v1
 committing each cycle's splits, results and figures, so an interrupted night
 still leaves a complete and self-consistent set of numbers.
 
-### Does the pocket contribute? The ablation at 21,000 complexes
+### Does the pocket contribute?
 
-At 97 complexes the gate said the pocket was being ignored. At scale the random
-forest disagrees in all three regimes, most strongly in the one that
-memorisation cannot explain:
+**Live numbers are in `corpus/v1/figures/RESULTS.md`**, regenerated every cycle
+by `corpus/overnight.sh` as the corpus grows. They are deliberately not copied
+here, because a number pasted into a README goes stale the moment the next cycle
+runs. What follows is the methodology and the conclusion, which have been stable
+across cycles.
 
-| Regime | prior | RF ligand | RF +pocket | delta | verdict |
-| --- | --- | --- | --- | --- | --- |
-| `unseen_ligand` | 0.5571 | 0.6249 | 0.6794 | **+0.0545** | uses the pocket |
-| `unseen_protein` | 0.6400 | 0.6676 | 0.7034 | **+0.0358** | uses the pocket |
-| `both_unseen` | 0.5561 | 0.6066 | 0.6623 | **+0.0557** | uses the pocket |
+At 97 complexes the gate said the pocket was being ignored. At 21,000 the random
+forest disagrees in all three regimes, with deltas of roughly +0.04 to +0.06
+macro AUC against a 0.02 margin. The effect is chemically coherent, which is a
+better argument than the aggregate: per type it is carried by
+`Cationic` (+0.135), `PiCation` (+0.115), `PiStacking` (+0.103) and
+`Anionic` (+0.081) — the interactions the protein decides — while `Hydrophobic`,
+which the ligand largely determines on its own, moves +0.008.
 
-**The transformer does not agree, and that is the open question.** On
-`unseen_ligand` it reaches 0.7973 with the pocket and 0.7911 without — a delta
-of 0.0070, below the margin, so its gate still reads "predicting from the ligand
-alone" even though the forest's reads the opposite on the same split.
+**The transformer does not agree, and that is the open question.** Its ablation
+delta is 0.0070–0.0154 across the three regimes, below the margin, so its gate
+reads "predicting from the ligand alone" where the forest's reads the opposite
+on the same split. The decisive detail is the shuffled-pocket arm: pairing every
+ligand with a stranger's pocket costs it only 0.011–0.016. A model that used the
+pocket could not survive being given the wrong one.
+
+### Two measurements that make the ablation interpretable
+
+**The labels are pocket-dependent, so this is not "the pocket does not matter".**
+Over 43,400 pairs of the same ligand bound to two different proteins, the median
+overlap of its per-atom labels is **0.27**; only 2.1% of pairs are labelled
+identically and 18.7% share no label at all. A ligand-only model must give one
+answer for every one of those pairs. The ceiling is real and the transformer is
+leaving signal on the table — most likely because the pocket enters as one
+vector added identically to every atom, which can shift all atoms together but
+cannot say that *this* atom faces *that* residue.
+
+**The corpus-wide ablation is diluted.** Only 1,660 of 13,123 ligands bind more
+than one protein; for the rest, memorising the molecule is the correct answer
+and a ligand-only arm loses nothing. `train.py` and `baselines.py` therefore
+report the same ablation restricted to promiscuous ligands, beside the
+corpus-wide number rather than instead of it. On `unseen_protein` that subset is
+27,746 atoms over 1,217 complexes and the delta rises from +0.0289 to **+0.0412**,
+which is the dilution showing up exactly where it was predicted. In
+`unseen_ligand` the subset is a handful of complexes and in `both_unseen` it is
+empty, because holding ligands out by scaffold removes promiscuous ones by
+construction — hence the 1,000-atom floor before the subset is reported at all.
+
+### Why macro averages require 50 positive atoms
+
+The first overnight cycle returned an ablation delta of −0.0262 on
+`unseen_ligand` where the previous run gave +0.0545. A sign change between two
+runs of one measurement is not a result, and the cause is the macro average
+itself: it weights every interaction type equally, and `MetalDonor` turned up in
+one test split with **2 positive atoms** and an AUC of 0.986. With nine types,
+one rare type swinging moves the average by more than the effect being measured.
+
+Macro aggregates now need 50 positive atoms in the test set. Every type is still
+reported individually with its support, and the old all-types average survives as
+`macro_auc_all_types` so the floor is auditable. Absolute numbers fell when this
+came in — `unseen_ligand` with pocket went 0.6794 to 0.6410 — because the
+inflated rare-type AUCs had been propping them up. The deltas held or
+strengthened.
 
 Two readings, with different fixes, which is why neither has been applied yet:
 
