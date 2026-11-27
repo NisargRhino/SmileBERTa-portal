@@ -223,6 +223,39 @@ class PromiscuousSubsetTests(unittest.TestCase):
         self.assertEqual(int(D.atom_mask(examples, {'AAA'}).sum()), 0)
 
 
+class MacroSupportFloorTests(unittest.TestCase):
+    """A type with a handful of positives must not swing the headline number."""
+
+    def _scores(self, n, rare_perfect):
+        import numpy as np
+        from pharmacophore.interactions import INTERACTIONS
+        rng = np.random.default_rng(0)
+        y = np.zeros((n, len(INTERACTIONS)))
+        s = rng.random((n, len(INTERACTIONS)))
+        y[:n // 2, 0] = 1                     # well-supported type, chance scores
+        y[:3, 1] = 1                          # three positives only
+        s[:3, 1] = 1.0 if rare_perfect else 0.0
+        return y, s
+
+    def test_a_three_atom_type_is_excluded_from_macro(self):
+        from pharmacophore import metrics as M
+        hi = M.summarise(*self._scores(400, True))
+        lo = M.summarise(*self._scores(400, False))
+        # The rare type flips from a perfect AUC to a terrible one. The headline
+        # must not move; the all-types average, which is what used to be
+        # reported, is expected to swing hard.
+        self.assertEqual(hi['macro_auc'], lo['macro_auc'])
+        self.assertIn('HBDonor', hi['types_below_support'])
+        self.assertGreater(abs(hi['macro_auc_all_types']
+                               - lo['macro_auc_all_types']), 0.2)
+
+    def test_a_well_supported_type_still_counts(self):
+        from pharmacophore import metrics as M
+        out = M.summarise(*self._scores(400, True))
+        self.assertGreaterEqual(out['types_in_macro'], 1)
+        self.assertNotIn('Hydrophobic', out['types_below_support'])
+
+
 class FigureHonestyTests(unittest.TestCase):
     """A figure must not put results from two different splits on one axis."""
 

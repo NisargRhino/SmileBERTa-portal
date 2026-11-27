@@ -75,28 +75,52 @@ def _round(value, nd=4):
     return None if value is None else round(value, nd)
 
 
-def summarise(y_true, y_score, threshold=0.5, names=None):
+# An AUC computed on a handful of positive atoms is almost pure sampling noise,
+# and a macro average over a dozen types gives it the same weight as a type with
+# nine thousand. Observed directly: MetalDonor turned up with 2 positive atoms in
+# one test split, and between two consecutive runs the macro-AUC ablation delta
+# moved from +0.0545 to -0.0262 — a sign change driven by the rare types, not by
+# the model. Types below this floor are still reported individually, with their
+# support, but they are kept out of the aggregate.
+MIN_SUPPORT_FOR_MACRO = 50
+
+
+def summarise(y_true, y_score, threshold=0.5, names=None,
+              min_support=MIN_SUPPORT_FOR_MACRO):
     """Per-type metrics plus the only aggregates that are honest here.
 
-    Macro averages are taken over the types that actually occur in this test
-    set: averaging in a type with zero support would quietly reward a model for
-    a question nobody asked it.
+    Macro averages are taken over the types with enough support to estimate a
+    number at all. Averaging in a type with zero support would reward a model
+    for a question nobody asked it; averaging in a type with two positives adds
+    noise with the weight of evidence. Both aggregates are reported — the
+    restricted one as `macro_auc`, the old all-types one as
+    `macro_auc_all_types` — so nothing is hidden by the choice.
     """
     names = names or INTERACTIONS
     per_type = per_type_metrics(y_true, y_score, threshold, names)
     present = [m for m in per_type.values() if m['support'] > 0]
-    aucs = [m['auc'] for m in present if m['auc'] is not None]
-    aps = [m['average_precision'] for m in present if m['average_precision'] is not None]
+    scored = [m for m in present if m['support'] >= min_support]
+    thin = {name: m['support'] for name, m in per_type.items()
+            if 0 < m['support'] < min_support}
+    aucs = [m['auc'] for m in scored if m['auc'] is not None]
+    aps = [m['average_precision'] for m in scored if m['average_precision'] is not None]
+    all_aucs = [m['auc'] for m in present if m['auc'] is not None]
 
     any_true = (y_true.sum(axis=1) > 0).astype(int)
     any_score = y_score.max(axis=1)
     return {
         'atoms': int(y_true.shape[0]),
         'types_present': len(present),
+        'types_in_macro': len(scored),
+        'min_support_for_macro': min_support,
+        'types_below_support': thin,
         'per_type': per_type,
         'macro_auc': _round(float(np.mean(aucs)) if aucs else None),
         'macro_average_precision': _round(float(np.mean(aps)) if aps else None),
-        'macro_f1': round(float(np.mean([m['f1'] for m in present])), 4) if present else None,
+        'macro_f1': round(float(np.mean([m['f1'] for m in scored])), 4) if scored else None,
+        # The previous definition, kept so the choice of floor is auditable
+        # rather than something the reader has to take on trust.
+        'macro_auc_all_types': _round(float(np.mean(all_aucs)) if all_aucs else None),
         # "Does this atom interact at all" — the coarse question, useful because
         # it is what a highlighted pharmacophore actually shows a user.
         'any_interaction': {
