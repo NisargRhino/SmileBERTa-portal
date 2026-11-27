@@ -258,6 +258,14 @@ def select(pdb_id):
     out = []
     for cand in candidates:
         try:
+            # Name check first. Building the molecule means fetching a component
+            # definition and matching bond orders onto it, and a crystallisation
+            # lipid fails that match before anything notices it is a lipid: in
+            # the first 150 entries, 75 copies of monoolein (OLC) across two
+            # structures were filed as 'ligand_incomplete_or_unmatched' when
+            # OLC was on the artefact list the whole time.
+            if cand['comp_id'] in EXTRA_ARTEFACTS:
+                raise Rejected('known_artefact', cand['comp_id'])
             mol = ligand_mol(cand, cand['comp_id'])
             artefact = is_artefact(cand['comp_id'], mol)
             if artefact:

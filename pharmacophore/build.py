@@ -15,6 +15,7 @@ import argparse
 import json
 import multiprocessing as mp
 import os
+import random
 import time
 from collections import Counter
 
@@ -198,6 +199,7 @@ def main():
     ap.add_argument('--workers', type=int, default=max(1, (os.cpu_count() or 4) // 2))
     ap.add_argument('--ids', nargs='*', help='explicit PDB IDs instead of a search')
     ap.add_argument('--summarise-only', action='store_true')
+    ap.add_argument('--shuffle-seed', type=int, default=20261126)
     args = ap.parse_args()
 
     if args.summarise_only:
@@ -208,6 +210,14 @@ def main():
         ids = args.ids
     else:
         ids = sources.candidate_ids(os.path.join(args.release, 'candidate_ids.json'))
+        # Shuffled with a fixed seed. RCSB returns candidates in ID order, so
+        # processing them as given means the first hours are spent on 100D,
+        # 101D, 102L and the rest of the alphabetical head - disproportionately
+        # nucleic-acid and legacy entries, which is why 42 of the first 150 were
+        # mmCIF-only. Shuffling costs nothing, makes partial progress a
+        # representative sample of the whole PDB, and the seed keeps the order
+        # reproducible across restarts so resume still works.
+        random.Random(args.shuffle_seed).shuffle(ids)
         if args.limit:
             ids = ids[:args.limit]
     manifest = build(args.release, ids, workers=args.workers)
