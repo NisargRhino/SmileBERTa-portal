@@ -5,23 +5,51 @@ actually makes, built to replace docking scores as the fragment model's
 supervision. See `PHARMACOPHORE_DATA_TASK.md` for the spec and
 `BENCHMARK.md` for why the old approach is being replaced.
 
-## State as of 2026-11-26
+## State as of 2026-11-27, 00:25
 
-**Pipeline built and validated. Corpus build paused at entry 150 of 139,597.**
+**Full pipeline built and running end to end.** Corpus build is in progress under
+a watchdog.
 
 | | |
 | --- | --- |
 | Candidate entries | 139,597 (X-ray, ≤ 2.5 Å, has a non-polymer entity) |
-| Processed | 150 |
-| Complexes kept | 23 |
-| Records | `corpus/v1/records/*.jsonl` (gitignored, ~1 MB so far) |
-| Candidate ID list | `corpus/v1/candidate_ids.json` — fetched once, reused |
-| Estimated full run | ~14 h at 170 entries/min with 4 workers |
+| Build rate | ~105 entries/min, 6 concurrent batches |
+| Projected full run | ~22 h |
+| Records | `corpus/v1/records/*.jsonl` (gitignored) |
+| Health log | `corpus/v1/health.log` — a snapshot every 5 minutes |
 
-Validated against known binding modes: **3PTB** gives Asp189 at 2.92 Å and
-Gly219 at 2.82 Å, **1HSG** gives the catalytic Asp25 at 2.77 Å, **4EY7** gives
-Trp86 / Trp286 / Tyr341. **1M17** is correctly rejected at 2.6 Å, and
-**10CX** is correctly rejected because its "ligand" is polyethylene glycol.
+Validated against known binding modes. **3PTB** gives `Cationic ASP189 2.92 Å`,
+the benzamidine salt bridge. **4EY7** gives face-to-face π-stacking with
+`TRP86 3.89 Å` — the defining donepezil interaction — plus Trp286, Tyr341,
+His447 and cation-π to Tyr337. **1HSG** gives `Cationic ASP25 4.00 Å`, the
+catalytic dyad. **1M17** is rejected at 2.6 Å and **10CX** is rejected because
+its "ligand" is polyethylene glycol.
+
+Label statistics on the first 78 complexes: 30.7% of ligand atoms carry an
+interaction, with π-stacking the commonest single type at 14.7%.
+
+### Pipeline, all runnable
+
+```bash
+PYTHONPATH=. python3 -m pharmacophore.build   --release corpus/v1 --workers 6
+PYTHONPATH=. python3 -m pharmacophore.splits  --release corpus/v1
+PYTHONPATH=. python3 -m pharmacophore.dataset --release corpus/v1
+PYTHONPATH=. python3 -m pharmacophore.baselines --release corpus/v1
+PYTHONPATH=. python3 -m pharmacophore.train   --release corpus/v1 --epochs 30
+```
+
+A smoke test of the whole chain on 97 training complexes completed, and the
+ablation gate fired correctly: *"removing the pocket costs only 0.0147, below
+the 0.02 margin: the model is predicting from the ligand alone."* Expected at
+that size — the question is whether it still says that at 17,000 complexes, and
+that is the single most important number this project will produce.
+
+### The GPU moment
+
+Not yet. Everything above runs on CPU or MPS. The GPU becomes worth renting when
+the corpus is large enough for the training arms to take hours rather than
+seconds — roughly once `both_unseen` has a few hundred test complexes, which
+needs ~30,000 complexes because that regime is intrinsically ~1% of the corpus.
 
 ## Running it
 
