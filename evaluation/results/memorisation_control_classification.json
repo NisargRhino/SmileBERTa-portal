@@ -1,0 +1,282 @@
+{
+  "task": "classification",
+  "name": "memorisation_control",
+  "epochs": 12,
+  "train_pairs": 8336,
+  "training": {
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 1.9777,
+        "val_loss": 1.1844,
+        "seconds": 150.0
+      },
+      {
+        "epoch": 2,
+        "train_loss": 1.2351,
+        "val_loss": 0.8905,
+        "seconds": 136.2
+      },
+      {
+        "epoch": 3,
+        "train_loss": 1.0214,
+        "val_loss": 0.6828,
+        "seconds": 140.7
+      },
+      {
+        "epoch": 4,
+        "train_loss": 0.8341,
+        "val_loss": 0.5014,
+        "seconds": 132.4
+      },
+      {
+        "epoch": 5,
+        "train_loss": 0.6804,
+        "val_loss": 0.4041,
+        "seconds": 133.9
+      },
+      {
+        "epoch": 6,
+        "train_loss": 0.5553,
+        "val_loss": 0.3077,
+        "seconds": 144.4
+      },
+      {
+        "epoch": 7,
+        "train_loss": 0.457,
+        "val_loss": 0.2507,
+        "seconds": 157.5
+      },
+      {
+        "epoch": 8,
+        "train_loss": 0.3831,
+        "val_loss": 0.199,
+        "seconds": 134.4
+      },
+      {
+        "epoch": 9,
+        "train_loss": 0.3249,
+        "val_loss": 0.1765,
+        "seconds": 130.0
+      },
+      {
+        "epoch": 10,
+        "train_loss": 0.2831,
+        "val_loss": 0.1346,
+        "seconds": 127.1
+      },
+      {
+        "epoch": 11,
+        "train_loss": 0.245,
+        "val_loss": 0.1422,
+        "seconds": 131.4
+      },
+      {
+        "epoch": 12,
+        "train_loss": 0.2221,
+        "val_loss": 0.1269,
+        "seconds": 133.0
+      }
+    ],
+    "best_epoch": 12,
+    "best_val_loss": 0.1269,
+    "trainable_parameters": 44106239
+  },
+  "test_seen_during_training": true,
+  "test": {
+    "macro_f1": 0.4866,
+    "micro_f1": 0.4934,
+    "top_3_accuracy": 0.856,
+    "subset_accuracy": 0.1155,
+    "any_correct": 0.8012,
+    "hamming_loss": 0.1526
+  },
+  "full_test_metrics": {
+    "n": 840,
+    "per_class": {
+      "antiinfective": {
+        "precision": 0.6444,
+        "recall": 0.9932,
+        "f1": 0.7817,
+        "support": 292,
+        "predicted": 450
+      },
+      "antineoplastic": {
+        "precision": 0.3435,
+        "recall": 0.9573,
+        "f1": 0.5056,
+        "support": 164,
+        "predicted": 457
+      },
+      "cns": {
+        "precision": 0.7018,
+        "recall": 0.5229,
+        "f1": 0.5993,
+        "support": 153,
+        "predicted": 114
+      },
+      "cardio": {
+        "precision": 0.3204,
+        "recall": 0.2619,
+        "f1": 0.2882,
+        "support": 126,
+        "predicted": 103
+      },
+      "antiinflammatory": {
+        "precision": 0.0679,
+        "recall": 0.4386,
+        "f1": 0.1176,
+        "support": 57,
+        "predicted": 368
+      },
+      "gastrointestinal": {
+        "precision": 0.422,
+        "recall": 0.9388,
+        "f1": 0.5823,
+        "support": 49,
+        "predicted": 109
+      },
+      "hematologic": {
+        "precision": 0.3433,
+        "recall": 0.5,
+        "f1": 0.4071,
+        "support": 46,
+        "predicted": 67
+      },
+      "respiratorysystem": {
+        "precision": 0.1718,
+        "recall": 1.0,
+        "f1": 0.2932,
+        "support": 28,
+        "predicted": 163
+      },
+      "dermatologic": {
+        "precision": 0.2468,
+        "recall": 0.8261,
+        "f1": 0.38,
+        "support": 23,
+        "predicted": 77
+      },
+      "reproductivecontrol": {
+        "precision": 0.23,
+        "recall": 1.0,
+        "f1": 0.374,
+        "support": 23,
+        "predicted": 100
+      },
+      "lipidregulating": {
+        "precision": 0.6061,
+        "recall": 0.9524,
+        "f1": 0.7407,
+        "support": 21,
+        "predicted": 33
+      },
+      "urological": {
+        "precision": 0.8333,
+        "recall": 0.7143,
+        "f1": 0.7692,
+        "support": 7,
+        "predicted": 6
+      }
+    },
+    "macro_f1": 0.4866,
+    "micro_f1": 0.4934,
+    "micro_precision": 0.3659,
+    "micro_recall": 0.7573,
+    "subset_accuracy": 0.1155,
+    "any_correct": 0.8012,
+    "hamming_loss": 0.1526,
+    "top_1_accuracy": 0.5667,
+    "top_3_accuracy": 0.856,
+    "multi_label_subset": {
+      "n": 133,
+      "subset_accuracy": 0.2707,
+      "any_correct": 0.8722,
+      "hamming_loss": 0.141
+    },
+    "confusion": {
+      "n": 707,
+      "matrix": {
+        "antiinfective": {
+          "antiinfective": 239,
+          "cardio": 1
+        },
+        "antineoplastic": {
+          "antineoplastic": 74,
+          "antiinfective": 25,
+          "antiinflammatory": 11
+        },
+        "cns": {
+          "antiinfective": 38,
+          "cardio": 27,
+          "antineoplastic": 26,
+          "cns": 8,
+          "antiinflammatory": 6,
+          "gastrointestinal": 5,
+          "respiratorysystem": 2,
+          "dermatologic": 1,
+          "lipidregulating": 1,
+          "hematologic": 1
+        },
+        "cardio": {
+          "antiinflammatory": 21,
+          "antiinfective": 21,
+          "cardio": 16,
+          "hematologic": 8,
+          "reproductivecontrol": 5,
+          "antineoplastic": 4,
+          "dermatologic": 2,
+          "gastrointestinal": 1,
+          "respiratorysystem": 1,
+          "cns": 1
+        },
+        "antiinflammatory": {
+          "antiinfective": 18,
+          "antiinflammatory": 16
+        },
+        "gastrointestinal": {
+          "antiinflammatory": 13,
+          "gastrointestinal": 9,
+          "antiinfective": 9,
+          "cardio": 1
+        },
+        "hematologic": {
+          "antiinflammatory": 18,
+          "antiinfective": 4,
+          "hematologic": 2,
+          "cardio": 2
+        },
+        "respiratorysystem": {
+          "cardio": 5,
+          "antiinfective": 2,
+          "respiratorysystem": 2
+        },
+        "dermatologic": {
+          "antiinflammatory": 11,
+          "antiinfective": 6,
+          "antineoplastic": 1,
+          "dermatologic": 1,
+          "cardio": 1
+        },
+        "reproductivecontrol": {
+          "reproductivecontrol": 22
+        },
+        "lipidregulating": {
+          "cardio": 15,
+          "lipidregulating": 2,
+          "antiinfective": 1
+        },
+        "urological": {
+          "urological": 1
+        }
+      }
+    },
+    "raw_output_was_exact_label": 0.0071,
+    "model": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/classification_control_memorisation",
+    "split": "classification_scaffold",
+    "subset": "test",
+    "contaminated": false
+  },
+  "checkpoint": "/private/tmp/claude-501/-Users-nisargshah-Documents-cs-SmileBERTa-portal/d5665c0f-0ea0-405a-b676-e25fb81ddc4d/scratchpad/ckpt/classification_control_memorisation",
+  "note": "the test set was in this model's training data; the score measures capacity to memorise, not generalisation"
+}

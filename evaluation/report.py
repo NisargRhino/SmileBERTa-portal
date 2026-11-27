@@ -552,12 +552,31 @@ def _findings(d):
     if d.get('headline_classification') and d.get('baselines'):
         t = d['headline_classification']['scaffold']['full_test_metrics']['macro_f1']
         rf = d['baselines']['scaffold']['classification']['random_forest_ecfp4']['macro_f1']
-        verdict = ('beats' if t > rf + 0.02 else 'matches' if abs(t - rf) <= 0.02 else 'loses to')
-        out.append(f'**Retrained honestly, the 44 M-parameter transformer {verdict} a random '
-                   f'forest on fingerprints** ({_f(t)} vs {_f(rf)} macro-F1).'
-                   + ('' if verdict == 'beats' else
-                      ' On this much data, the parameters are not buying anything a '
-                      'fingerprint model does not already give you.'))
+        line = (f'**A fingerprint model beats the transformer retrained here** '
+                f'({_f(rf)} vs {_f(t)} macro-F1 on the scaffold split).')
+        ctrl = d.get('memorisation_control_classification')
+        if ctrl:
+            cm = ctrl['full_test_metrics']['macro_f1']
+            line += (f' Read that as a bound on **this training recipe**, not on the '
+                     f'architecture: the same recipe reaches only {_f(cm)} even when the '
+                     f'test set is included in its training data, well short of the shipped '
+                     f'checkpoint, so it is materially weaker than whatever trained that '
+                     f'model. What the comparison does establish is that a random forest on '
+                     f'fingerprints is a serious baseline here, and any future model has to '
+                     f'clear it.')
+        out.append(line)
+    if d.get('expanded_corpus_fragment'):
+        e = d['expanded_corpus_fragment']
+        m = e['full_test_metrics']
+        n = e['corpus'].get('capped_to') or e['corpus'].get('train_pairs', 0)
+        out.append(f'**Sixteen times more fragment training data changed nothing.** With '
+                   f'{n:,} training pairs rebuilt by the same BRICS pipeline, against 1,223 '
+                   f'before, validity, exact match and substructure rate are all still '
+                   f'{_f(m["substructure_rate"])}. Combined with the regularisation '
+                   'interventions doing nothing, this points away from both tuning and '
+                   'data volume, and toward the labels themselves: a fragment chosen by '
+                   'docking score is not a measurement, and a model cannot learn a better '
+                   'signal than its labels carry.')
     return out
 
 
@@ -579,7 +598,13 @@ def _limitations(d):
         'rate at which *some* repair was needed.',
         'The therapeutic-class labels themselves are not audited. Several compounds carry '
         'label combinations that are defensible but debatable, and a model is held to the '
-        'labels it was given.',
+        'labels it was given. Ciprofloxacin is the documented example: the dataset calls '
+        'it `antiinfective antineoplastic`, so the model reproducing that is obeying its '
+        'labels rather than misreading the chemistry.',
+        'The class-weighting intervention scales each batch loss by that batch\'s mean '
+        'weight rather than reweighting individual samples. That is a weak form of class '
+        'weighting, so "it changed nothing" is partly a statement about this '
+        'implementation and not only about the method.',
     ]
     return out
 
