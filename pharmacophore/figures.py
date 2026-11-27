@@ -631,6 +631,41 @@ def write_report(release, stats, baselines, model, figures, out_dir, promiscuity
                 cell(net_s)))
         lines += ['', 'The margin that counts as "uses the pocket" is 0.02 macro '
                   'AUC, set before the numbers were seen.', '']
+
+        subset_rows = []
+        for regime in ('unseen_ligand', 'unseen_protein', 'both_unseen'):
+            b = ((baselines or {}).get(regime) or {}).get('multi_protein_ligands')
+            m = ((model or {}).get(regime) or {}).get('multi_protein_ligands')
+            if not b and not m:
+                continue
+            source = b or m
+            subset_rows.append('| `%s` | %s | %s | %s | %s |' % (
+                regime,
+                f"{source.get('complexes', 0):,}",
+                f"{source.get('atoms', 0):,}",
+                ('%+.4f' % (b['_ablation']['delta'])) if b else '—',
+                ('%+.4f' % (m['_ablation']['delta'])) if m else '—'))
+        if subset_rows:
+            lines += [
+                '### Restricted to ligands that bind more than one protein', '',
+                'The corpus-wide figures above are diluted: most ligands appear '
+                'in a single complex, where memorising the molecule is the '
+                'correct answer and the pocket cannot change it. These are the '
+                'complexes where the pocket is actually in contention.', '',
+                '| Regime | complexes | atoms | RF delta | net delta |',
+                '| --- | --- | --- | --- | --- |'] + subset_rows + ['']
+            # Only drawn when both models are present for the same subset.
+            # Stated unconditionally it would be an assertion about a
+            # comparison the table above may not be showing.
+            if any(row.rstrip().endswith('|') and '—' not in row.split('|')[-2]
+                   for row in subset_rows):
+                lines += [
+                    'Both models see the same split, the same features and the '
+                    'same subset, so where only one of them finds the pocket '
+                    'the difference is the architecture rather than the data — '
+                    'the pocket enters the network as a single vector added '
+                    'identically to every atom, which cannot express that one '
+                    'atom faces one residue.', '']
     if figures:
         lines += ['## Figures', ''] + \
                  ['- `%s`' % os.path.basename(p) for p in figures if p] + ['']
