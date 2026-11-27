@@ -9,5 +9,12 @@ smileberta.db
 
 # Local model checkpoints from evaluation/experiments.py (hundreds of MB each)
 evaluation/checkpoints/
-corpus/
+# The corpus records are gigabytes and stay out of git, but the spec requires the
+# splits, the manifest and the results to be committed with their digests — they
+# are what makes a number in BENCHMARK.md reproducible.
+corpus/**
+!corpus/**/
+!corpus/*/splits/**
+!corpus/*/results/**
+!corpus/*/manifest.json
 .corpus-cache/

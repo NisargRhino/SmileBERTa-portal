@@ -1,0 +1,54 @@
+{
+  "seed": 20261126,
+  "ratios": [
+    0.8,
+    0.1,
+    0.1
+  ],
+  "complexes": 17445,
+  "protein_grouping": "uniprot_accession",
+  "protein_groups": 5105,
+  "scaffold_groups": 7332,
+  "regimes": {
+    "unseen_ligand": {
+      "counts": {
+        "test": 1745,
+        "train": 13956,
+        "validation": 1744
+      },
+      "sha256_16": "41b78beec80c3c9b",
+      "leaks": {
+        "shared_scaffolds": 0,
+        "shared_proteins": 0
+      },
+      "path": "corpus/v1/splits/unseen_ligand.csv"
+    },
+    "unseen_protein": {
+      "counts": {
+        "train": 13956,
+        "test": 1745,
+        "validation": 1744
+      },
+      "sha256_16": "47e28863be5cf689",
+      "leaks": {
+        "shared_scaffolds": 0,
+        "shared_proteins": 0
+      },
+      "path": "corpus/v1/splits/unseen_protein.csv"
+    },
+    "both_unseen": {
+      "counts": {
+        "discarded": 6481,
+        "train": 10803,
+        "test": 77,
+        "validation": 84
+      },
+      "sha256_16": "fb29d3f798803977",
+      "leaks": {
+        "shared_scaffolds": 0,
+        "shared_proteins": 0
+      },
+      "path": "corpus/v1/splits/both_unseen.csv"
+    }
+  }
+}
