@@ -75,14 +75,36 @@ def assign_protein_charges(mol):
     return n
 
 
-def protein_molecule(pdb_text, protonate=True):
+# Margin, in Angstroms, kept around each ligand when the receptor is trimmed.
+# Every interaction this module detects is decided well inside this: the widest
+# cutoffs are PI_CENTROID_CUTOFF at 5.5 and IONIC_CUTOFF at 5.0, and ProLIF's
+# own defaults top out around 6. Twelve is roughly double the largest of them,
+# so a trimmed receptor cannot change a verdict; it only removes atoms that were
+# never candidates. Whole residues are kept, so no residue is half-present.
+TRIM_MARGIN = 12.0
+
+
+def protein_molecule(pdb_text, protonate=True, near=None, margin=TRIM_MARGIN):
     """A ProLIF Molecule for the protein, protonated and charged.
 
     MDAnalysis is used for the PDB parsing because ProLIF is built on it, and
     because it preserves author residue numbering — which `protonate.py` goes to
     some trouble to keep.
+
+    `near` is a sequence of ligand coordinate arrays. Given them, only residues
+    within `margin` of a ligand are converted. This matters more than it looks:
+    `plf.Molecule.from_mda` calls RDKit's `GetMolFrags` to split the receptor
+    into residues, and on a 30,000-atom structure — 60,000 once protonated —
+    that single call is the largest allocation in the whole pipeline. On a
+    machine whose swap cannot grow it is reliably the one that dies with
+    SIGBUS, which is why every crash report in this project names it. Trimming
+    turns tens of thousands of atoms into a couple of thousand.
+
+    Without `near` the whole receptor is converted, which is the old behaviour
+    and still correct, only expensive.
     """
     import MDAnalysis as mda
+    import numpy as np
     import prolif as plf
 
     text, _added = P.protonated_pdb(pdb_text) if protonate else (pdb_text, 0)
@@ -94,6 +116,23 @@ def protein_molecule(pdb_text, protonate=True):
         selection = universe.select_atoms('protein')
         if not len(selection):
             raise ValueError('no protein atoms after protonation')
+        if near is not None and len(near):
+            spheres = []
+            for coords in near:
+                coords = np.asarray(coords, dtype=float)
+                if not coords.size:
+                    continue
+                centre = coords.mean(axis=0)
+                radius = float(np.linalg.norm(coords - centre, axis=1).max()) + margin
+                spheres.append('point %.3f %.3f %.3f %.3f'
+                               % (centre[0], centre[1], centre[2], radius))
+            if spheres:
+                trimmed = universe.select_atoms(
+                    'protein and byres (%s)' % ' or '.join(spheres))
+                # Falling back rather than failing: a selection that somehow
+                # catches nothing must not silently produce an empty receptor.
+                if len(trimmed):
+                    selection = trimmed
         mol = plf.Molecule.from_mda(selection, NoImplicit=False)
     assign_protein_charges(mol)
     return mol
