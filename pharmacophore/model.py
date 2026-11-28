@@ -20,6 +20,8 @@ zero rather than measured.
 Nothing here needs a GPU to be correct, only to be fast. It runs on CPU, MPS or
 CUDA unchanged.
 """
+import os
+
 import torch
 import torch.nn as nn
 
@@ -160,6 +162,42 @@ def collate_geometric(batch, atom_dim, neighbour_dim, k):
             neighbours[i, :rows] = torch.from_numpy(nf[:rows])
             neighbour_mask[i, :rows] = torch.from_numpy(nm[:rows])
     return atoms, neighbours, neighbour_mask, mask, labels
+
+
+def save_checkpoint(net, path, *, atom_dim, neighbour_dim, kind, metadata=None):
+    """Weights plus everything needed to rebuild the model.
+
+    The dimensions are stored with the weights rather than assumed at load
+    time. An atom-feature vector that grows by one element would otherwise load
+    silently into a model built for the old width and produce predictions that
+    are wrong but not obviously wrong, which is the worst failure mode for
+    something being served to users.
+    """
+    os.makedirs(os.path.dirname(path) or '.', exist_ok=True)
+    torch.save({
+        'state_dict': {k: v.detach().cpu() for k, v in net.state_dict().items()},
+        'atom_dim': atom_dim, 'neighbour_dim': neighbour_dim, 'kind': kind,
+        'interactions': list(INTERACTIONS),
+        'metadata': metadata or {},
+    }, path)
+    return path
+
+
+def load_checkpoint(path, map_location='cpu'):
+    """Rebuild a saved model, refusing a checkpoint that does not match the code."""
+    blob = torch.load(path, map_location=map_location, weights_only=False)
+    if list(blob.get('interactions', [])) != list(INTERACTIONS):
+        raise ValueError(
+            'checkpoint was trained on a different interaction vocabulary '
+            '(%d types) than this code defines (%d); its outputs would be '
+            'mislabelled' % (len(blob.get('interactions', [])), len(INTERACTIONS)))
+    if blob['kind'] == 'geometric':
+        net = GeometricPocketAtomModel(blob['atom_dim'], blob['neighbour_dim'])
+    else:
+        net = PocketConditionedAtomModel(blob['atom_dim'], blob['neighbour_dim'])
+    net.load_state_dict(blob['state_dict'])
+    net.eval()
+    return net, blob
 
 
 def collate(batch, atom_dim, pocket_dim):
