@@ -79,9 +79,14 @@ def needed(release):
     return wanted, len(done)
 
 
-def run(release, limit=None, log=print):
+def run(release, limit=None, shard=0, of=1, log=print):
     wanted, done_count = needed(release)
     ids = sorted(wanted)
+    if of > 1:
+        # Partitioned by position in the sorted list rather than by hash, so the
+        # shards are equal in length and every id belongs to exactly one of
+        # them. Each writes its own sidecar file, so they never contend.
+        ids = ids[shard::of]
     if limit:
         ids = ids[:limit]
     total = sum(len(v) for v in wanted.values())
@@ -92,7 +97,7 @@ def run(release, limit=None, log=print):
 
     directory = os.path.join(release, SIDECAR_DIR)
     os.makedirs(directory, exist_ok=True)
-    path = os.path.join(directory, '%s.jsonl' % os.environ.get('SB_SHARD', '0000'))
+    path = os.path.join(directory, '%04d.jsonl' % shard)
 
     written = failed = 0
     started = time.time()
@@ -152,5 +157,7 @@ if __name__ == '__main__':
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--release', default='corpus/v1')
     ap.add_argument('--limit', type=int, default=None)
+    ap.add_argument('--shard', type=int, default=0)
+    ap.add_argument('--of', type=int, default=1)
     args = ap.parse_args()
-    sys.exit(0 if run(args.release, args.limit) >= 0 else 1)
+    sys.exit(0 if run(args.release, args.limit, args.shard, args.of) >= 0 else 1)
