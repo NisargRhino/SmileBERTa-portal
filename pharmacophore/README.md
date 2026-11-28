@@ -237,15 +237,31 @@ rather than a hundred thousand entry-API calls, and the figures prefer it over
 the stored value so existing records are repaired for reporting without a
 rebuild. True median is 1.9 Å.
 
-**RDKit's recursion was killing the interpreter.** `MolOps::getMolFrags` walks
-the molecular graph recursively and ProLIF calls it when converting a receptor;
-on a large protein that runs off the 8 MB main-thread stack and the process dies
-with `SIGBUS`, which no Python handler can intercept. It cost a whole batch
-every few minutes. A thread's stack size is settable where the main thread's is
-not, so `run_batch` now runs the work on a thread with a 512 MB stack
-(`SB_STACK_BYTES`). Entries are also logged to `corpus/v1/attempts/` *before*
-their work begins, so an entry that kills the interpreter twice is recorded as
-`crashed_during_processing` instead of being retried forever.
+**The `SIGBUS` crashes are memory, not RDKit.** Batch processes die with
+`SIGBUS` / `KERN_PROTECTION_FAILURE` inside `MolOps::getMolFrags`, and the first
+diagnosis here was that its graph traversal overflowed the 8 MB main-thread
+stack. That was wrong, and the correction is worth keeping: a 150,000-atom
+chain traverses fine on an 8 MB stack, and the faulting thread in every report
+carries ~39 frames, not the thousands a runaway recursion would show.
+
+The cause is that **the swap file cannot grow while the disk sits at ~97%**.
+When a page cannot be backed, the kernel raises `SIGBUS` inside whatever call
+was allocating, and `getMolFrags` allocates heavily in the hot path, so it is
+the usual victim rather than the culprit. Observed with `vm.swapusage` at
+9,278 MB of 10,240 MB used.
+
+What actually helps: free disk, fewer concurrent workers, and a smaller sklearn
+fan-out (`baselines.RF_JOBS`, default 4 — `n_jobs=-1` duplicated a
+400,000-row matrix across eleven cores). The 512 MB thread stack
+(`SB_STACK_BYTES`) is kept as cheap insurance against genuine deep recursion but
+is not what stops these crashes.
+
+The loss is bounded and recoverable: entries are logged to
+`corpus/v1/attempts/` *before* their work begins, a crash costs only its batch's
+in-flight entries, and a restart retries them. An entry that kills the
+interpreter twice is written off as `crashed_during_processing` rather than
+retried forever. Measured at 102,740 entries: 246 attempted without a record,
+0.7%, none of them twice.
 
 ## The gap between this corpus and the reverse direction
 

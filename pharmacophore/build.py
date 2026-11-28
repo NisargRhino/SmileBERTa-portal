@@ -124,13 +124,23 @@ BATCH_SIZE = int(os.environ.get('SB_BATCH_SIZE', '40'))
 BATCH_TIMEOUT = int(os.environ.get('SB_BATCH_TIMEOUT', '900'))
 
 
-# RDKit's GetMolFrags walks the molecular graph recursively, and ProLIF calls it
-# when it converts a receptor to RDKit. On a large protein that recursion is deep
-# enough to run off the 8 MB main-thread stack and the process dies with SIGBUS
-# before any Python handler can see it — observed as repeated "Python quit
-# unexpectedly" crashes, roughly one every few minutes, each costing a whole
-# batch. A thread's stack size is settable where the main thread's is not, so the
-# work runs on a thread with a stack large enough for the deepest protein.
+# Batches run on a thread with a large stack. The original reason given for this
+# was wrong and is recorded here so nobody re-derives it: the SIGBUS crashes in
+# RDKit's GetMolFrags were read as deep recursion overflowing the 8 MB main
+# stack, but a 150,000-atom chain traverses fine on either stack, and the
+# faulting thread in every crash report carries about 39 frames rather than the
+# thousands a runaway recursion would show.
+#
+# The real cause is memory. The machine's swap file cannot grow because the disk
+# is ~97% full, and when a page cannot be backed the kernel raises SIGBUS with
+# KERN_PROTECTION_FAILURE inside whichever call was allocating. GetMolFrags
+# allocates heavily in the hot path, so it is the usual victim rather than the
+# culprit. The fix for that is fewer concurrent workers, a smaller sklearn
+# fan-out (see baselines.RF_JOBS) and free disk, not a bigger stack.
+#
+# The large stack is kept because it is harmless and cheap insurance against
+# genuine deep recursion on a pathological structure, but it is not what stops
+# these crashes.
 STACK_BYTES = int(os.environ.get('SB_STACK_BYTES', str(512 * 1024 * 1024)))
 
 # Attempts before an entry is written off as fatal. Two, not one: a batch killed

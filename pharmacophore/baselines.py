@@ -70,6 +70,16 @@ def frequency_prior(train_examples, test_examples):
     return np.array(scores) if scores else np.zeros((0, len(INTERACTIONS)))
 
 
+# sklearn's n_jobs=-1 fans out over every core and each worker holds its own
+# view of the training matrix. At 15,000 complexes that is hundreds of
+# thousands of rows duplicated eleven times, and on a machine whose swap file
+# cannot grow -- the disk here sits at 97% -- touching a page that cannot be
+# backed raises SIGBUS and kills the process outright. Capping the fan-out
+# costs wall-clock time and buys back both memory and cores for the build,
+# which is the long pole.
+RF_JOBS = int(os.environ.get('SB_RF_JOBS', '4'))
+
+
 def random_forest(train_examples, test_examples, with_pocket=True, n_estimators=200):
     """One-vs-rest random forest over per-atom descriptors."""
     from sklearn.ensemble import RandomForestClassifier
@@ -81,7 +91,7 @@ def random_forest(train_examples, test_examples, with_pocket=True, n_estimators=
         column = y_train[:, i]
         if column.sum() == 0:
             continue          # never seen in training: leave at zero, honestly
-        model = RandomForestClassifier(n_estimators=n_estimators, n_jobs=-1,
+        model = RandomForestClassifier(n_estimators=n_estimators, n_jobs=RF_JOBS,
                                        random_state=SEED, min_samples_leaf=2,
                                        class_weight='balanced_subsample')
         model.fit(x_train, column)
