@@ -1,79 +1,79 @@
 {
   "unseen_ligand": {
     "frequency_prior": {
-      "atoms": 62611,
+      "atoms": 70476,
       "types_present": 9,
       "types_in_macro": 8,
       "min_support_for_macro": 50,
       "types_below_support": {
-        "MetalDonor": 1
+        "MetalDonor": 3
       },
       "per_type": {
         "Hydrophobic": {
-          "support": 5339,
-          "base_rate": 0.08527,
-          "auc": 0.5446,
-          "average_precision": 0.0958,
+          "support": 5911,
+          "base_rate": 0.08387,
+          "auc": 0.5411,
+          "average_precision": 0.0935,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
-          "predicted_positive": 2
+          "predicted_positive": 0
         },
         "HBDonor": {
-          "support": 1801,
-          "base_rate": 0.02876,
-          "auc": 0.5314,
-          "average_precision": 0.0331,
+          "support": 2000,
+          "base_rate": 0.02838,
+          "auc": 0.5374,
+          "average_precision": 0.0318,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
           "predicted_positive": 0
         },
         "HBAcceptor": {
-          "support": 2612,
-          "base_rate": 0.04172,
-          "auc": 0.5335,
-          "average_precision": 0.0497,
+          "support": 2834,
+          "base_rate": 0.04021,
+          "auc": 0.54,
+          "average_precision": 0.0489,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
           "predicted_positive": 0
         },
         "Cationic": {
-          "support": 412,
-          "base_rate": 0.00658,
-          "auc": 0.5605,
-          "average_precision": 0.011,
+          "support": 481,
+          "base_rate": 0.00683,
+          "auc": 0.546,
+          "average_precision": 0.0088,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
           "predicted_positive": 0
         },
         "Anionic": {
-          "support": 320,
-          "base_rate": 0.00511,
-          "auc": 0.5874,
-          "average_precision": 0.0143,
+          "support": 359,
+          "base_rate": 0.00509,
+          "auc": 0.5808,
+          "average_precision": 0.01,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
           "predicted_positive": 0
         },
         "PiStacking": {
-          "support": 10607,
-          "base_rate": 0.16941,
-          "auc": 0.5519,
-          "average_precision": 0.1875,
+          "support": 11949,
+          "base_rate": 0.16955,
+          "auc": 0.5533,
+          "average_precision": 0.1893,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
-          "predicted_positive": 3
+          "predicted_positive": 0
         },
         "PiCation": {
-          "support": 278,
-          "base_rate": 0.00444,
-          "auc": 0.5732,
-          "average_precision": 0.0077,
+          "support": 298,
+          "base_rate": 0.00423,
+          "auc": 0.5736,
+          "average_precision": 0.0068,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
@@ -90,10 +90,10 @@
           "predicted_positive": 0
         },
         "XBDonor": {
-          "support": 172,
+          "support": 194,
           "base_rate": 0.00275,
-          "auc": 0.5591,
-          "average_precision": 0.0067,
+          "auc": 0.5729,
+          "average_precision": 0.006,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
@@ -110,10 +110,10 @@
           "predicted_positive": 0
         },
         "MetalDonor": {
-          "support": 1,
-          "base_rate": 2e-05,
-          "auc": 0.756,
-          "average_precision": 0.0001,
+          "support": 3,
+          "base_rate": 4e-05,
+          "auc": 0.9184,
+          "average_precision": 0.1731,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
@@ -130,94 +130,94 @@
           "predicted_positive": 0
         }
       },
-      "macro_auc": 0.5552,
-      "macro_average_precision": 0.0507,
+      "macro_auc": 0.5556,
+      "macro_average_precision": 0.0494,
       "macro_f1": 0.0,
-      "macro_auc_all_types": 0.5775,
+      "macro_auc_all_types": 0.5959,
       "any_interaction": {
-        "base_rate": 0.3005,
-        "auc": 0.538,
-        "average_precision": 0.3199
+        "base_rate": 0.2981,
+        "auc": 0.5338,
+        "average_precision": 0.316
       }
     },
     "random_forest_ligand_only": {
-      "atoms": 62611,
+      "atoms": 70476,
       "types_present": 9,
       "types_in_macro": 8,
       "min_support_for_macro": 50,
       "types_below_support": {
-        "MetalDonor": 1
+        "MetalDonor": 3
       },
       "per_type": {
         "Hydrophobic": {
-          "support": 5339,
-          "base_rate": 0.08527,
-          "auc": 0.5517,
-          "average_precision": 0.0957,
-          "precision": 0.0953,
-          "recall": 0.7426,
-          "f1": 0.1689,
-          "predicted_positive": 41621
+          "support": 5911,
+          "base_rate": 0.08387,
+          "auc": 0.5491,
+          "average_precision": 0.0931,
+          "precision": 0.0933,
+          "recall": 0.7383,
+          "f1": 0.1656,
+          "predicted_positive": 46782
         },
         "HBDonor": {
-          "support": 1801,
-          "base_rate": 0.02876,
-          "auc": 0.5485,
-          "average_precision": 0.0374,
-          "precision": 0.0369,
-          "recall": 0.2537,
-          "f1": 0.0644,
-          "predicted_positive": 12392
+          "support": 2000,
+          "base_rate": 0.02838,
+          "auc": 0.5503,
+          "average_precision": 0.0366,
+          "precision": 0.0387,
+          "recall": 0.2675,
+          "f1": 0.0676,
+          "predicted_positive": 13818
         },
         "HBAcceptor": {
-          "support": 2612,
-          "base_rate": 0.04172,
-          "auc": 0.5539,
-          "average_precision": 0.0531,
-          "precision": 0.0562,
-          "recall": 0.299,
-          "f1": 0.0946,
-          "predicted_positive": 13906
+          "support": 2834,
+          "base_rate": 0.04021,
+          "auc": 0.5617,
+          "average_precision": 0.0518,
+          "precision": 0.0558,
+          "recall": 0.3133,
+          "f1": 0.0947,
+          "predicted_positive": 15923
         },
         "Cationic": {
-          "support": 412,
-          "base_rate": 0.00658,
-          "auc": 0.5813,
-          "average_precision": 0.0125,
-          "precision": 0.0086,
-          "recall": 0.5267,
-          "f1": 0.0169,
-          "predicted_positive": 25211
+          "support": 481,
+          "base_rate": 0.00683,
+          "auc": 0.5601,
+          "average_precision": 0.0118,
+          "precision": 0.0083,
+          "recall": 0.4802,
+          "f1": 0.0162,
+          "predicted_positive": 27978
         },
         "Anionic": {
-          "support": 320,
-          "base_rate": 0.00511,
-          "auc": 0.6254,
-          "average_precision": 0.0202,
-          "precision": 0.0096,
-          "recall": 0.3875,
-          "f1": 0.0187,
-          "predicted_positive": 12915
+          "support": 359,
+          "base_rate": 0.00509,
+          "auc": 0.629,
+          "average_precision": 0.0101,
+          "precision": 0.0101,
+          "recall": 0.4206,
+          "f1": 0.0198,
+          "predicted_positive": 14913
         },
         "PiStacking": {
-          "support": 10607,
-          "base_rate": 0.16941,
-          "auc": 0.5647,
-          "average_precision": 0.1941,
-          "precision": 0.2018,
-          "recall": 0.6181,
-          "f1": 0.3043,
-          "predicted_positive": 32481
+          "support": 11949,
+          "base_rate": 0.16955,
+          "auc": 0.5703,
+          "average_precision": 0.1975,
+          "precision": 0.2023,
+          "recall": 0.6272,
+          "f1": 0.306,
+          "predicted_positive": 37037
         },
         "PiCation": {
-          "support": 278,
-          "base_rate": 0.00444,
-          "auc": 0.5862,
-          "average_precision": 0.0079,
-          "precision": 0.0067,
-          "recall": 0.3345,
-          "f1": 0.0132,
-          "predicted_positive": 13782
+          "support": 298,
+          "base_rate": 0.00423,
+          "auc": 0.5938,
+          "average_precision": 0.0069,
+          "precision": 0.0063,
+          "recall": 0.3591,
+          "f1": 0.0124,
+          "predicted_positive": 16934
         },
         "CationPi": {
           "support": 0,
@@ -230,14 +230,14 @@
           "predicted_positive": 0
         },
         "XBDonor": {
-          "support": 172,
+          "support": 194,
           "base_rate": 0.00275,
-          "auc": 0.5769,
-          "average_precision": 0.0072,
-          "precision": 0.0032,
-          "recall": 0.6105,
-          "f1": 0.0064,
-          "predicted_positive": 32463
+          "auc": 0.5879,
+          "average_precision": 0.0063,
+          "precision": 0.0034,
+          "recall": 0.6598,
+          "f1": 0.0069,
+          "predicted_positive": 37128
         },
         "XBAcceptor": {
           "support": 0,
@@ -250,14 +250,14 @@
           "predicted_positive": 0
         },
         "MetalDonor": {
-          "support": 1,
-          "base_rate": 2e-05,
-          "auc": 0.9998,
-          "average_precision": 0.0588,
-          "precision": 0.0003,
+          "support": 3,
+          "base_rate": 4e-05,
+          "auc": 0.9997,
+          "average_precision": 0.1627,
+          "precision": 0.0009,
           "recall": 1.0,
-          "f1": 0.0007,
-          "predicted_positive": 2872
+          "f1": 0.0018,
+          "predicted_positive": 3279
         },
         "MetalAcceptor": {
           "support": 0,
@@ -270,94 +270,94 @@
           "predicted_positive": 0
         }
       },
-      "macro_auc": 0.5736,
-      "macro_average_precision": 0.0535,
-      "macro_f1": 0.0859,
-      "macro_auc_all_types": 0.6209,
+      "macro_auc": 0.5753,
+      "macro_average_precision": 0.0518,
+      "macro_f1": 0.0861,
+      "macro_auc_all_types": 0.6224,
       "any_interaction": {
-        "base_rate": 0.3005,
-        "auc": 0.5207,
-        "average_precision": 0.3093
+        "base_rate": 0.2981,
+        "auc": 0.5182,
+        "average_precision": 0.304
       }
     },
     "random_forest_with_pocket": {
-      "atoms": 62611,
+      "atoms": 70476,
       "types_present": 9,
       "types_in_macro": 8,
       "min_support_for_macro": 50,
       "types_below_support": {
-        "MetalDonor": 1
+        "MetalDonor": 3
       },
       "per_type": {
         "Hydrophobic": {
-          "support": 5339,
-          "base_rate": 0.08527,
-          "auc": 0.5627,
-          "average_precision": 0.1028,
-          "precision": 0.1166,
+          "support": 5911,
+          "base_rate": 0.08387,
+          "auc": 0.5628,
+          "average_precision": 0.1001,
+          "precision": 0.1083,
           "recall": 0.0871,
-          "f1": 0.0997,
-          "predicted_positive": 3987
+          "f1": 0.0966,
+          "predicted_positive": 4755
         },
         "HBDonor": {
-          "support": 1801,
-          "base_rate": 0.02876,
-          "auc": 0.5681,
-          "average_precision": 0.0377,
-          "precision": 0.0524,
-          "recall": 0.0505,
-          "f1": 0.0515,
-          "predicted_positive": 1736
+          "support": 2000,
+          "base_rate": 0.02838,
+          "auc": 0.559,
+          "average_precision": 0.0356,
+          "precision": 0.0494,
+          "recall": 0.047,
+          "f1": 0.0482,
+          "predicted_positive": 1902
         },
         "HBAcceptor": {
-          "support": 2612,
-          "base_rate": 0.04172,
-          "auc": 0.5624,
-          "average_precision": 0.0544,
-          "precision": 0.072,
-          "recall": 0.0463,
-          "f1": 0.0564,
-          "predicted_positive": 1681
+          "support": 2834,
+          "base_rate": 0.04021,
+          "auc": 0.5689,
+          "average_precision": 0.05,
+          "precision": 0.0602,
+          "recall": 0.0448,
+          "f1": 0.0514,
+          "predicted_positive": 2110
         },
         "Cationic": {
-          "support": 412,
-          "base_rate": 0.00658,
-          "auc": 0.727,
-          "average_precision": 0.0168,
-          "precision": 0.0343,
-          "recall": 0.0267,
-          "f1": 0.03,
-          "predicted_positive": 321
+          "support": 481,
+          "base_rate": 0.00683,
+          "auc": 0.6963,
+          "average_precision": 0.0171,
+          "precision": 0.0224,
+          "recall": 0.0229,
+          "f1": 0.0226,
+          "predicted_positive": 492
         },
         "Anionic": {
-          "support": 320,
-          "base_rate": 0.00511,
-          "auc": 0.7066,
-          "average_precision": 0.0123,
-          "precision": 0.0168,
-          "recall": 0.0156,
-          "f1": 0.0162,
-          "predicted_positive": 297
+          "support": 359,
+          "base_rate": 0.00509,
+          "auc": 0.7237,
+          "average_precision": 0.0127,
+          "precision": 0.0174,
+          "recall": 0.0223,
+          "f1": 0.0195,
+          "predicted_positive": 461
         },
         "PiStacking": {
-          "support": 10607,
-          "base_rate": 0.16941,
-          "auc": 0.6739,
-          "average_precision": 0.2741,
-          "precision": 0.3128,
-          "recall": 0.2454,
-          "f1": 0.275,
-          "predicted_positive": 8321
+          "support": 11949,
+          "base_rate": 0.16955,
+          "auc": 0.671,
+          "average_precision": 0.2767,
+          "precision": 0.311,
+          "recall": 0.2647,
+          "f1": 0.286,
+          "predicted_positive": 10171
         },
         "PiCation": {
-          "support": 278,
-          "base_rate": 0.00444,
-          "auc": 0.6911,
-          "average_precision": 0.0146,
-          "precision": 0.026,
-          "recall": 0.0216,
-          "f1": 0.0236,
-          "predicted_positive": 231
+          "support": 298,
+          "base_rate": 0.00423,
+          "auc": 0.6758,
+          "average_precision": 0.0121,
+          "precision": 0.0192,
+          "recall": 0.0168,
+          "f1": 0.0179,
+          "predicted_positive": 261
         },
         "CationPi": {
           "support": 0,
@@ -370,14 +370,14 @@
           "predicted_positive": 0
         },
         "XBDonor": {
-          "support": 172,
+          "support": 194,
           "base_rate": 0.00275,
-          "auc": 0.6136,
-          "average_precision": 0.0045,
-          "precision": 0.0,
-          "recall": 0.0,
-          "f1": 0.0,
-          "predicted_positive": 206
+          "auc": 0.5788,
+          "average_precision": 0.0041,
+          "precision": 0.0054,
+          "recall": 0.0052,
+          "f1": 0.0053,
+          "predicted_positive": 185
         },
         "XBAcceptor": {
           "support": 0,
@@ -390,14 +390,14 @@
           "predicted_positive": 0
         },
         "MetalDonor": {
-          "support": 1,
-          "base_rate": 2e-05,
-          "auc": 1.0,
-          "average_precision": 0.3333,
+          "support": 3,
+          "base_rate": 4e-05,
+          "auc": 0.9977,
+          "average_precision": 0.0346,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
-          "predicted_positive": 1
+          "predicted_positive": 18
         },
         "MetalAcceptor": {
           "support": 0,
@@ -410,76 +410,76 @@
           "predicted_positive": 0
         }
       },
-      "macro_auc": 0.6382,
-      "macro_average_precision": 0.0646,
-      "macro_f1": 0.0691,
-      "macro_auc_all_types": 0.6784,
+      "macro_auc": 0.6295,
+      "macro_average_precision": 0.0635,
+      "macro_f1": 0.0684,
+      "macro_auc_all_types": 0.6704,
       "any_interaction": {
-        "base_rate": 0.3005,
-        "auc": 0.57,
-        "average_precision": 0.3515
+        "base_rate": 0.2981,
+        "auc": 0.5685,
+        "average_precision": 0.3531
       }
     },
     "_ablation": {
       "metric": "macro_auc",
-      "with_pocket": 0.6382,
-      "without_pocket": 0.5736,
-      "delta": 0.0646,
+      "with_pocket": 0.6295,
+      "without_pocket": 0.5753,
+      "delta": 0.0542,
       "verdict": "uses_the_pocket",
-      "reason": "removing the pocket costs 0.0646, at or above the 0.02 margin"
+      "reason": "removing the pocket costs 0.0542, at or above the 0.02 margin"
     },
     "_split": {
       "regime": "unseen_ligand",
-      "train_complexes": 16883,
-      "test_complexes": 2110,
+      "train_complexes": 18843,
+      "test_complexes": 2356,
       "train_labels": {
-        "atoms": 404717,
-        "complexes": 16883,
-        "any_interaction_rate": 0.3067,
+        "atoms": 451266,
+        "complexes": 18843,
+        "any_interaction_rate": 0.3061,
         "per_type": {
           "Hydrophobic": {
-            "positives": 28408,
-            "rate": 0.07019
+            "positives": 31845,
+            "rate": 0.07057
           },
           "HBDonor": {
-            "positives": 15211,
-            "rate": 0.03758
+            "positives": 16845,
+            "rate": 0.03733
           },
           "HBAcceptor": {
-            "positives": 27003,
-            "rate": 0.06672
+            "positives": 29907,
+            "rate": 0.06627
           },
           "Cationic": {
-            "positives": 2599,
-            "rate": 0.00642
+            "positives": 2869,
+            "rate": 0.00636
           },
           "Anionic": {
-            "positives": 7796,
-            "rate": 0.01926
+            "positives": 8569,
+            "rate": 0.01899
           },
           "PiStacking": {
-            "positives": 59634,
-            "rate": 0.14735
+            "positives": 66555,
+            "rate": 0.14749
           },
           "PiCation": {
-            "positives": 2171,
-            "rate": 0.00536
+            "positives": 2408,
+            "rate": 0.00534
           },
           "CationPi": {
             "positives": 0,
             "rate": 0.0
           },
           "XBDonor": {
-            "positives": 1006,
-            "rate": 0.00249
+            "positives": 1130,
+            "rate": 0.0025
           },
           "XBAcceptor": {
             "positives": 0,
             "rate": 0.0
           },
           "MetalDonor": {
-            "positives": 32,
-            "rate": 8e-05
+            "positives": 39,
+            "rate": 9e-05
           },
           "MetalAcceptor": {
             "positives": 0,
@@ -488,44 +488,44 @@
         }
       },
       "test_labels": {
-        "atoms": 62611,
-        "complexes": 2110,
-        "any_interaction_rate": 0.3005,
+        "atoms": 70476,
+        "complexes": 2356,
+        "any_interaction_rate": 0.2981,
         "per_type": {
           "Hydrophobic": {
-            "positives": 5339,
-            "rate": 0.08527
+            "positives": 5911,
+            "rate": 0.08387
           },
           "HBDonor": {
-            "positives": 1801,
-            "rate": 0.02876
+            "positives": 2000,
+            "rate": 0.02838
           },
           "HBAcceptor": {
-            "positives": 2612,
-            "rate": 0.04172
+            "positives": 2834,
+            "rate": 0.04021
           },
           "Cationic": {
-            "positives": 412,
-            "rate": 0.00658
+            "positives": 481,
+            "rate": 0.00683
           },
           "Anionic": {
-            "positives": 320,
-            "rate": 0.00511
+            "positives": 359,
+            "rate": 0.00509
           },
           "PiStacking": {
-            "positives": 10607,
-            "rate": 0.16941
+            "positives": 11949,
+            "rate": 0.16955
           },
           "PiCation": {
-            "positives": 278,
-            "rate": 0.00444
+            "positives": 298,
+            "rate": 0.00423
           },
           "CationPi": {
             "positives": 0,
             "rate": 0.0
           },
           "XBDonor": {
-            "positives": 172,
+            "positives": 194,
             "rate": 0.00275
           },
           "XBAcceptor": {
@@ -533,8 +533,8 @@
             "rate": 0.0
           },
           "MetalDonor": {
-            "positives": 1,
-            "rate": 2e-05
+            "positives": 3,
+            "rate": 4e-05
           },
           "MetalAcceptor": {
             "positives": 0,
@@ -546,80 +546,79 @@
   },
   "unseen_protein": {
     "frequency_prior": {
-      "atoms": 51828,
+      "atoms": 57386,
       "types_present": 9,
-      "types_in_macro": 7,
+      "types_in_macro": 8,
       "min_support_for_macro": 50,
       "types_below_support": {
-        "XBDonor": 42,
         "MetalDonor": 12
       },
       "per_type": {
         "Hydrophobic": {
-          "support": 2634,
-          "base_rate": 0.05082,
-          "auc": 0.6156,
-          "average_precision": 0.0716,
+          "support": 2850,
+          "base_rate": 0.04966,
+          "auc": 0.6213,
+          "average_precision": 0.07,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
           "predicted_positive": 0
         },
         "HBDonor": {
-          "support": 2160,
-          "base_rate": 0.04168,
-          "auc": 0.5581,
-          "average_precision": 0.0568,
+          "support": 2351,
+          "base_rate": 0.04097,
+          "auc": 0.551,
+          "average_precision": 0.0548,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
           "predicted_positive": 0
         },
         "HBAcceptor": {
-          "support": 4605,
-          "base_rate": 0.08885,
-          "auc": 0.5633,
-          "average_precision": 0.109,
+          "support": 4945,
+          "base_rate": 0.08617,
+          "auc": 0.5685,
+          "average_precision": 0.1069,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
           "predicted_positive": 0
         },
         "Cationic": {
-          "support": 306,
-          "base_rate": 0.0059,
-          "auc": 0.5956,
-          "average_precision": 0.0398,
+          "support": 355,
+          "base_rate": 0.00619,
+          "auc": 0.6001,
+          "average_precision": 0.0331,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
           "predicted_positive": 0
         },
         "Anionic": {
-          "support": 1552,
-          "base_rate": 0.02995,
-          "auc": 0.6102,
-          "average_precision": 0.0474,
+          "support": 1680,
+          "base_rate": 0.02928,
+          "auc": 0.6131,
+          "average_precision": 0.0496,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
           "predicted_positive": 0
         },
         "PiStacking": {
-          "support": 6603,
-          "base_rate": 0.1274,
-          "auc": 0.6136,
-          "average_precision": 0.1774,
+          "support": 7191,
+          "base_rate": 0.12531,
+          "auc": 0.6155,
+          "average_precision": 0.1726,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
-          "predicted_positive": 0
+          "predicted_positive": 1
         },
         "PiCation": {
-          "support": 284,
-          "base_rate": 0.00548,
-          "auc": 0.5986,
-          "average_precision": 0.0328,
+          "support": 345,
+          "base_rate": 0.00601,
+          "auc": 0.6289,
+          "average_precision": 0.026,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
@@ -636,10 +635,10 @@
           "predicted_positive": 0
         },
         "XBDonor": {
-          "support": 42,
-          "base_rate": 0.00081,
-          "auc": 0.7344,
-          "average_precision": 0.0041,
+          "support": 82,
+          "base_rate": 0.00143,
+          "auc": 0.7476,
+          "average_precision": 0.0057,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
@@ -657,9 +656,9 @@
         },
         "MetalDonor": {
           "support": 12,
-          "base_rate": 0.00023,
-          "auc": 0.8568,
-          "average_precision": 0.0141,
+          "base_rate": 0.00021,
+          "auc": 0.8385,
+          "average_precision": 0.0094,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
@@ -676,95 +675,94 @@
           "predicted_positive": 0
         }
       },
-      "macro_auc": 0.5936,
-      "macro_average_precision": 0.0764,
+      "macro_auc": 0.6182,
+      "macro_average_precision": 0.0648,
       "macro_f1": 0.0,
-      "macro_auc_all_types": 0.6385,
+      "macro_auc_all_types": 0.6427,
       "any_interaction": {
-        "base_rate": 0.3017,
-        "auc": 0.5534,
-        "average_precision": 0.3377
+        "base_rate": 0.2945,
+        "auc": 0.5565,
+        "average_precision": 0.331
       }
     },
     "random_forest_ligand_only": {
-      "atoms": 51828,
+      "atoms": 57386,
       "types_present": 9,
-      "types_in_macro": 7,
+      "types_in_macro": 8,
       "min_support_for_macro": 50,
       "types_below_support": {
-        "XBDonor": 42,
         "MetalDonor": 12
       },
       "per_type": {
         "Hydrophobic": {
-          "support": 2634,
-          "base_rate": 0.05082,
-          "auc": 0.651,
-          "average_precision": 0.0812,
-          "precision": 0.0747,
-          "recall": 0.6226,
-          "f1": 0.1334,
-          "predicted_positive": 21955
+          "support": 2850,
+          "base_rate": 0.04966,
+          "auc": 0.6578,
+          "average_precision": 0.0809,
+          "precision": 0.0745,
+          "recall": 0.6575,
+          "f1": 0.1339,
+          "predicted_positive": 25146
         },
         "HBDonor": {
-          "support": 2160,
-          "base_rate": 0.04168,
-          "auc": 0.5902,
-          "average_precision": 0.0672,
-          "precision": 0.0549,
-          "recall": 0.4963,
-          "f1": 0.0989,
-          "predicted_positive": 19528
+          "support": 2351,
+          "base_rate": 0.04097,
+          "auc": 0.5834,
+          "average_precision": 0.0653,
+          "precision": 0.054,
+          "recall": 0.4968,
+          "f1": 0.0974,
+          "predicted_positive": 21633
         },
         "HBAcceptor": {
-          "support": 4605,
-          "base_rate": 0.08885,
-          "auc": 0.5843,
-          "average_precision": 0.1137,
-          "precision": 0.1134,
-          "recall": 0.5952,
-          "f1": 0.1905,
-          "predicted_positive": 24173
+          "support": 4945,
+          "base_rate": 0.08617,
+          "auc": 0.5976,
+          "average_precision": 0.1147,
+          "precision": 0.1126,
+          "recall": 0.6269,
+          "f1": 0.1909,
+          "predicted_positive": 27534
         },
         "Cationic": {
-          "support": 306,
-          "base_rate": 0.0059,
-          "auc": 0.6689,
-          "average_precision": 0.0434,
-          "precision": 0.0096,
-          "recall": 0.5882,
-          "f1": 0.0189,
-          "predicted_positive": 18786
+          "support": 355,
+          "base_rate": 0.00619,
+          "auc": 0.6466,
+          "average_precision": 0.039,
+          "precision": 0.0095,
+          "recall": 0.569,
+          "f1": 0.0186,
+          "predicted_positive": 21345
         },
         "Anionic": {
-          "support": 1552,
-          "base_rate": 0.02995,
-          "auc": 0.6422,
-          "average_precision": 0.0521,
-          "precision": 0.0434,
-          "recall": 0.6495,
-          "f1": 0.0814,
-          "predicted_positive": 23226
+          "support": 1680,
+          "base_rate": 0.02928,
+          "auc": 0.6447,
+          "average_precision": 0.0584,
+          "precision": 0.0421,
+          "recall": 0.6673,
+          "f1": 0.0791,
+          "predicted_positive": 26656
         },
         "PiStacking": {
-          "support": 6603,
-          "base_rate": 0.1274,
-          "auc": 0.6339,
-          "average_precision": 0.1893,
-          "precision": 0.2017,
-          "recall": 0.5213,
-          "f1": 0.2909,
-          "predicted_positive": 17065
+          "support": 7191,
+          "base_rate": 0.12531,
+          "auc": 0.6348,
+          "average_precision": 0.1853,
+          "precision": 0.2009,
+          "recall": 0.524,
+          "f1": 0.2904,
+          "predicted_positive": 18758
         },
         "PiCation": {
-          "support": 284,
-          "base_rate": 0.00548,
-          "auc": 0.6667,
-          "average_precision": 0.0268,
-          "precision": 0.0088,
-          "recall": 0.5528,
-          "f1": 0.0174,
-          "predicted_positive": 17752
+          "support": 345,
+          "base_rate": 0.00601,
+          "auc": 0.6763,
+          "average_precision": 0.0334,
+          "precision": 0.0105,
+          "recall": 0.6087,
+          "f1": 0.0206,
+          "predicted_positive": 20080
         },
         "CationPi": {
           "support": 0,
@@ -777,14 +775,14 @@
           "predicted_positive": 0
         },
         "XBDonor": {
-          "support": 42,
-          "base_rate": 0.00081,
-          "auc": 0.7441,
-          "average_precision": 0.0033,
-          "precision": 0.0018,
-          "recall": 0.6667,
-          "f1": 0.0036,
-          "predicted_positive": 15563
+          "support": 82,
+          "base_rate": 0.00143,
+          "auc": 0.7197,
+          "average_precision": 0.0065,
+          "precision": 0.0031,
+          "recall": 0.6707,
+          "f1": 0.0061,
+          "predicted_positive": 17826
         },
         "XBAcceptor": {
           "support": 0,
@@ -798,13 +796,13 @@
         },
         "MetalDonor": {
           "support": 12,
-          "base_rate": 0.00023,
-          "auc": 0.9912,
-          "average_precision": 0.0623,
-          "precision": 0.0079,
+          "base_rate": 0.00021,
+          "auc": 0.8458,
+          "average_precision": 0.0372,
+          "precision": 0.0026,
           "recall": 0.8333,
-          "f1": 0.0157,
-          "predicted_positive": 1259
+          "f1": 0.0052,
+          "predicted_positive": 3798
         },
         "MetalAcceptor": {
           "support": 0,
@@ -817,95 +815,94 @@
           "predicted_positive": 0
         }
       },
-      "macro_auc": 0.6339,
-      "macro_average_precision": 0.082,
-      "macro_f1": 0.1188,
-      "macro_auc_all_types": 0.6858,
+      "macro_auc": 0.6451,
+      "macro_average_precision": 0.0729,
+      "macro_f1": 0.1046,
+      "macro_auc_all_types": 0.6674,
       "any_interaction": {
-        "base_rate": 0.3017,
-        "auc": 0.5155,
-        "average_precision": 0.308
+        "base_rate": 0.2945,
+        "auc": 0.5104,
+        "average_precision": 0.3017
       }
     },
     "random_forest_with_pocket": {
-      "atoms": 51828,
+      "atoms": 57386,
       "types_present": 9,
-      "types_in_macro": 7,
+      "types_in_macro": 8,
       "min_support_for_macro": 50,
       "types_below_support": {
-        "XBDonor": 42,
         "MetalDonor": 12
       },
       "per_type": {
         "Hydrophobic": {
-          "support": 2634,
-          "base_rate": 0.05082,
-          "auc": 0.6408,
-          "average_precision": 0.0819,
-          "precision": 0.1117,
-          "recall": 0.0554,
-          "f1": 0.0741,
-          "predicted_positive": 1307
+          "support": 2850,
+          "base_rate": 0.04966,
+          "auc": 0.6329,
+          "average_precision": 0.0753,
+          "precision": 0.0932,
+          "recall": 0.0586,
+          "f1": 0.072,
+          "predicted_positive": 1792
         },
         "HBDonor": {
-          "support": 2160,
-          "base_rate": 0.04168,
-          "auc": 0.5876,
-          "average_precision": 0.0589,
-          "precision": 0.0704,
-          "recall": 0.0269,
-          "f1": 0.0389,
-          "predicted_positive": 824
+          "support": 2351,
+          "base_rate": 0.04097,
+          "auc": 0.5778,
+          "average_precision": 0.0533,
+          "precision": 0.0636,
+          "recall": 0.0268,
+          "f1": 0.0377,
+          "predicted_positive": 991
         },
         "HBAcceptor": {
-          "support": 4605,
-          "base_rate": 0.08885,
-          "auc": 0.6088,
-          "average_precision": 0.1237,
-          "precision": 0.1449,
-          "recall": 0.0354,
-          "f1": 0.0569,
-          "predicted_positive": 1125
+          "support": 4945,
+          "base_rate": 0.08617,
+          "auc": 0.598,
+          "average_precision": 0.1161,
+          "precision": 0.1386,
+          "recall": 0.0352,
+          "f1": 0.0561,
+          "predicted_positive": 1255
         },
         "Cationic": {
-          "support": 306,
-          "base_rate": 0.0059,
-          "auc": 0.7405,
-          "average_precision": 0.0226,
-          "precision": 0.0373,
-          "recall": 0.0163,
-          "f1": 0.0227,
-          "predicted_positive": 134
+          "support": 355,
+          "base_rate": 0.00619,
+          "auc": 0.7404,
+          "average_precision": 0.018,
+          "precision": 0.0112,
+          "recall": 0.0056,
+          "f1": 0.0075,
+          "predicted_positive": 178
         },
         "Anionic": {
-          "support": 1552,
-          "base_rate": 0.02995,
-          "auc": 0.7355,
-          "average_precision": 0.0835,
-          "precision": 0.1517,
-          "recall": 0.0522,
-          "f1": 0.0777,
-          "predicted_positive": 534
+          "support": 1680,
+          "base_rate": 0.02928,
+          "auc": 0.7259,
+          "average_precision": 0.0795,
+          "precision": 0.1526,
+          "recall": 0.0518,
+          "f1": 0.0773,
+          "predicted_positive": 570
         },
         "PiStacking": {
-          "support": 6603,
-          "base_rate": 0.1274,
-          "auc": 0.6604,
-          "average_precision": 0.2232,
-          "precision": 0.2908,
-          "recall": 0.1723,
-          "f1": 0.2164,
-          "predicted_positive": 3913
+          "support": 7191,
+          "base_rate": 0.12531,
+          "auc": 0.6717,
+          "average_precision": 0.2229,
+          "precision": 0.2733,
+          "recall": 0.1965,
+          "f1": 0.2286,
+          "predicted_positive": 5170
         },
         "PiCation": {
-          "support": 284,
-          "base_rate": 0.00548,
-          "auc": 0.6901,
-          "average_precision": 0.0149,
-          "precision": 0.0182,
-          "recall": 0.0035,
-          "f1": 0.0059,
-          "predicted_positive": 55
+          "support": 345,
+          "base_rate": 0.00601,
+          "auc": 0.717,
+          "average_precision": 0.017,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "predicted_positive": 88
         },
         "CationPi": {
           "support": 0,
@@ -918,14 +915,14 @@
           "predicted_positive": 0
         },
         "XBDonor": {
-          "support": 42,
-          "base_rate": 0.00081,
-          "auc": 0.7204,
-          "average_precision": 0.0018,
-          "precision": 0.0,
-          "recall": 0.0,
-          "f1": 0.0,
-          "predicted_positive": 71
+          "support": 82,
+          "base_rate": 0.00143,
+          "auc": 0.7208,
+          "average_precision": 0.0279,
+          "precision": 0.0312,
+          "recall": 0.0244,
+          "f1": 0.0274,
+          "predicted_positive": 64
         },
         "XBAcceptor": {
           "support": 0,
@@ -939,9 +936,9 @@
         },
         "MetalDonor": {
           "support": 12,
-          "base_rate": 0.00023,
-          "auc": 0.9507,
-          "average_precision": 0.2486,
+          "base_rate": 0.00021,
+          "auc": 0.8991,
+          "average_precision": 0.0136,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
@@ -958,107 +955,107 @@
           "predicted_positive": 0
         }
       },
-      "macro_auc": 0.6662,
-      "macro_average_precision": 0.087,
-      "macro_f1": 0.0704,
-      "macro_auc_all_types": 0.7039,
+      "macro_auc": 0.6731,
+      "macro_average_precision": 0.0762,
+      "macro_f1": 0.0633,
+      "macro_auc_all_types": 0.6982,
       "any_interaction": {
-        "base_rate": 0.3017,
-        "auc": 0.5628,
-        "average_precision": 0.3525
+        "base_rate": 0.2945,
+        "auc": 0.5629,
+        "average_precision": 0.3456
       }
     },
     "_ablation": {
       "metric": "macro_auc",
-      "with_pocket": 0.6662,
-      "without_pocket": 0.6339,
-      "delta": 0.0323,
+      "with_pocket": 0.6731,
+      "without_pocket": 0.6451,
+      "delta": 0.028,
       "verdict": "uses_the_pocket",
-      "reason": "removing the pocket costs 0.0323, at or above the 0.02 margin"
+      "reason": "removing the pocket costs 0.0280, at or above the 0.02 margin"
     },
     "multi_protein_ligands": {
-      "atoms": 31911,
-      "complexes": 1386,
-      "share_of_test_atoms": 0.6157,
+      "atoms": 34980,
+      "complexes": 1551,
+      "share_of_test_atoms": 0.6096,
       "random_forest_with_pocket": {
-        "atoms": 31911,
+        "atoms": 34980,
         "types_present": 9,
         "types_in_macro": 7,
         "min_support_for_macro": 50,
         "types_below_support": {
-          "XBDonor": 14,
-          "MetalDonor": 6
+          "XBDonor": 40,
+          "MetalDonor": 5
         },
         "per_type": {
           "Hydrophobic": {
-            "support": 1280,
-            "base_rate": 0.04011,
-            "auc": 0.6603,
-            "average_precision": 0.0693,
-            "precision": 0.0991,
-            "recall": 0.057,
-            "f1": 0.0724,
-            "predicted_positive": 737
+            "support": 1339,
+            "base_rate": 0.03828,
+            "auc": 0.6531,
+            "average_precision": 0.0642,
+            "precision": 0.0902,
+            "recall": 0.0695,
+            "f1": 0.0785,
+            "predicted_positive": 1031
           },
           "HBDonor": {
-            "support": 1465,
-            "base_rate": 0.04591,
-            "auc": 0.5967,
-            "average_precision": 0.071,
-            "precision": 0.0991,
-            "recall": 0.0314,
-            "f1": 0.0477,
-            "predicted_positive": 464
+            "support": 1645,
+            "base_rate": 0.04703,
+            "auc": 0.5809,
+            "average_precision": 0.0636,
+            "precision": 0.0812,
+            "recall": 0.031,
+            "f1": 0.0449,
+            "predicted_positive": 628
           },
           "HBAcceptor": {
-            "support": 3350,
-            "base_rate": 0.10498,
-            "auc": 0.605,
-            "average_precision": 0.1433,
-            "precision": 0.1761,
-            "recall": 0.04,
-            "f1": 0.0652,
-            "predicted_positive": 761
+            "support": 3513,
+            "base_rate": 0.10043,
+            "auc": 0.5889,
+            "average_precision": 0.1311,
+            "precision": 0.1615,
+            "recall": 0.0404,
+            "f1": 0.0647,
+            "predicted_positive": 879
           },
           "Cationic": {
-            "support": 170,
-            "base_rate": 0.00533,
-            "auc": 0.7749,
-            "average_precision": 0.0258,
-            "precision": 0.0465,
-            "recall": 0.0235,
-            "f1": 0.0312,
-            "predicted_positive": 86
+            "support": 215,
+            "base_rate": 0.00615,
+            "auc": 0.7713,
+            "average_precision": 0.0225,
+            "precision": 0.012,
+            "recall": 0.0047,
+            "f1": 0.0067,
+            "predicted_positive": 83
           },
           "Anionic": {
-            "support": 1192,
-            "base_rate": 0.03735,
-            "auc": 0.7145,
-            "average_precision": 0.0873,
-            "precision": 0.1338,
-            "recall": 0.0445,
-            "f1": 0.0668,
-            "predicted_positive": 396
+            "support": 1265,
+            "base_rate": 0.03616,
+            "auc": 0.7192,
+            "average_precision": 0.0924,
+            "precision": 0.1726,
+            "recall": 0.0656,
+            "f1": 0.0951,
+            "predicted_positive": 481
           },
           "PiStacking": {
-            "support": 3857,
-            "base_rate": 0.12087,
-            "auc": 0.6733,
-            "average_precision": 0.2275,
-            "precision": 0.306,
-            "recall": 0.154,
-            "f1": 0.2049,
-            "predicted_positive": 1941
+            "support": 4237,
+            "base_rate": 0.12113,
+            "auc": 0.6855,
+            "average_precision": 0.2239,
+            "precision": 0.2776,
+            "recall": 0.1749,
+            "f1": 0.2146,
+            "predicted_positive": 2669
           },
           "PiCation": {
-            "support": 164,
-            "base_rate": 0.00514,
-            "auc": 0.72,
-            "average_precision": 0.0158,
-            "precision": 0.0286,
-            "recall": 0.0061,
-            "f1": 0.0101,
-            "predicted_positive": 35
+            "support": 234,
+            "base_rate": 0.00669,
+            "auc": 0.7334,
+            "average_precision": 0.0227,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "predicted_positive": 42
           },
           "CationPi": {
             "support": 0,
@@ -1071,14 +1068,14 @@
             "predicted_positive": 0
           },
           "XBDonor": {
-            "support": 14,
-            "base_rate": 0.00044,
-            "auc": 0.7752,
-            "average_precision": 0.002,
-            "precision": 0.0,
-            "recall": 0.0,
-            "f1": 0.0,
-            "predicted_positive": 19
+            "support": 40,
+            "base_rate": 0.00114,
+            "auc": 0.8022,
+            "average_precision": 0.019,
+            "precision": 0.0377,
+            "recall": 0.05,
+            "f1": 0.043,
+            "predicted_positive": 53
           },
           "XBAcceptor": {
             "support": 0,
@@ -1091,10 +1088,10 @@
             "predicted_positive": 0
           },
           "MetalDonor": {
-            "support": 6,
-            "base_rate": 0.00019,
-            "auc": 0.997,
-            "average_precision": 0.0388,
+            "support": 5,
+            "base_rate": 0.00014,
+            "auc": 0.9935,
+            "average_precision": 0.0188,
             "precision": 0.0,
             "recall": 0.0,
             "f1": 0.0,
@@ -1111,95 +1108,95 @@
             "predicted_positive": 0
           }
         },
-        "macro_auc": 0.6778,
-        "macro_average_precision": 0.0914,
-        "macro_f1": 0.0712,
-        "macro_auc_all_types": 0.7241,
+        "macro_auc": 0.676,
+        "macro_average_precision": 0.0886,
+        "macro_f1": 0.0721,
+        "macro_auc_all_types": 0.7253,
         "any_interaction": {
-          "base_rate": 0.308,
-          "auc": 0.5683,
-          "average_precision": 0.3637
+          "base_rate": 0.3019,
+          "auc": 0.5632,
+          "average_precision": 0.353
         }
       },
       "random_forest_ligand_only": {
-        "atoms": 31911,
+        "atoms": 34980,
         "types_present": 9,
         "types_in_macro": 7,
         "min_support_for_macro": 50,
         "types_below_support": {
-          "XBDonor": 14,
-          "MetalDonor": 6
+          "XBDonor": 40,
+          "MetalDonor": 5
         },
         "per_type": {
           "Hydrophobic": {
-            "support": 1280,
-            "base_rate": 0.04011,
-            "auc": 0.6633,
-            "average_precision": 0.0682,
-            "precision": 0.0617,
-            "recall": 0.5641,
-            "f1": 0.1112,
-            "predicted_positive": 11709
+            "support": 1339,
+            "base_rate": 0.03828,
+            "auc": 0.687,
+            "average_precision": 0.0731,
+            "precision": 0.0638,
+            "recall": 0.6221,
+            "f1": 0.1157,
+            "predicted_positive": 13065
           },
           "HBDonor": {
-            "support": 1465,
-            "base_rate": 0.04591,
-            "auc": 0.5866,
-            "average_precision": 0.0754,
-            "precision": 0.0574,
-            "recall": 0.5365,
-            "f1": 0.1037,
-            "predicted_positive": 13699
+            "support": 1645,
+            "base_rate": 0.04703,
+            "auc": 0.577,
+            "average_precision": 0.0753,
+            "precision": 0.0582,
+            "recall": 0.538,
+            "f1": 0.1051,
+            "predicted_positive": 15204
           },
           "HBAcceptor": {
-            "support": 3350,
-            "base_rate": 0.10498,
-            "auc": 0.5686,
-            "average_precision": 0.1251,
-            "precision": 0.1248,
-            "recall": 0.6394,
-            "f1": 0.2089,
-            "predicted_positive": 17160
+            "support": 3513,
+            "base_rate": 0.10043,
+            "auc": 0.5765,
+            "average_precision": 0.1221,
+            "precision": 0.1209,
+            "recall": 0.6712,
+            "f1": 0.2049,
+            "predicted_positive": 19499
           },
           "Cationic": {
-            "support": 170,
-            "base_rate": 0.00533,
-            "auc": 0.6812,
-            "average_precision": 0.0471,
-            "precision": 0.0091,
-            "recall": 0.5824,
-            "f1": 0.0179,
-            "predicted_positive": 10909
+            "support": 215,
+            "base_rate": 0.00615,
+            "auc": 0.6694,
+            "average_precision": 0.0492,
+            "precision": 0.0101,
+            "recall": 0.586,
+            "f1": 0.0199,
+            "predicted_positive": 12452
           },
           "Anionic": {
-            "support": 1192,
-            "base_rate": 0.03735,
-            "auc": 0.6154,
-            "average_precision": 0.0583,
-            "precision": 0.0477,
-            "recall": 0.6644,
-            "f1": 0.0889,
-            "predicted_positive": 16616
+            "support": 1265,
+            "base_rate": 0.03616,
+            "auc": 0.6257,
+            "average_precision": 0.0675,
+            "precision": 0.0465,
+            "recall": 0.6996,
+            "f1": 0.0873,
+            "predicted_positive": 19013
           },
           "PiStacking": {
-            "support": 3857,
-            "base_rate": 0.12087,
-            "auc": 0.6447,
-            "average_precision": 0.1888,
-            "precision": 0.2044,
-            "recall": 0.5076,
-            "f1": 0.2915,
-            "predicted_positive": 9578
+            "support": 4237,
+            "base_rate": 0.12113,
+            "auc": 0.6399,
+            "average_precision": 0.1849,
+            "precision": 0.2024,
+            "recall": 0.5006,
+            "f1": 0.2882,
+            "predicted_positive": 10480
           },
           "PiCation": {
-            "support": 164,
-            "base_rate": 0.00514,
-            "auc": 0.7056,
-            "average_precision": 0.0376,
-            "precision": 0.0088,
-            "recall": 0.5915,
-            "f1": 0.0173,
-            "predicted_positive": 11065
+            "support": 234,
+            "base_rate": 0.00669,
+            "auc": 0.6817,
+            "average_precision": 0.0411,
+            "precision": 0.0116,
+            "recall": 0.6239,
+            "f1": 0.0228,
+            "predicted_positive": 12545
           },
           "CationPi": {
             "support": 0,
@@ -1212,14 +1209,14 @@
             "predicted_positive": 0
           },
           "XBDonor": {
-            "support": 14,
-            "base_rate": 0.00044,
-            "auc": 0.8542,
-            "average_precision": 0.0111,
-            "precision": 0.0013,
-            "recall": 0.7857,
-            "f1": 0.0026,
-            "predicted_positive": 8513
+            "support": 40,
+            "base_rate": 0.00114,
+            "auc": 0.7392,
+            "average_precision": 0.0042,
+            "precision": 0.0027,
+            "recall": 0.65,
+            "f1": 0.0054,
+            "predicted_positive": 9544
           },
           "XBAcceptor": {
             "support": 0,
@@ -1232,14 +1229,14 @@
             "predicted_positive": 0
           },
           "MetalDonor": {
-            "support": 6,
-            "base_rate": 0.00019,
-            "auc": 0.9961,
-            "average_precision": 0.0286,
-            "precision": 0.0071,
+            "support": 5,
+            "base_rate": 0.00014,
+            "auc": 0.9827,
+            "average_precision": 0.0106,
+            "precision": 0.0024,
             "recall": 1.0,
-            "f1": 0.014,
-            "predicted_positive": 850
+            "f1": 0.0048,
+            "predicted_positive": 2074
           },
           "MetalAcceptor": {
             "support": 0,
@@ -1252,76 +1249,76 @@
             "predicted_positive": 0
           }
         },
-        "macro_auc": 0.6379,
-        "macro_average_precision": 0.0858,
-        "macro_f1": 0.1199,
-        "macro_auc_all_types": 0.7017,
+        "macro_auc": 0.6367,
+        "macro_average_precision": 0.0876,
+        "macro_f1": 0.1206,
+        "macro_auc_all_types": 0.6866,
         "any_interaction": {
-          "base_rate": 0.308,
-          "auc": 0.5155,
-          "average_precision": 0.3145
+          "base_rate": 0.3019,
+          "auc": 0.5108,
+          "average_precision": 0.31
         }
       },
       "_ablation": {
         "metric": "macro_auc",
-        "with_pocket": 0.6778,
-        "without_pocket": 0.6379,
-        "delta": 0.0399,
+        "with_pocket": 0.676,
+        "without_pocket": 0.6367,
+        "delta": 0.0393,
         "verdict": "uses_the_pocket",
-        "reason": "removing the pocket costs 0.0399, at or above the 0.02 margin"
+        "reason": "removing the pocket costs 0.0393, at or above the 0.02 margin"
       }
     },
     "_split": {
       "regime": "unseen_protein",
-      "train_complexes": 16883,
-      "test_complexes": 2110,
+      "train_complexes": 18843,
+      "test_complexes": 2355,
       "train_labels": {
-        "atoms": 425934,
-        "complexes": 16883,
+        "atoms": 476155,
+        "complexes": 18843,
         "any_interaction_rate": 0.3073,
         "per_type": {
           "Hydrophobic": {
-            "positives": 33958,
-            "rate": 0.07973
+            "positives": 38046,
+            "rate": 0.0799
           },
           "HBDonor": {
-            "positives": 14550,
-            "rate": 0.03416
+            "positives": 16128,
+            "rate": 0.03387
           },
           "HBAcceptor": {
-            "positives": 23018,
-            "rate": 0.05404
+            "positives": 25577,
+            "rate": 0.05372
           },
           "Cationic": {
-            "positives": 2789,
-            "rate": 0.00655
+            "positives": 3097,
+            "rate": 0.0065
           },
           "Anionic": {
-            "positives": 5324,
-            "rate": 0.0125
+            "positives": 5870,
+            "rate": 0.01233
           },
           "PiStacking": {
-            "positives": 67866,
-            "rate": 0.15933
+            "positives": 76047,
+            "rate": 0.15971
           },
           "PiCation": {
-            "positives": 2155,
-            "rate": 0.00506
+            "positives": 2395,
+            "rate": 0.00503
           },
           "CationPi": {
             "positives": 0,
             "rate": 0.0
           },
           "XBDonor": {
-            "positives": 1242,
-            "rate": 0.00292
+            "positives": 1374,
+            "rate": 0.00289
           },
           "XBAcceptor": {
             "positives": 0,
             "rate": 0.0
           },
           "MetalDonor": {
-            "positives": 12,
+            "positives": 14,
             "rate": 3e-05
           },
           "MetalAcceptor": {
@@ -1331,45 +1328,45 @@
         }
       },
       "test_labels": {
-        "atoms": 51828,
-        "complexes": 2110,
-        "any_interaction_rate": 0.3017,
+        "atoms": 57386,
+        "complexes": 2355,
+        "any_interaction_rate": 0.2945,
         "per_type": {
           "Hydrophobic": {
-            "positives": 2634,
-            "rate": 0.05082
+            "positives": 2850,
+            "rate": 0.04966
           },
           "HBDonor": {
-            "positives": 2160,
-            "rate": 0.04168
+            "positives": 2351,
+            "rate": 0.04097
           },
           "HBAcceptor": {
-            "positives": 4605,
-            "rate": 0.08885
+            "positives": 4945,
+            "rate": 0.08617
           },
           "Cationic": {
-            "positives": 306,
-            "rate": 0.0059
+            "positives": 355,
+            "rate": 0.00619
           },
           "Anionic": {
-            "positives": 1552,
-            "rate": 0.02995
+            "positives": 1680,
+            "rate": 0.02928
           },
           "PiStacking": {
-            "positives": 6603,
-            "rate": 0.1274
+            "positives": 7191,
+            "rate": 0.12531
           },
           "PiCation": {
-            "positives": 284,
-            "rate": 0.00548
+            "positives": 345,
+            "rate": 0.00601
           },
           "CationPi": {
             "positives": 0,
             "rate": 0.0
           },
           "XBDonor": {
-            "positives": 42,
-            "rate": 0.00081
+            "positives": 82,
+            "rate": 0.00143
           },
           "XBAcceptor": {
             "positives": 0,
@@ -1377,7 +1374,7 @@
           },
           "MetalDonor": {
             "positives": 12,
-            "rate": 0.00023
+            "rate": 0.00021
           },
           "MetalAcceptor": {
             "positives": 0,
@@ -1389,82 +1386,82 @@
   },
   "both_unseen": {
     "frequency_prior": {
-      "atoms": 3338,
+      "atoms": 3134,
       "types_present": 8,
       "types_in_macro": 4,
       "min_support_for_macro": 50,
       "types_below_support": {
-        "Cationic": 27,
-        "Anionic": 26,
-        "PiCation": 26,
+        "Cationic": 19,
+        "Anionic": 36,
+        "PiCation": 17,
         "XBDonor": 4
       },
       "per_type": {
         "Hydrophobic": {
-          "support": 252,
-          "base_rate": 0.07549,
-          "auc": 0.5696,
-          "average_precision": 0.0953,
+          "support": 212,
+          "base_rate": 0.06765,
+          "auc": 0.5474,
+          "average_precision": 0.0786,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
-          "predicted_positive": 1
+          "predicted_positive": 0
         },
         "HBDonor": {
-          "support": 104,
-          "base_rate": 0.03116,
-          "auc": 0.5248,
-          "average_precision": 0.0339,
+          "support": 81,
+          "base_rate": 0.02585,
+          "auc": 0.5493,
+          "average_precision": 0.0318,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
           "predicted_positive": 0
         },
         "HBAcceptor": {
-          "support": 138,
-          "base_rate": 0.04134,
-          "auc": 0.52,
-          "average_precision": 0.0526,
+          "support": 150,
+          "base_rate": 0.04786,
+          "auc": 0.5765,
+          "average_precision": 0.0678,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
           "predicted_positive": 0
         },
         "Cationic": {
-          "support": 27,
-          "base_rate": 0.00809,
-          "auc": 0.5473,
-          "average_precision": 0.0182,
+          "support": 19,
+          "base_rate": 0.00606,
+          "auc": 0.534,
+          "average_precision": 0.0264,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
           "predicted_positive": 0
         },
         "Anionic": {
-          "support": 26,
-          "base_rate": 0.00779,
-          "auc": 0.6045,
-          "average_precision": 0.0182,
+          "support": 36,
+          "base_rate": 0.01149,
+          "auc": 0.5909,
+          "average_precision": 0.0378,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
           "predicted_positive": 0
         },
         "PiStacking": {
-          "support": 478,
-          "base_rate": 0.1432,
-          "auc": 0.5615,
-          "average_precision": 0.1549,
+          "support": 526,
+          "base_rate": 0.16784,
+          "auc": 0.5802,
+          "average_precision": 0.1928,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
-          "predicted_positive": 1
+          "predicted_positive": 0
         },
         "PiCation": {
-          "support": 26,
-          "base_rate": 0.00779,
-          "auc": 0.5809,
-          "average_precision": 0.0276,
+          "support": 17,
+          "base_rate": 0.00542,
+          "auc": 0.6343,
+          "average_precision": 0.014,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
@@ -1482,9 +1479,9 @@
         },
         "XBDonor": {
           "support": 4,
-          "base_rate": 0.0012,
-          "auc": 0.4258,
-          "average_precision": 0.0012,
+          "base_rate": 0.00128,
+          "auc": 0.6562,
+          "average_precision": 0.0029,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
@@ -1521,97 +1518,97 @@
           "predicted_positive": 0
         }
       },
-      "macro_auc": 0.544,
-      "macro_average_precision": 0.0842,
+      "macro_auc": 0.5634,
+      "macro_average_precision": 0.0927,
       "macro_f1": 0.0,
-      "macro_auc_all_types": 0.5418,
+      "macro_auc_all_types": 0.5836,
       "any_interaction": {
-        "base_rate": 0.2756,
-        "auc": 0.5529,
-        "average_precision": 0.3214
+        "base_rate": 0.2894,
+        "auc": 0.5421,
+        "average_precision": 0.3029
       }
     },
     "random_forest_ligand_only": {
-      "atoms": 3338,
+      "atoms": 3134,
       "types_present": 8,
       "types_in_macro": 4,
       "min_support_for_macro": 50,
       "types_below_support": {
-        "Cationic": 27,
-        "Anionic": 26,
-        "PiCation": 26,
+        "Cationic": 19,
+        "Anionic": 36,
+        "PiCation": 17,
         "XBDonor": 4
       },
       "per_type": {
         "Hydrophobic": {
-          "support": 252,
-          "base_rate": 0.07549,
-          "auc": 0.6029,
-          "average_precision": 0.0995,
-          "precision": 0.094,
-          "recall": 0.7381,
-          "f1": 0.1667,
-          "predicted_positive": 1979
+          "support": 212,
+          "base_rate": 0.06765,
+          "auc": 0.5615,
+          "average_precision": 0.0821,
+          "precision": 0.0797,
+          "recall": 0.6792,
+          "f1": 0.1426,
+          "predicted_positive": 1807
         },
         "HBDonor": {
-          "support": 104,
-          "base_rate": 0.03116,
-          "auc": 0.5483,
-          "average_precision": 0.0362,
-          "precision": 0.0398,
-          "recall": 0.3077,
-          "f1": 0.0705,
-          "predicted_positive": 804
+          "support": 81,
+          "base_rate": 0.02585,
+          "auc": 0.5542,
+          "average_precision": 0.041,
+          "precision": 0.0328,
+          "recall": 0.321,
+          "f1": 0.0595,
+          "predicted_positive": 793
         },
         "HBAcceptor": {
-          "support": 138,
-          "base_rate": 0.04134,
-          "auc": 0.5185,
-          "average_precision": 0.0524,
-          "precision": 0.0478,
-          "recall": 0.3116,
-          "f1": 0.0829,
-          "predicted_positive": 899
+          "support": 150,
+          "base_rate": 0.04786,
+          "auc": 0.5977,
+          "average_precision": 0.0669,
+          "precision": 0.0729,
+          "recall": 0.4467,
+          "f1": 0.1254,
+          "predicted_positive": 919
         },
         "Cationic": {
-          "support": 27,
-          "base_rate": 0.00809,
-          "auc": 0.6235,
-          "average_precision": 0.0199,
-          "precision": 0.0119,
-          "recall": 0.6296,
-          "f1": 0.0233,
-          "predicted_positive": 1433
+          "support": 19,
+          "base_rate": 0.00606,
+          "auc": 0.6403,
+          "average_precision": 0.1011,
+          "precision": 0.0085,
+          "recall": 0.6842,
+          "f1": 0.0167,
+          "predicted_positive": 1534
         },
         "Anionic": {
-          "support": 26,
-          "base_rate": 0.00779,
-          "auc": 0.6942,
-          "average_precision": 0.0196,
-          "precision": 0.0175,
-          "recall": 0.5769,
-          "f1": 0.034,
-          "predicted_positive": 856
+          "support": 36,
+          "base_rate": 0.01149,
+          "auc": 0.6518,
+          "average_precision": 0.0305,
+          "precision": 0.0224,
+          "recall": 0.5278,
+          "f1": 0.0429,
+          "predicted_positive": 849
         },
         "PiStacking": {
-          "support": 478,
-          "base_rate": 0.1432,
-          "auc": 0.5867,
-          "average_precision": 0.1849,
-          "precision": 0.1838,
-          "recall": 0.569,
-          "f1": 0.2778,
-          "predicted_positive": 1480
+          "support": 526,
+          "base_rate": 0.16784,
+          "auc": 0.612,
+          "average_precision": 0.2171,
+          "precision": 0.2329,
+          "recall": 0.5837,
+          "f1": 0.333,
+          "predicted_positive": 1318
         },
         "PiCation": {
-          "support": 26,
-          "base_rate": 0.00779,
-          "auc": 0.5588,
-          "average_precision": 0.0253,
-          "precision": 0.0103,
-          "recall": 0.3846,
-          "f1": 0.02,
-          "predicted_positive": 974
+          "support": 17,
+          "base_rate": 0.00542,
+          "auc": 0.6445,
+          "average_precision": 0.0221,
+          "precision": 0.0108,
+          "recall": 0.6471,
+          "f1": 0.0213,
+          "predicted_positive": 1016
         },
         "CationPi": {
           "support": 0,
@@ -1625,13 +1622,13 @@
         },
         "XBDonor": {
           "support": 4,
-          "base_rate": 0.0012,
-          "auc": 0.4985,
-          "average_precision": 0.0015,
-          "precision": 0.0007,
-          "recall": 0.25,
-          "f1": 0.0014,
-          "predicted_positive": 1404
+          "base_rate": 0.00128,
+          "auc": 0.6407,
+          "average_precision": 0.0123,
+          "precision": 0.0023,
+          "recall": 0.75,
+          "f1": 0.0045,
+          "predicted_positive": 1332
         },
         "XBAcceptor": {
           "support": 0,
@@ -1651,7 +1648,7 @@
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
-          "predicted_positive": 53
+          "predicted_positive": 219
         },
         "MetalAcceptor": {
           "support": 0,
@@ -1664,97 +1661,97 @@
           "predicted_positive": 0
         }
       },
-      "macro_auc": 0.5641,
-      "macro_average_precision": 0.0932,
-      "macro_f1": 0.1495,
-      "macro_auc_all_types": 0.5789,
+      "macro_auc": 0.5814,
+      "macro_average_precision": 0.1018,
+      "macro_f1": 0.1651,
+      "macro_auc_all_types": 0.6128,
       "any_interaction": {
-        "base_rate": 0.2756,
-        "auc": 0.5077,
-        "average_precision": 0.2806
+        "base_rate": 0.2894,
+        "auc": 0.5026,
+        "average_precision": 0.2892
       }
     },
     "random_forest_with_pocket": {
-      "atoms": 3338,
+      "atoms": 3134,
       "types_present": 8,
       "types_in_macro": 4,
       "min_support_for_macro": 50,
       "types_below_support": {
-        "Cationic": 27,
-        "Anionic": 26,
-        "PiCation": 26,
+        "Cationic": 19,
+        "Anionic": 36,
+        "PiCation": 17,
         "XBDonor": 4
       },
       "per_type": {
         "Hydrophobic": {
-          "support": 252,
-          "base_rate": 0.07549,
-          "auc": 0.5922,
-          "average_precision": 0.0997,
-          "precision": 0.0833,
-          "recall": 0.0278,
-          "f1": 0.0417,
-          "predicted_positive": 84
+          "support": 212,
+          "base_rate": 0.06765,
+          "auc": 0.5881,
+          "average_precision": 0.0939,
+          "precision": 0.0684,
+          "recall": 0.0377,
+          "f1": 0.0486,
+          "predicted_positive": 117
         },
         "HBDonor": {
-          "support": 104,
-          "base_rate": 0.03116,
-          "auc": 0.5236,
-          "average_precision": 0.0374,
-          "precision": 0.0467,
-          "recall": 0.0481,
-          "f1": 0.0474,
-          "predicted_positive": 107
+          "support": 81,
+          "base_rate": 0.02585,
+          "auc": 0.5575,
+          "average_precision": 0.0358,
+          "precision": 0.0152,
+          "recall": 0.0123,
+          "f1": 0.0136,
+          "predicted_positive": 66
         },
         "HBAcceptor": {
-          "support": 138,
-          "base_rate": 0.04134,
-          "auc": 0.5541,
-          "average_precision": 0.0553,
-          "precision": 0.0541,
-          "recall": 0.0145,
-          "f1": 0.0229,
-          "predicted_positive": 37
+          "support": 150,
+          "base_rate": 0.04786,
+          "auc": 0.6295,
+          "average_precision": 0.0762,
+          "precision": 0.1,
+          "recall": 0.0267,
+          "f1": 0.0421,
+          "predicted_positive": 40
         },
         "Cationic": {
-          "support": 27,
-          "base_rate": 0.00809,
-          "auc": 0.7325,
-          "average_precision": 0.0204,
+          "support": 19,
+          "base_rate": 0.00606,
+          "auc": 0.644,
+          "average_precision": 0.0105,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
-          "predicted_positive": 15
+          "predicted_positive": 12
         },
         "Anionic": {
-          "support": 26,
-          "base_rate": 0.00779,
-          "auc": 0.6466,
-          "average_precision": 0.0142,
-          "precision": 0.0,
-          "recall": 0.0,
-          "f1": 0.0,
-          "predicted_positive": 7
+          "support": 36,
+          "base_rate": 0.01149,
+          "auc": 0.7087,
+          "average_precision": 0.0452,
+          "precision": 0.2,
+          "recall": 0.0278,
+          "f1": 0.0488,
+          "predicted_positive": 5
         },
         "PiStacking": {
-          "support": 478,
-          "base_rate": 0.1432,
-          "auc": 0.6721,
-          "average_precision": 0.2341,
-          "precision": 0.3222,
-          "recall": 0.2218,
-          "f1": 0.2627,
-          "predicted_positive": 329
+          "support": 526,
+          "base_rate": 0.16784,
+          "auc": 0.6666,
+          "average_precision": 0.2858,
+          "precision": 0.3284,
+          "recall": 0.251,
+          "f1": 0.2845,
+          "predicted_positive": 402
         },
         "PiCation": {
-          "support": 26,
-          "base_rate": 0.00779,
-          "auc": 0.6846,
-          "average_precision": 0.03,
+          "support": 17,
+          "base_rate": 0.00542,
+          "auc": 0.7129,
+          "average_precision": 0.0125,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
-          "predicted_positive": 2
+          "predicted_positive": 13
         },
         "CationPi": {
           "support": 0,
@@ -1768,13 +1765,13 @@
         },
         "XBDonor": {
           "support": 4,
-          "base_rate": 0.0012,
-          "auc": 0.7232,
-          "average_precision": 0.0047,
+          "base_rate": 0.00128,
+          "auc": 0.5741,
+          "average_precision": 0.0018,
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
-          "predicted_positive": 1
+          "predicted_positive": 0
         },
         "XBAcceptor": {
           "support": 0,
@@ -1807,75 +1804,75 @@
           "predicted_positive": 0
         }
       },
-      "macro_auc": 0.5855,
-      "macro_average_precision": 0.1066,
-      "macro_f1": 0.0937,
-      "macro_auc_all_types": 0.6411,
+      "macro_auc": 0.6104,
+      "macro_average_precision": 0.1229,
+      "macro_f1": 0.0972,
+      "macro_auc_all_types": 0.6352,
       "any_interaction": {
-        "base_rate": 0.2756,
-        "auc": 0.5767,
-        "average_precision": 0.3247
+        "base_rate": 0.2894,
+        "auc": 0.57,
+        "average_precision": 0.3525
       }
     },
     "_ablation": {
       "metric": "macro_auc",
-      "with_pocket": 0.5855,
-      "without_pocket": 0.5641,
-      "delta": 0.0214,
+      "with_pocket": 0.6104,
+      "without_pocket": 0.5814,
+      "delta": 0.029,
       "verdict": "uses_the_pocket",
-      "reason": "removing the pocket costs 0.0214, at or above the 0.02 margin"
+      "reason": "removing the pocket costs 0.0290, at or above the 0.02 margin"
     },
     "_split": {
       "regime": "both_unseen",
-      "train_complexes": 13076,
-      "test_complexes": 109,
+      "train_complexes": 14553,
+      "test_complexes": 106,
       "train_labels": {
-        "atoms": 313091,
-        "complexes": 13076,
-        "any_interaction_rate": 0.3083,
+        "atoms": 348856,
+        "complexes": 14553,
+        "any_interaction_rate": 0.3089,
         "per_type": {
           "Hydrophobic": {
-            "positives": 24141,
-            "rate": 0.07711
+            "positives": 27066,
+            "rate": 0.07759
           },
           "HBDonor": {
-            "positives": 11305,
-            "rate": 0.03611
+            "positives": 12437,
+            "rate": 0.03565
           },
           "HBAcceptor": {
-            "positives": 18464,
-            "rate": 0.05897
+            "positives": 20461,
+            "rate": 0.05865
           },
           "Cationic": {
-            "positives": 2067,
-            "rate": 0.0066
+            "positives": 2238,
+            "rate": 0.00642
           },
           "Anionic": {
-            "positives": 4820,
-            "rate": 0.01539
+            "positives": 5303,
+            "rate": 0.0152
           },
           "PiStacking": {
-            "positives": 48231,
-            "rate": 0.15405
+            "positives": 54141,
+            "rate": 0.1552
           },
           "PiCation": {
-            "positives": 1664,
-            "rate": 0.00531
+            "positives": 1826,
+            "rate": 0.00523
           },
           "CationPi": {
             "positives": 0,
             "rate": 0.0
           },
           "XBDonor": {
-            "positives": 910,
-            "rate": 0.00291
+            "positives": 1020,
+            "rate": 0.00292
           },
           "XBAcceptor": {
             "positives": 0,
             "rate": 0.0
           },
           "MetalDonor": {
-            "positives": 12,
+            "positives": 13,
             "rate": 4e-05
           },
           "MetalAcceptor": {
@@ -1885,37 +1882,37 @@
         }
       },
       "test_labels": {
-        "atoms": 3338,
-        "complexes": 109,
-        "any_interaction_rate": 0.2756,
+        "atoms": 3134,
+        "complexes": 106,
+        "any_interaction_rate": 0.2894,
         "per_type": {
           "Hydrophobic": {
-            "positives": 252,
-            "rate": 0.07549
+            "positives": 212,
+            "rate": 0.06765
           },
           "HBDonor": {
-            "positives": 104,
-            "rate": 0.03116
+            "positives": 81,
+            "rate": 0.02585
           },
           "HBAcceptor": {
-            "positives": 138,
-            "rate": 0.04134
+            "positives": 150,
+            "rate": 0.04786
           },
           "Cationic": {
-            "positives": 27,
-            "rate": 0.00809
+            "positives": 19,
+            "rate": 0.00606
           },
           "Anionic": {
-            "positives": 26,
-            "rate": 0.00779
+            "positives": 36,
+            "rate": 0.01149
           },
           "PiStacking": {
-            "positives": 478,
-            "rate": 0.1432
+            "positives": 526,
+            "rate": 0.16784
           },
           "PiCation": {
-            "positives": 26,
-            "rate": 0.00779
+            "positives": 17,
+            "rate": 0.00542
           },
           "CationPi": {
             "positives": 0,
@@ -1923,7 +1920,7 @@
           },
           "XBDonor": {
             "positives": 4,
-            "rate": 0.0012
+            "rate": 0.00128
           },
           "XBAcceptor": {
             "positives": 0,

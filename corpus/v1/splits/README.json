@@ -5,18 +5,18 @@
     0.1,
     0.1
   ],
-  "complexes": 21103,
+  "complexes": 23554,
   "protein_grouping": "uniprot_accession",
-  "protein_groups": 5771,
-  "scaffold_groups": 8533,
+  "protein_groups": 6170,
+  "scaffold_groups": 9341,
   "regimes": {
     "unseen_ligand": {
       "counts": {
-        "test": 2110,
-        "train": 16883,
-        "validation": 2110
+        "test": 2356,
+        "validation": 2355,
+        "train": 18843
       },
-      "sha256_16": "bfa89857fc193e29",
+      "sha256_16": "5f9b39307458544e",
       "leaks": {
         "shared_scaffolds": 0,
         "shared_proteins": 0
@@ -25,11 +25,11 @@
     },
     "unseen_protein": {
       "counts": {
-        "train": 16883,
-        "validation": 2110,
-        "test": 2110
+        "train": 18843,
+        "validation": 2356,
+        "test": 2355
       },
-      "sha256_16": "ebd2533374b62e64",
+      "sha256_16": "5dba0441899ab326",
       "leaks": {
         "shared_scaffolds": 0,
         "shared_proteins": 0
@@ -38,12 +38,12 @@
     },
     "both_unseen": {
       "counts": {
-        "discarded": 7818,
-        "train": 13076,
-        "test": 109,
-        "validation": 100
+        "discarded": 8796,
+        "train": 14553,
+        "test": 106,
+        "validation": 99
       },
-      "sha256_16": "11ed82123cd2b4ca",
+      "sha256_16": "85ad27af0647f7c4",
       "leaks": {
         "shared_scaffolds": 0,
         "shared_proteins": 0

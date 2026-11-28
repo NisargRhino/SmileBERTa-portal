@@ -3,58 +3,58 @@
     "regime": "unseen_ligand",
     "device": "mps",
     "counts": {
-      "train": 16883,
-      "validation": 2110,
-      "test": 2110
+      "train": 18843,
+      "validation": 2355,
+      "test": 2356
     },
     "label_statistics": {
-      "atoms": 404717,
-      "complexes": 16883,
-      "any_interaction_rate": 0.3067,
+      "atoms": 451266,
+      "complexes": 18843,
+      "any_interaction_rate": 0.3061,
       "per_type": {
         "Hydrophobic": {
-          "positives": 28408,
-          "rate": 0.07019
+          "positives": 31845,
+          "rate": 0.07057
         },
         "HBDonor": {
-          "positives": 15211,
-          "rate": 0.03758
+          "positives": 16845,
+          "rate": 0.03733
         },
         "HBAcceptor": {
-          "positives": 27003,
-          "rate": 0.06672
+          "positives": 29907,
+          "rate": 0.06627
         },
         "Cationic": {
-          "positives": 2599,
-          "rate": 0.00642
+          "positives": 2869,
+          "rate": 0.00636
         },
         "Anionic": {
-          "positives": 7796,
-          "rate": 0.01926
+          "positives": 8569,
+          "rate": 0.01899
         },
         "PiStacking": {
-          "positives": 59634,
-          "rate": 0.14735
+          "positives": 66555,
+          "rate": 0.14749
         },
         "PiCation": {
-          "positives": 2171,
-          "rate": 0.00536
+          "positives": 2408,
+          "rate": 0.00534
         },
         "CationPi": {
           "positives": 0,
           "rate": 0.0
         },
         "XBDonor": {
-          "positives": 1006,
-          "rate": 0.00249
+          "positives": 1130,
+          "rate": 0.0025
         },
         "XBAcceptor": {
           "positives": 0,
           "rate": 0.0
         },
         "MetalDonor": {
-          "positives": 32,
-          "rate": 8e-05
+          "positives": 39,
+          "rate": 9e-05
         },
         "MetalAcceptor": {
           "positives": 0,
@@ -67,213 +67,189 @@
         "history": [
           {
             "epoch": 1,
-            "train_loss": 0.5882,
-            "val_macro_auc": 0.7687,
-            "seconds": 54.6
+            "train_loss": 0.5814,
+            "val_macro_auc": 0.7729,
+            "seconds": 54.1
           },
           {
             "epoch": 2,
-            "train_loss": 0.5315,
-            "val_macro_auc": 0.7729,
-            "seconds": 37.5
+            "train_loss": 0.531,
+            "val_macro_auc": 0.7819,
+            "seconds": 40.2
           },
           {
             "epoch": 3,
-            "train_loss": 0.52,
-            "val_macro_auc": 0.7793,
-            "seconds": 35.5
+            "train_loss": 0.5193,
+            "val_macro_auc": 0.7825,
+            "seconds": 42.5
           },
           {
             "epoch": 4,
-            "train_loss": 0.5132,
-            "val_macro_auc": 0.7807,
-            "seconds": 36.3
+            "train_loss": 0.5116,
+            "val_macro_auc": 0.7857,
+            "seconds": 42.8
           },
           {
             "epoch": 5,
-            "train_loss": 0.5079,
-            "val_macro_auc": 0.784,
-            "seconds": 38.7
+            "train_loss": 0.5063,
+            "val_macro_auc": 0.7866,
+            "seconds": 39.6
           },
           {
             "epoch": 6,
-            "train_loss": 0.5035,
-            "val_macro_auc": 0.7827,
-            "seconds": 37.6
+            "train_loss": 0.5022,
+            "val_macro_auc": 0.7871,
+            "seconds": 37.1
           },
           {
             "epoch": 7,
-            "train_loss": 0.4994,
-            "val_macro_auc": 0.7854,
-            "seconds": 35.5
+            "train_loss": 0.4974,
+            "val_macro_auc": 0.7875,
+            "seconds": 38.7
           },
           {
             "epoch": 8,
-            "train_loss": 0.4945,
-            "val_macro_auc": 0.7849,
-            "seconds": 33.7
+            "train_loss": 0.4932,
+            "val_macro_auc": 0.7888,
+            "seconds": 39.7
           },
           {
             "epoch": 9,
-            "train_loss": 0.4918,
-            "val_macro_auc": 0.784,
-            "seconds": 33.8
+            "train_loss": 0.4894,
+            "val_macro_auc": 0.7898,
+            "seconds": 39.8
           },
           {
             "epoch": 10,
-            "train_loss": 0.4875,
-            "val_macro_auc": 0.7854,
-            "seconds": 35.1
+            "train_loss": 0.4851,
+            "val_macro_auc": 0.7896,
+            "seconds": 38.4
           },
           {
             "epoch": 11,
-            "train_loss": 0.4836,
-            "val_macro_auc": 0.7862,
-            "seconds": 36.1
+            "train_loss": 0.4809,
+            "val_macro_auc": 0.7886,
+            "seconds": 40.3
           },
           {
             "epoch": 12,
-            "train_loss": 0.4796,
-            "val_macro_auc": 0.7871,
-            "seconds": 30.9
+            "train_loss": 0.4773,
+            "val_macro_auc": 0.7904,
+            "seconds": 40.4
           },
           {
             "epoch": 13,
-            "train_loss": 0.4759,
-            "val_macro_auc": 0.7868,
-            "seconds": 33.7
+            "train_loss": 0.4739,
+            "val_macro_auc": 0.7872,
+            "seconds": 38.3
           },
           {
             "epoch": 14,
-            "train_loss": 0.4723,
-            "val_macro_auc": 0.7867,
-            "seconds": 35.5
+            "train_loss": 0.4697,
+            "val_macro_auc": 0.7886,
+            "seconds": 39.3
           },
           {
             "epoch": 15,
-            "train_loss": 0.4689,
-            "val_macro_auc": 0.7855,
-            "seconds": 34.7
+            "train_loss": 0.4663,
+            "val_macro_auc": 0.7867,
+            "seconds": 41.0
           },
           {
             "epoch": 16,
-            "train_loss": 0.4657,
-            "val_macro_auc": 0.7883,
-            "seconds": 34.7
+            "train_loss": 0.4623,
+            "val_macro_auc": 0.7877,
+            "seconds": 39.8
           },
           {
             "epoch": 17,
-            "train_loss": 0.4614,
-            "val_macro_auc": 0.7847,
-            "seconds": 34.3
-          },
-          {
-            "epoch": 18,
-            "train_loss": 0.4581,
-            "val_macro_auc": 0.786,
-            "seconds": 35.2
-          },
-          {
-            "epoch": 19,
-            "train_loss": 0.4541,
-            "val_macro_auc": 0.7844,
-            "seconds": 33.0
-          },
-          {
-            "epoch": 20,
-            "train_loss": 0.4503,
-            "val_macro_auc": 0.7843,
-            "seconds": 33.0
-          },
-          {
-            "epoch": 21,
-            "train_loss": 0.4467,
-            "val_macro_auc": 0.7827,
-            "seconds": 37.5
+            "train_loss": 0.4577,
+            "val_macro_auc": 0.7861,
+            "seconds": 39.0
           }
         ],
-        "best_epoch": 16,
-        "best_val_macro_auc": 0.7883,
+        "best_epoch": 12,
+        "best_val_macro_auc": 0.7904,
         "parameters": 1826508
       },
       "test": {
-        "atoms": 62611,
+        "atoms": 70476,
         "types_present": 9,
         "types_in_macro": 8,
         "min_support_for_macro": 50,
         "types_below_support": {
-          "MetalDonor": 1
+          "MetalDonor": 3
         },
         "per_type": {
           "Hydrophobic": {
-            "support": 5339,
-            "base_rate": 0.08527,
-            "auc": 0.6257,
-            "average_precision": 0.1271,
-            "precision": 0.1048,
-            "recall": 0.7942,
-            "f1": 0.1851,
-            "predicted_positive": 40467
+            "support": 5911,
+            "base_rate": 0.08387,
+            "auc": 0.6316,
+            "average_precision": 0.1263,
+            "precision": 0.1022,
+            "recall": 0.8246,
+            "f1": 0.1819,
+            "predicted_positive": 47676
           },
           "HBDonor": {
-            "support": 1801,
-            "base_rate": 0.02876,
-            "auc": 0.6932,
-            "average_precision": 0.0533,
-            "precision": 0.0514,
-            "recall": 0.5725,
-            "f1": 0.0943,
-            "predicted_positive": 20073
+            "support": 2000,
+            "base_rate": 0.02838,
+            "auc": 0.691,
+            "average_precision": 0.0556,
+            "precision": 0.0442,
+            "recall": 0.729,
+            "f1": 0.0834,
+            "predicted_positive": 32962
           },
           "HBAcceptor": {
-            "support": 2612,
-            "base_rate": 0.04172,
-            "auc": 0.6355,
-            "average_precision": 0.0727,
-            "precision": 0.0843,
-            "recall": 0.245,
-            "f1": 0.1254,
-            "predicted_positive": 7593
+            "support": 2834,
+            "base_rate": 0.04021,
+            "auc": 0.6412,
+            "average_precision": 0.0711,
+            "precision": 0.0841,
+            "recall": 0.2484,
+            "f1": 0.1256,
+            "predicted_positive": 8374
           },
           "Cationic": {
-            "support": 412,
-            "base_rate": 0.00658,
-            "auc": 0.8735,
-            "average_precision": 0.0325,
-            "precision": 0.0281,
-            "recall": 0.6141,
-            "f1": 0.0537,
-            "predicted_positive": 9009
+            "support": 481,
+            "base_rate": 0.00683,
+            "auc": 0.8792,
+            "average_precision": 0.0419,
+            "precision": 0.0298,
+            "recall": 0.6112,
+            "f1": 0.0569,
+            "predicted_positive": 9859
           },
           "Anionic": {
-            "support": 320,
-            "base_rate": 0.00511,
-            "auc": 0.9109,
-            "average_precision": 0.0492,
-            "precision": 0.0321,
-            "recall": 0.6625,
-            "f1": 0.0613,
-            "predicted_positive": 6595
+            "support": 359,
+            "base_rate": 0.00509,
+            "auc": 0.9122,
+            "average_precision": 0.0402,
+            "precision": 0.0344,
+            "recall": 0.5655,
+            "f1": 0.0648,
+            "predicted_positive": 5908
           },
           "PiStacking": {
-            "support": 10607,
-            "base_rate": 0.16941,
-            "auc": 0.7367,
-            "average_precision": 0.3511,
-            "precision": 0.2506,
-            "recall": 0.8311,
-            "f1": 0.3851,
-            "predicted_positive": 35177
+            "support": 11949,
+            "base_rate": 0.16955,
+            "auc": 0.7324,
+            "average_precision": 0.3504,
+            "precision": 0.2656,
+            "recall": 0.7535,
+            "f1": 0.3927,
+            "predicted_positive": 33900
           },
           "PiCation": {
-            "support": 278,
-            "base_rate": 0.00444,
-            "auc": 0.8917,
-            "average_precision": 0.0299,
-            "precision": 0.0285,
-            "recall": 0.4496,
-            "f1": 0.0536,
-            "predicted_positive": 4386
+            "support": 298,
+            "base_rate": 0.00423,
+            "auc": 0.9077,
+            "average_precision": 0.0324,
+            "precision": 0.0321,
+            "recall": 0.5537,
+            "f1": 0.0607,
+            "predicted_positive": 5143
           },
           "CationPi": {
             "support": 0,
@@ -286,14 +262,14 @@
             "predicted_positive": 0
           },
           "XBDonor": {
-            "support": 172,
+            "support": 194,
             "base_rate": 0.00275,
-            "auc": 0.9368,
-            "average_precision": 0.0277,
-            "precision": 0.0243,
-            "recall": 0.4128,
+            "auc": 0.9269,
+            "average_precision": 0.0243,
+            "precision": 0.0253,
+            "recall": 0.2577,
             "f1": 0.046,
-            "predicted_positive": 2918
+            "predicted_positive": 1980
           },
           "XBAcceptor": {
             "support": 0,
@@ -306,14 +282,14 @@
             "predicted_positive": 0
           },
           "MetalDonor": {
-            "support": 1,
-            "base_rate": 2e-05,
-            "auc": 1.0,
-            "average_precision": 1.0,
-            "precision": 0.04,
-            "recall": 1.0,
-            "f1": 0.0769,
-            "predicted_positive": 25
+            "support": 3,
+            "base_rate": 4e-05,
+            "auc": 0.9998,
+            "average_precision": 0.3984,
+            "precision": 0.0667,
+            "recall": 0.3333,
+            "f1": 0.1111,
+            "predicted_positive": 15
           },
           "MetalAcceptor": {
             "support": 0,
@@ -326,96 +302,96 @@
             "predicted_positive": 0
           }
         },
-        "macro_auc": 0.788,
-        "macro_average_precision": 0.0929,
-        "macro_f1": 0.1256,
-        "macro_auc_all_types": 0.8116,
+        "macro_auc": 0.7903,
+        "macro_average_precision": 0.0928,
+        "macro_f1": 0.1265,
+        "macro_auc_all_types": 0.8136,
         "any_interaction": {
-          "base_rate": 0.3005,
-          "auc": 0.6087,
-          "average_precision": 0.3987
+          "base_rate": 0.2981,
+          "auc": 0.6027,
+          "average_precision": 0.3875
         }
       }
     },
     "shuffled_pocket": {
       "test": {
-        "atoms": 62611,
+        "atoms": 70476,
         "types_present": 9,
         "types_in_macro": 8,
         "min_support_for_macro": 50,
         "types_below_support": {
-          "MetalDonor": 1
+          "MetalDonor": 3
         },
         "per_type": {
           "Hydrophobic": {
-            "support": 5339,
-            "base_rate": 0.08527,
-            "auc": 0.6133,
-            "average_precision": 0.1211,
-            "precision": 0.1027,
-            "recall": 0.7987,
-            "f1": 0.1821,
-            "predicted_positive": 41504
+            "support": 5911,
+            "base_rate": 0.08387,
+            "auc": 0.6145,
+            "average_precision": 0.1184,
+            "precision": 0.0996,
+            "recall": 0.8193,
+            "f1": 0.1776,
+            "predicted_positive": 48630
           },
           "HBDonor": {
-            "support": 1801,
-            "base_rate": 0.02876,
-            "auc": 0.6713,
-            "average_precision": 0.05,
-            "precision": 0.0503,
-            "recall": 0.4836,
-            "f1": 0.0911,
-            "predicted_positive": 17313
+            "support": 2000,
+            "base_rate": 0.02838,
+            "auc": 0.6793,
+            "average_precision": 0.0517,
+            "precision": 0.0446,
+            "recall": 0.6805,
+            "f1": 0.0837,
+            "predicted_positive": 30513
           },
           "HBAcceptor": {
-            "support": 2612,
-            "base_rate": 0.04172,
-            "auc": 0.6164,
-            "average_precision": 0.0686,
-            "precision": 0.0831,
-            "recall": 0.2175,
-            "f1": 0.1203,
-            "predicted_positive": 6832
+            "support": 2834,
+            "base_rate": 0.04021,
+            "auc": 0.6278,
+            "average_precision": 0.0659,
+            "precision": 0.0808,
+            "recall": 0.2265,
+            "f1": 0.1191,
+            "predicted_positive": 7943
           },
           "Cationic": {
-            "support": 412,
-            "base_rate": 0.00658,
-            "auc": 0.8315,
-            "average_precision": 0.0257,
-            "precision": 0.0236,
-            "recall": 0.4102,
-            "f1": 0.0445,
-            "predicted_positive": 7175
+            "support": 481,
+            "base_rate": 0.00683,
+            "auc": 0.8431,
+            "average_precision": 0.0321,
+            "precision": 0.0265,
+            "recall": 0.4407,
+            "f1": 0.05,
+            "predicted_positive": 8000
           },
           "Anionic": {
-            "support": 320,
-            "base_rate": 0.00511,
-            "auc": 0.892,
-            "average_precision": 0.0423,
-            "precision": 0.0283,
-            "recall": 0.4969,
-            "f1": 0.0535,
-            "predicted_positive": 5628
+            "support": 359,
+            "base_rate": 0.00509,
+            "auc": 0.9009,
+            "average_precision": 0.0329,
+            "precision": 0.0349,
+            "recall": 0.4485,
+            "f1": 0.0647,
+            "predicted_positive": 4618
           },
           "PiStacking": {
-            "support": 10607,
-            "base_rate": 0.16941,
-            "auc": 0.6051,
-            "average_precision": 0.2347,
-            "precision": 0.2006,
-            "recall": 0.6937,
-            "f1": 0.3112,
-            "predicted_positive": 36681
+            "support": 11949,
+            "base_rate": 0.16955,
+            "auc": 0.5947,
+            "average_precision": 0.2313,
+            "precision": 0.2081,
+            "recall": 0.624,
+            "f1": 0.3121,
+            "predicted_positive": 35827
           },
           "PiCation": {
-            "support": 278,
-            "base_rate": 0.00444,
-            "auc": 0.8507,
-            "average_precision": 0.0193,
-            "precision": 0.0198,
-            "recall": 0.2842,
-            "f1": 0.0369,
-            "predicted_positive": 3999
+            "support": 298,
+            "base_rate": 0.00423,
+            "auc": 0.8618,
+            "average_precision": 0.0235,
+            "precision": 0.0247,
+            "recall": 0.4329,
+            "f1": 0.0468,
+            "predicted_positive": 5218
           },
           "CationPi": {
             "support": 0,
@@ -428,14 +404,14 @@
             "predicted_positive": 0
           },
           "XBDonor": {
-            "support": 172,
+            "support": 194,
             "base_rate": 0.00275,
-            "auc": 0.9237,
-            "average_precision": 0.0234,
-            "precision": 0.0205,
-            "recall": 0.3256,
-            "f1": 0.0385,
-            "predicted_positive": 2738
+            "auc": 0.9235,
+            "average_precision": 0.0235,
+            "precision": 0.0244,
+            "recall": 0.2268,
+            "f1": 0.044,
+            "predicted_positive": 1804
           },
           "XBAcceptor": {
             "support": 0,
@@ -448,14 +424,14 @@
             "predicted_positive": 0
           },
           "MetalDonor": {
-            "support": 1,
-            "base_rate": 2e-05,
-            "auc": 1.0,
-            "average_precision": 1.0,
-            "precision": 0.1667,
-            "recall": 1.0,
-            "f1": 0.2857,
-            "predicted_positive": 6
+            "support": 3,
+            "base_rate": 4e-05,
+            "auc": 0.9998,
+            "average_precision": 0.415,
+            "precision": 0.0952,
+            "recall": 0.6667,
+            "f1": 0.1667,
+            "predicted_positive": 21
           },
           "MetalAcceptor": {
             "support": 0,
@@ -468,14 +444,14 @@
             "predicted_positive": 0
           }
         },
-        "macro_auc": 0.7505,
-        "macro_average_precision": 0.0731,
-        "macro_f1": 0.1098,
-        "macro_auc_all_types": 0.7782,
+        "macro_auc": 0.7557,
+        "macro_average_precision": 0.0724,
+        "macro_f1": 0.1122,
+        "macro_auc_all_types": 0.7828,
         "any_interaction": {
-          "base_rate": 0.3005,
-          "auc": 0.5676,
-          "average_precision": 0.3535
+          "base_rate": 0.2981,
+          "auc": 0.5695,
+          "average_precision": 0.35
         }
       }
     },
@@ -484,177 +460,201 @@
         "history": [
           {
             "epoch": 1,
-            "train_loss": 0.5902,
-            "val_macro_auc": 0.7546,
-            "seconds": 33.8
+            "train_loss": 0.5837,
+            "val_macro_auc": 0.7622,
+            "seconds": 38.6
           },
           {
             "epoch": 2,
-            "train_loss": 0.5385,
-            "val_macro_auc": 0.762,
-            "seconds": 32.5
+            "train_loss": 0.5374,
+            "val_macro_auc": 0.7671,
+            "seconds": 38.2
           },
           {
             "epoch": 3,
-            "train_loss": 0.528,
-            "val_macro_auc": 0.7678,
-            "seconds": 36.0
+            "train_loss": 0.5264,
+            "val_macro_auc": 0.7676,
+            "seconds": 38.8
           },
           {
             "epoch": 4,
-            "train_loss": 0.5223,
-            "val_macro_auc": 0.768,
-            "seconds": 37.3
+            "train_loss": 0.5194,
+            "val_macro_auc": 0.7714,
+            "seconds": 38.1
           },
           {
             "epoch": 5,
-            "train_loss": 0.5167,
-            "val_macro_auc": 0.7672,
-            "seconds": 35.5
+            "train_loss": 0.5144,
+            "val_macro_auc": 0.7723,
+            "seconds": 36.5
           },
           {
             "epoch": 6,
-            "train_loss": 0.513,
-            "val_macro_auc": 0.7681,
-            "seconds": 33.4
+            "train_loss": 0.5095,
+            "val_macro_auc": 0.7734,
+            "seconds": 34.6
           },
           {
             "epoch": 7,
-            "train_loss": 0.508,
-            "val_macro_auc": 0.7697,
-            "seconds": 34.7
+            "train_loss": 0.5058,
+            "val_macro_auc": 0.7754,
+            "seconds": 37.2
           },
           {
             "epoch": 8,
-            "train_loss": 0.5039,
-            "val_macro_auc": 0.7712,
-            "seconds": 32.6
+            "train_loss": 0.5017,
+            "val_macro_auc": 0.7758,
+            "seconds": 37.7
           },
           {
             "epoch": 9,
-            "train_loss": 0.5012,
-            "val_macro_auc": 0.767,
-            "seconds": 33.3
+            "train_loss": 0.4976,
+            "val_macro_auc": 0.7746,
+            "seconds": 35.0
           },
           {
             "epoch": 10,
-            "train_loss": 0.4981,
-            "val_macro_auc": 0.7731,
-            "seconds": 33.2
+            "train_loss": 0.4937,
+            "val_macro_auc": 0.7742,
+            "seconds": 37.8
           },
           {
             "epoch": 11,
-            "train_loss": 0.4942,
-            "val_macro_auc": 0.7703,
-            "seconds": 32.6
+            "train_loss": 0.4902,
+            "val_macro_auc": 0.7727,
+            "seconds": 40.9
           },
           {
             "epoch": 12,
-            "train_loss": 0.4907,
-            "val_macro_auc": 0.7716,
-            "seconds": 34.5
+            "train_loss": 0.4872,
+            "val_macro_auc": 0.7761,
+            "seconds": 40.4
           },
           {
             "epoch": 13,
-            "train_loss": 0.4873,
-            "val_macro_auc": 0.7728,
-            "seconds": 32.8
+            "train_loss": 0.484,
+            "val_macro_auc": 0.7737,
+            "seconds": 37.9
           },
           {
             "epoch": 14,
-            "train_loss": 0.4838,
-            "val_macro_auc": 0.7719,
-            "seconds": 34.1
+            "train_loss": 0.4813,
+            "val_macro_auc": 0.7772,
+            "seconds": 40.6
           },
           {
             "epoch": 15,
-            "train_loss": 0.4809,
-            "val_macro_auc": 0.7721,
-            "seconds": 33.5
+            "train_loss": 0.4769,
+            "val_macro_auc": 0.7751,
+            "seconds": 37.9
+          },
+          {
+            "epoch": 16,
+            "train_loss": 0.4745,
+            "val_macro_auc": 0.7741,
+            "seconds": 39.5
+          },
+          {
+            "epoch": 17,
+            "train_loss": 0.4705,
+            "val_macro_auc": 0.7744,
+            "seconds": 37.1
+          },
+          {
+            "epoch": 18,
+            "train_loss": 0.468,
+            "val_macro_auc": 0.7719,
+            "seconds": 37.5
+          },
+          {
+            "epoch": 19,
+            "train_loss": 0.4655,
+            "val_macro_auc": 0.7734,
+            "seconds": 34.7
           }
         ],
-        "best_epoch": 10,
-        "best_val_macro_auc": 0.7731,
+        "best_epoch": 14,
+        "best_val_macro_auc": 0.7772,
         "parameters": 1826508
       },
       "test": {
-        "atoms": 62611,
+        "atoms": 70476,
         "types_present": 9,
         "types_in_macro": 8,
         "min_support_for_macro": 50,
         "types_below_support": {
-          "MetalDonor": 1
+          "MetalDonor": 3
         },
         "per_type": {
           "Hydrophobic": {
-            "support": 5339,
-            "base_rate": 0.08527,
-            "auc": 0.6201,
-            "average_precision": 0.1225,
-            "precision": 0.1052,
-            "recall": 0.776,
-            "f1": 0.1854,
-            "predicted_positive": 39364
+            "support": 5911,
+            "base_rate": 0.08387,
+            "auc": 0.6262,
+            "average_precision": 0.1241,
+            "precision": 0.1,
+            "recall": 0.8532,
+            "f1": 0.1789,
+            "predicted_positive": 50454
           },
           "HBDonor": {
-            "support": 1801,
-            "base_rate": 0.02876,
-            "auc": 0.6894,
-            "average_precision": 0.0525,
-            "precision": 0.0525,
-            "recall": 0.5375,
-            "f1": 0.0957,
-            "predicted_positive": 18437
+            "support": 2000,
+            "base_rate": 0.02838,
+            "auc": 0.6895,
+            "average_precision": 0.0545,
+            "precision": 0.0507,
+            "recall": 0.556,
+            "f1": 0.093,
+            "predicted_positive": 21912
           },
           "HBAcceptor": {
-            "support": 2612,
-            "base_rate": 0.04172,
-            "auc": 0.6291,
-            "average_precision": 0.0716,
-            "precision": 0.0807,
-            "recall": 0.2956,
-            "f1": 0.1268,
-            "predicted_positive": 9569
+            "support": 2834,
+            "base_rate": 0.04021,
+            "auc": 0.6316,
+            "average_precision": 0.0684,
+            "precision": 0.0897,
+            "recall": 0.1743,
+            "f1": 0.1185,
+            "predicted_positive": 5505
           },
           "Cationic": {
-            "support": 412,
-            "base_rate": 0.00658,
-            "auc": 0.8695,
-            "average_precision": 0.0321,
-            "precision": 0.0326,
-            "recall": 0.2597,
-            "f1": 0.0579,
-            "predicted_positive": 3282
+            "support": 481,
+            "base_rate": 0.00683,
+            "auc": 0.8727,
+            "average_precision": 0.041,
+            "precision": 0.0295,
+            "recall": 0.6528,
+            "f1": 0.0565,
+            "predicted_positive": 10641
           },
           "Anionic": {
-            "support": 320,
-            "base_rate": 0.00511,
-            "auc": 0.9075,
-            "average_precision": 0.043,
-            "precision": 0.0286,
-            "recall": 0.6813,
-            "f1": 0.0548,
-            "predicted_positive": 7633
+            "support": 359,
+            "base_rate": 0.00509,
+            "auc": 0.9104,
+            "average_precision": 0.0425,
+            "precision": 0.0337,
+            "recall": 0.6574,
+            "f1": 0.0641,
+            "predicted_positive": 7002
           },
           "PiStacking": {
-            "support": 10607,
-            "base_rate": 0.16941,
-            "auc": 0.657,
-            "average_precision": 0.2666,
-            "precision": 0.2272,
-            "recall": 0.7238,
-            "f1": 0.3458,
-            "predicted_positive": 33797
+            "support": 11949,
+            "base_rate": 0.16955,
+            "auc": 0.6556,
+            "average_precision": 0.271,
+            "precision": 0.2221,
+            "recall": 0.7292,
+            "f1": 0.3405,
+            "predicted_positive": 39233
           },
           "PiCation": {
-            "support": 278,
-            "base_rate": 0.00444,
-            "auc": 0.881,
-            "average_precision": 0.0254,
-            "precision": 0.03,
-            "recall": 0.3165,
-            "f1": 0.0547,
-            "predicted_positive": 2938
+            "support": 298,
+            "base_rate": 0.00423,
+            "auc": 0.8938,
+            "average_precision": 0.0351,
+            "precision": 0.0274,
+            "recall": 0.5067,
+            "f1": 0.0521,
+            "predicted_positive": 5503
           },
           "CationPi": {
             "support": 0,
@@ -667,14 +667,14 @@
             "predicted_positive": 0
           },
           "XBDonor": {
-            "support": 172,
+            "support": 194,
             "base_rate": 0.00275,
-            "auc": 0.9347,
-            "average_precision": 0.0263,
-            "precision": 0.0283,
-            "recall": 0.1802,
-            "f1": 0.0489,
-            "predicted_positive": 1095
+            "auc": 0.9275,
+            "average_precision": 0.0254,
+            "precision": 0.0241,
+            "recall": 0.3351,
+            "f1": 0.0449,
+            "predicted_positive": 2702
           },
           "XBAcceptor": {
             "support": 0,
@@ -687,14 +687,14 @@
             "predicted_positive": 0
           },
           "MetalDonor": {
-            "support": 1,
-            "base_rate": 2e-05,
-            "auc": 1.0,
-            "average_precision": 1.0,
-            "precision": 1.0,
-            "recall": 1.0,
-            "f1": 1.0,
-            "predicted_positive": 1
+            "support": 3,
+            "base_rate": 4e-05,
+            "auc": 0.9999,
+            "average_precision": 0.55,
+            "precision": 0.2857,
+            "recall": 0.6667,
+            "f1": 0.4,
+            "predicted_positive": 7
           },
           "MetalAcceptor": {
             "support": 0,
@@ -707,89 +707,89 @@
             "predicted_positive": 0
           }
         },
-        "macro_auc": 0.7735,
-        "macro_average_precision": 0.08,
-        "macro_f1": 0.1212,
-        "macro_auc_all_types": 0.7987,
+        "macro_auc": 0.7759,
+        "macro_average_precision": 0.0828,
+        "macro_f1": 0.1186,
+        "macro_auc_all_types": 0.8008,
         "any_interaction": {
-          "base_rate": 0.3005,
-          "auc": 0.5785,
-          "average_precision": 0.3555
+          "base_rate": 0.2981,
+          "auc": 0.5808,
+          "average_precision": 0.353
         }
       }
     },
     "_ablation": {
       "metric": "macro_auc",
-      "with_pocket": 0.788,
-      "without_pocket": 0.7735,
-      "delta": 0.0145,
+      "with_pocket": 0.7903,
+      "without_pocket": 0.7759,
+      "delta": 0.0144,
       "verdict": "ignores_the_pocket",
-      "reason": "removing the pocket costs only 0.0145, below the 0.02 margin: the model is predicting from the ligand alone"
+      "reason": "removing the pocket costs only 0.0144, below the 0.02 margin: the model is predicting from the ligand alone"
     },
     "_shuffle_check": {
       "metric": "macro_auc",
-      "with_pocket": 0.788,
-      "without_pocket": 0.7505,
-      "delta": 0.0375,
+      "with_pocket": 0.7903,
+      "without_pocket": 0.7557,
+      "delta": 0.0346,
       "verdict": "uses_the_pocket",
-      "reason": "removing the pocket costs 0.0375, at or above the 0.02 margin"
+      "reason": "removing the pocket costs 0.0346, at or above the 0.02 margin"
     }
   },
   "unseen_protein": {
     "regime": "unseen_protein",
     "device": "mps",
     "counts": {
-      "train": 16883,
-      "validation": 2110,
-      "test": 2110
+      "train": 18843,
+      "validation": 2356,
+      "test": 2355
     },
     "label_statistics": {
-      "atoms": 425934,
-      "complexes": 16883,
+      "atoms": 476155,
+      "complexes": 18843,
       "any_interaction_rate": 0.3073,
       "per_type": {
         "Hydrophobic": {
-          "positives": 33958,
-          "rate": 0.07973
+          "positives": 38046,
+          "rate": 0.0799
         },
         "HBDonor": {
-          "positives": 14550,
-          "rate": 0.03416
+          "positives": 16128,
+          "rate": 0.03387
         },
         "HBAcceptor": {
-          "positives": 23018,
-          "rate": 0.05404
+          "positives": 25577,
+          "rate": 0.05372
         },
         "Cationic": {
-          "positives": 2789,
-          "rate": 0.00655
+          "positives": 3097,
+          "rate": 0.0065
         },
         "Anionic": {
-          "positives": 5324,
-          "rate": 0.0125
+          "positives": 5870,
+          "rate": 0.01233
         },
         "PiStacking": {
-          "positives": 67866,
-          "rate": 0.15933
+          "positives": 76047,
+          "rate": 0.15971
         },
         "PiCation": {
-          "positives": 2155,
-          "rate": 0.00506
+          "positives": 2395,
+          "rate": 0.00503
         },
         "CationPi": {
           "positives": 0,
           "rate": 0.0
         },
         "XBDonor": {
-          "positives": 1242,
-          "rate": 0.00292
+          "positives": 1374,
+          "rate": 0.00289
         },
         "XBAcceptor": {
           "positives": 0,
           "rate": 0.0
         },
         "MetalDonor": {
-          "positives": 12,
+          "positives": 14,
           "rate": 3e-05
         },
         "MetalAcceptor": {
@@ -803,250 +803,243 @@
         "history": [
           {
             "epoch": 1,
-            "train_loss": 0.5807,
-            "val_macro_auc": 0.8115,
-            "seconds": 37.3
+            "train_loss": 0.5792,
+            "val_macro_auc": 0.8159,
+            "seconds": 43.3
           },
           {
             "epoch": 2,
-            "train_loss": 0.5298,
-            "val_macro_auc": 0.8195,
-            "seconds": 36.3
+            "train_loss": 0.5277,
+            "val_macro_auc": 0.8235,
+            "seconds": 40.5
           },
           {
             "epoch": 3,
-            "train_loss": 0.5196,
-            "val_macro_auc": 0.8247,
-            "seconds": 34.0
+            "train_loss": 0.5169,
+            "val_macro_auc": 0.8265,
+            "seconds": 41.4
           },
           {
             "epoch": 4,
-            "train_loss": 0.5117,
-            "val_macro_auc": 0.8267,
-            "seconds": 37.1
+            "train_loss": 0.5112,
+            "val_macro_auc": 0.8319,
+            "seconds": 40.6
           },
           {
             "epoch": 5,
-            "train_loss": 0.5086,
-            "val_macro_auc": 0.8279,
-            "seconds": 34.7
+            "train_loss": 0.507,
+            "val_macro_auc": 0.8316,
+            "seconds": 40.6
           },
           {
             "epoch": 6,
-            "train_loss": 0.5043,
-            "val_macro_auc": 0.8309,
-            "seconds": 35.9
+            "train_loss": 0.5028,
+            "val_macro_auc": 0.8328,
+            "seconds": 39.2
           },
           {
             "epoch": 7,
-            "train_loss": 0.5013,
-            "val_macro_auc": 0.8312,
-            "seconds": 36.8
+            "train_loss": 0.5003,
+            "val_macro_auc": 0.8346,
+            "seconds": 39.8
           },
           {
             "epoch": 8,
-            "train_loss": 0.4981,
-            "val_macro_auc": 0.8345,
-            "seconds": 34.0
+            "train_loss": 0.4969,
+            "val_macro_auc": 0.837,
+            "seconds": 37.6
           },
           {
             "epoch": 9,
-            "train_loss": 0.4954,
-            "val_macro_auc": 0.8348,
-            "seconds": 34.1
+            "train_loss": 0.4942,
+            "val_macro_auc": 0.8368,
+            "seconds": 38.7
           },
           {
             "epoch": 10,
-            "train_loss": 0.4938,
-            "val_macro_auc": 0.837,
-            "seconds": 36.9
+            "train_loss": 0.4908,
+            "val_macro_auc": 0.8395,
+            "seconds": 40.7
           },
           {
             "epoch": 11,
-            "train_loss": 0.4895,
-            "val_macro_auc": 0.8385,
-            "seconds": 34.1
+            "train_loss": 0.4884,
+            "val_macro_auc": 0.8391,
+            "seconds": 39.8
           },
           {
             "epoch": 12,
-            "train_loss": 0.4869,
-            "val_macro_auc": 0.8374,
-            "seconds": 36.0
+            "train_loss": 0.4857,
+            "val_macro_auc": 0.8405,
+            "seconds": 40.3
           },
           {
             "epoch": 13,
-            "train_loss": 0.484,
-            "val_macro_auc": 0.8399,
-            "seconds": 36.0
+            "train_loss": 0.4823,
+            "val_macro_auc": 0.8422,
+            "seconds": 37.9
           },
           {
             "epoch": 14,
-            "train_loss": 0.4813,
-            "val_macro_auc": 0.8416,
-            "seconds": 37.8
+            "train_loss": 0.4798,
+            "val_macro_auc": 0.8437,
+            "seconds": 39.9
           },
           {
             "epoch": 15,
-            "train_loss": 0.4779,
-            "val_macro_auc": 0.84,
-            "seconds": 35.9
+            "train_loss": 0.4764,
+            "val_macro_auc": 0.8417,
+            "seconds": 42.8
           },
           {
             "epoch": 16,
-            "train_loss": 0.4747,
-            "val_macro_auc": 0.8423,
-            "seconds": 36.8
+            "train_loss": 0.4736,
+            "val_macro_auc": 0.8447,
+            "seconds": 37.9
           },
           {
             "epoch": 17,
-            "train_loss": 0.4715,
-            "val_macro_auc": 0.8429,
-            "seconds": 32.8
+            "train_loss": 0.4701,
+            "val_macro_auc": 0.8433,
+            "seconds": 39.0
           },
           {
             "epoch": 18,
-            "train_loss": 0.4683,
-            "val_macro_auc": 0.8444,
-            "seconds": 33.5
+            "train_loss": 0.4673,
+            "val_macro_auc": 0.8452,
+            "seconds": 39.5
           },
           {
             "epoch": 19,
-            "train_loss": 0.4647,
-            "val_macro_auc": 0.8435,
-            "seconds": 34.7
+            "train_loss": 0.464,
+            "val_macro_auc": 0.8453,
+            "seconds": 40.2
           },
           {
             "epoch": 20,
-            "train_loss": 0.4615,
-            "val_macro_auc": 0.8438,
-            "seconds": 32.1
+            "train_loss": 0.4602,
+            "val_macro_auc": 0.8473,
+            "seconds": 40.6
           },
           {
             "epoch": 21,
-            "train_loss": 0.458,
-            "val_macro_auc": 0.8444,
-            "seconds": 33.5
+            "train_loss": 0.4567,
+            "val_macro_auc": 0.8498,
+            "seconds": 39.1
           },
           {
             "epoch": 22,
-            "train_loss": 0.4555,
-            "val_macro_auc": 0.8458,
-            "seconds": 35.2
+            "train_loss": 0.4537,
+            "val_macro_auc": 0.8489,
+            "seconds": 40.1
           },
           {
             "epoch": 23,
-            "train_loss": 0.4526,
-            "val_macro_auc": 0.8454,
-            "seconds": 34.1
+            "train_loss": 0.4501,
+            "val_macro_auc": 0.8479,
+            "seconds": 38.9
           },
           {
             "epoch": 24,
-            "train_loss": 0.4484,
-            "val_macro_auc": 0.8439,
-            "seconds": 36.4
+            "train_loss": 0.4469,
+            "val_macro_auc": 0.8498,
+            "seconds": 38.7
           },
           {
             "epoch": 25,
-            "train_loss": 0.4447,
-            "val_macro_auc": 0.8438,
-            "seconds": 34.2
+            "train_loss": 0.4438,
+            "val_macro_auc": 0.8495,
+            "seconds": 38.8
           },
           {
             "epoch": 26,
-            "train_loss": 0.4424,
-            "val_macro_auc": 0.8459,
-            "seconds": 34.5
-          },
-          {
-            "epoch": 27,
-            "train_loss": 0.4391,
-            "val_macro_auc": 0.8457,
-            "seconds": 33.8
+            "train_loss": 0.4417,
+            "val_macro_auc": 0.8498,
+            "seconds": 38.2
           }
         ],
-        "best_epoch": 22,
-        "best_val_macro_auc": 0.8458,
+        "best_epoch": 21,
+        "best_val_macro_auc": 0.8498,
         "parameters": 1826508
       },
       "test": {
-        "atoms": 51828,
+        "atoms": 57386,
         "types_present": 9,
-        "types_in_macro": 7,
+        "types_in_macro": 8,
         "min_support_for_macro": 50,
         "types_below_support": {
-          "XBDonor": 42,
           "MetalDonor": 12
         },
         "per_type": {
           "Hydrophobic": {
-            "support": 2634,
-            "base_rate": 0.05082,
-            "auc": 0.7837,
-            "average_precision": 0.1443,
-            "precision": 0.1161,
-            "recall": 0.6807,
-            "f1": 0.1983,
-            "predicted_positive": 15448
+            "support": 2850,
+            "base_rate": 0.04966,
+            "auc": 0.7781,
+            "average_precision": 0.1388,
+            "precision": 0.1155,
+            "recall": 0.6407,
+            "f1": 0.1957,
+            "predicted_positive": 15807
           },
           "HBDonor": {
-            "support": 2160,
-            "base_rate": 0.04168,
-            "auc": 0.7425,
-            "average_precision": 0.1463,
-            "precision": 0.0688,
-            "recall": 0.8083,
-            "f1": 0.1269,
-            "predicted_positive": 25366
+            "support": 2351,
+            "base_rate": 0.04097,
+            "auc": 0.7489,
+            "average_precision": 0.1457,
+            "precision": 0.0723,
+            "recall": 0.7737,
+            "f1": 0.1323,
+            "predicted_positive": 25153
           },
           "HBAcceptor": {
-            "support": 4605,
-            "base_rate": 0.08885,
-            "auc": 0.7097,
-            "average_precision": 0.1916,
-            "precision": 0.1203,
-            "recall": 0.8725,
-            "f1": 0.2114,
-            "predicted_positive": 33405
+            "support": 4945,
+            "base_rate": 0.08617,
+            "auc": 0.7198,
+            "average_precision": 0.1918,
+            "precision": 0.1261,
+            "recall": 0.8512,
+            "f1": 0.2196,
+            "predicted_positive": 33385
           },
           "Cationic": {
-            "support": 306,
-            "base_rate": 0.0059,
-            "auc": 0.9445,
-            "average_precision": 0.1749,
-            "precision": 0.0598,
-            "recall": 0.6895,
-            "f1": 0.1101,
-            "predicted_positive": 3528
+            "support": 355,
+            "base_rate": 0.00619,
+            "auc": 0.9433,
+            "average_precision": 0.1428,
+            "precision": 0.0561,
+            "recall": 0.7465,
+            "f1": 0.1043,
+            "predicted_positive": 4725
           },
           "Anionic": {
-            "support": 1552,
-            "base_rate": 0.02995,
-            "auc": 0.8501,
-            "average_precision": 0.1618,
-            "precision": 0.066,
-            "recall": 0.9169,
-            "f1": 0.1231,
-            "predicted_positive": 21566
+            "support": 1680,
+            "base_rate": 0.02928,
+            "auc": 0.8651,
+            "average_precision": 0.1722,
+            "precision": 0.0727,
+            "recall": 0.8792,
+            "f1": 0.1343,
+            "predicted_positive": 20315
           },
           "PiStacking": {
-            "support": 6603,
-            "base_rate": 0.1274,
-            "auc": 0.7916,
-            "average_precision": 0.3537,
-            "precision": 0.2612,
-            "recall": 0.7116,
-            "f1": 0.3821,
-            "predicted_positive": 17993
+            "support": 7191,
+            "base_rate": 0.12531,
+            "auc": 0.8084,
+            "average_precision": 0.3652,
+            "precision": 0.2781,
+            "recall": 0.7137,
+            "f1": 0.4003,
+            "predicted_positive": 18452
           },
           "PiCation": {
-            "support": 284,
-            "base_rate": 0.00548,
-            "auc": 0.9432,
-            "average_precision": 0.1347,
-            "precision": 0.055,
-            "recall": 0.6585,
-            "f1": 0.1015,
-            "predicted_positive": 3401
+            "support": 345,
+            "base_rate": 0.00601,
+            "auc": 0.942,
+            "average_precision": 0.1353,
+            "precision": 0.0621,
+            "recall": 0.687,
+            "f1": 0.1139,
+            "predicted_positive": 3817
           },
           "CationPi": {
             "support": 0,
@@ -1059,14 +1052,14 @@
             "predicted_positive": 0
           },
           "XBDonor": {
-            "support": 42,
-            "base_rate": 0.00081,
-            "auc": 0.9767,
-            "average_precision": 0.0539,
-            "precision": 0.0201,
-            "recall": 0.5,
-            "f1": 0.0386,
-            "predicted_positive": 1045
+            "support": 82,
+            "base_rate": 0.00143,
+            "auc": 0.9795,
+            "average_precision": 0.059,
+            "precision": 0.0442,
+            "recall": 0.5488,
+            "f1": 0.0817,
+            "predicted_positive": 1019
           },
           "XBAcceptor": {
             "support": 0,
@@ -1080,13 +1073,13 @@
           },
           "MetalDonor": {
             "support": 12,
-            "base_rate": 0.00023,
-            "auc": 0.9983,
-            "average_precision": 0.2549,
-            "precision": 0.0938,
-            "recall": 0.5,
-            "f1": 0.1579,
-            "predicted_positive": 64
+            "base_rate": 0.00021,
+            "auc": 0.9281,
+            "average_precision": 0.1203,
+            "precision": 0.3333,
+            "recall": 0.25,
+            "f1": 0.2857,
+            "predicted_positive": 9
           },
           "MetalAcceptor": {
             "support": 0,
@@ -1099,97 +1092,96 @@
             "predicted_positive": 0
           }
         },
-        "macro_auc": 0.8236,
-        "macro_average_precision": 0.1868,
-        "macro_f1": 0.1791,
-        "macro_auc_all_types": 0.86,
+        "macro_auc": 0.8481,
+        "macro_average_precision": 0.1689,
+        "macro_f1": 0.1728,
+        "macro_auc_all_types": 0.857,
         "any_interaction": {
-          "base_rate": 0.3017,
-          "auc": 0.61,
-          "average_precision": 0.3894
+          "base_rate": 0.2945,
+          "auc": 0.6118,
+          "average_precision": 0.3779
         }
       }
     },
     "shuffled_pocket": {
       "test": {
-        "atoms": 51828,
+        "atoms": 57386,
         "types_present": 9,
-        "types_in_macro": 7,
+        "types_in_macro": 8,
         "min_support_for_macro": 50,
         "types_below_support": {
-          "XBDonor": 42,
           "MetalDonor": 12
         },
         "per_type": {
           "Hydrophobic": {
-            "support": 2634,
-            "base_rate": 0.05082,
-            "auc": 0.7747,
-            "average_precision": 0.1364,
-            "precision": 0.1164,
-            "recall": 0.6416,
-            "f1": 0.1971,
-            "predicted_positive": 14519
+            "support": 2850,
+            "base_rate": 0.04966,
+            "auc": 0.7669,
+            "average_precision": 0.13,
+            "precision": 0.1146,
+            "recall": 0.5796,
+            "f1": 0.1914,
+            "predicted_positive": 14412
           },
           "HBDonor": {
-            "support": 2160,
-            "base_rate": 0.04168,
-            "auc": 0.7191,
-            "average_precision": 0.1307,
-            "precision": 0.0681,
-            "recall": 0.762,
-            "f1": 0.125,
-            "predicted_positive": 24174
+            "support": 2351,
+            "base_rate": 0.04097,
+            "auc": 0.7201,
+            "average_precision": 0.1305,
+            "precision": 0.0701,
+            "recall": 0.6954,
+            "f1": 0.1273,
+            "predicted_positive": 23340
           },
           "HBAcceptor": {
-            "support": 4605,
-            "base_rate": 0.08885,
-            "auc": 0.6899,
-            "average_precision": 0.1737,
-            "precision": 0.1195,
-            "recall": 0.8512,
-            "f1": 0.2095,
-            "predicted_positive": 32815
+            "support": 4945,
+            "base_rate": 0.08617,
+            "auc": 0.6935,
+            "average_precision": 0.1707,
+            "precision": 0.1249,
+            "recall": 0.8042,
+            "f1": 0.2162,
+            "predicted_positive": 31853
           },
           "Cationic": {
-            "support": 306,
-            "base_rate": 0.0059,
-            "auc": 0.92,
-            "average_precision": 0.114,
-            "precision": 0.0542,
-            "recall": 0.5654,
-            "f1": 0.0989,
-            "predicted_positive": 3194
+            "support": 355,
+            "base_rate": 0.00619,
+            "auc": 0.9186,
+            "average_precision": 0.1152,
+            "precision": 0.0481,
+            "recall": 0.6056,
+            "f1": 0.0891,
+            "predicted_positive": 4471
           },
           "Anionic": {
-            "support": 1552,
-            "base_rate": 0.02995,
-            "auc": 0.8026,
-            "average_precision": 0.1239,
-            "precision": 0.0637,
-            "recall": 0.8093,
-            "f1": 0.1181,
-            "predicted_positive": 19715
+            "support": 1680,
+            "base_rate": 0.02928,
+            "auc": 0.8278,
+            "average_precision": 0.1375,
+            "precision": 0.069,
+            "recall": 0.7911,
+            "f1": 0.127,
+            "predicted_positive": 19257
           },
           "PiStacking": {
-            "support": 6603,
-            "base_rate": 0.1274,
-            "auc": 0.7081,
-            "average_precision": 0.2492,
-            "precision": 0.2077,
-            "recall": 0.6076,
-            "f1": 0.3096,
-            "predicted_positive": 19312
+            "support": 7191,
+            "base_rate": 0.12531,
+            "auc": 0.7031,
+            "average_precision": 0.2563,
+            "precision": 0.2133,
+            "recall": 0.593,
+            "f1": 0.3137,
+            "predicted_positive": 19990
           },
           "PiCation": {
-            "support": 284,
-            "base_rate": 0.00548,
-            "auc": 0.9222,
-            "average_precision": 0.0974,
-            "precision": 0.0475,
-            "recall": 0.5352,
-            "f1": 0.0873,
-            "predicted_positive": 3197
+            "support": 345,
+            "base_rate": 0.00601,
+            "auc": 0.9094,
+            "average_precision": 0.0971,
+            "precision": 0.053,
+            "recall": 0.5333,
+            "f1": 0.0964,
+            "predicted_positive": 3473
           },
           "CationPi": {
             "support": 0,
@@ -1202,14 +1194,14 @@
             "predicted_positive": 0
           },
           "XBDonor": {
-            "support": 42,
-            "base_rate": 0.00081,
-            "auc": 0.9763,
-            "average_precision": 0.0233,
-            "precision": 0.024,
-            "recall": 0.5238,
-            "f1": 0.0459,
-            "predicted_positive": 917
+            "support": 82,
+            "base_rate": 0.00143,
+            "auc": 0.9731,
+            "average_precision": 0.0452,
+            "precision": 0.0399,
+            "recall": 0.4268,
+            "f1": 0.0729,
+            "predicted_positive": 878
           },
           "XBAcceptor": {
             "support": 0,
@@ -1223,13 +1215,13 @@
           },
           "MetalDonor": {
             "support": 12,
-            "base_rate": 0.00023,
-            "auc": 0.9961,
-            "average_precision": 0.0829,
-            "precision": 0.0268,
-            "recall": 0.25,
-            "f1": 0.0484,
-            "predicted_positive": 112
+            "base_rate": 0.00021,
+            "auc": 0.8982,
+            "average_precision": 0.0049,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "predicted_positive": 62
           },
           "MetalAcceptor": {
             "support": 0,
@@ -1242,14 +1234,14 @@
             "predicted_positive": 0
           }
         },
-        "macro_auc": 0.7909,
-        "macro_average_precision": 0.1465,
-        "macro_f1": 0.1636,
-        "macro_auc_all_types": 0.8343,
+        "macro_auc": 0.8141,
+        "macro_average_precision": 0.1353,
+        "macro_f1": 0.1542,
+        "macro_auc_all_types": 0.8234,
         "any_interaction": {
-          "base_rate": 0.3017,
-          "auc": 0.5925,
-          "average_precision": 0.3748
+          "base_rate": 0.2945,
+          "auc": 0.5915,
+          "average_precision": 0.3635
         }
       }
     },
@@ -1258,268 +1250,267 @@
         "history": [
           {
             "epoch": 1,
-            "train_loss": 0.5829,
-            "val_macro_auc": 0.8093,
-            "seconds": 33.2
+            "train_loss": 0.5785,
+            "val_macro_auc": 0.8141,
+            "seconds": 38.9
           },
           {
             "epoch": 2,
-            "train_loss": 0.5367,
-            "val_macro_auc": 0.8152,
-            "seconds": 33.0
+            "train_loss": 0.5347,
+            "val_macro_auc": 0.8179,
+            "seconds": 39.1
           },
           {
             "epoch": 3,
-            "train_loss": 0.5278,
-            "val_macro_auc": 0.8208,
-            "seconds": 33.6
+            "train_loss": 0.5265,
+            "val_macro_auc": 0.8209,
+            "seconds": 38.9
           },
           {
             "epoch": 4,
-            "train_loss": 0.5219,
-            "val_macro_auc": 0.8228,
-            "seconds": 35.3
+            "train_loss": 0.5218,
+            "val_macro_auc": 0.825,
+            "seconds": 36.7
           },
           {
             "epoch": 5,
-            "train_loss": 0.5192,
-            "val_macro_auc": 0.8233,
-            "seconds": 33.9
+            "train_loss": 0.5179,
+            "val_macro_auc": 0.8257,
+            "seconds": 37.7
           },
           {
             "epoch": 6,
-            "train_loss": 0.5156,
-            "val_macro_auc": 0.8236,
-            "seconds": 32.5
+            "train_loss": 0.514,
+            "val_macro_auc": 0.8273,
+            "seconds": 36.5
           },
           {
             "epoch": 7,
-            "train_loss": 0.5124,
-            "val_macro_auc": 0.8243,
-            "seconds": 32.8
+            "train_loss": 0.5121,
+            "val_macro_auc": 0.831,
+            "seconds": 36.5
           },
           {
             "epoch": 8,
-            "train_loss": 0.5107,
-            "val_macro_auc": 0.8315,
-            "seconds": 32.7
+            "train_loss": 0.5091,
+            "val_macro_auc": 0.8325,
+            "seconds": 39.3
           },
           {
             "epoch": 9,
-            "train_loss": 0.5073,
-            "val_macro_auc": 0.832,
-            "seconds": 34.1
+            "train_loss": 0.5071,
+            "val_macro_auc": 0.8335,
+            "seconds": 36.0
           },
           {
             "epoch": 10,
-            "train_loss": 0.5062,
-            "val_macro_auc": 0.8347,
-            "seconds": 34.0
+            "train_loss": 0.5042,
+            "val_macro_auc": 0.8357,
+            "seconds": 35.4
           },
           {
             "epoch": 11,
-            "train_loss": 0.5034,
-            "val_macro_auc": 0.835,
-            "seconds": 33.1
+            "train_loss": 0.5029,
+            "val_macro_auc": 0.8349,
+            "seconds": 36.9
           },
           {
             "epoch": 12,
-            "train_loss": 0.5011,
-            "val_macro_auc": 0.8348,
-            "seconds": 34.9
+            "train_loss": 0.5004,
+            "val_macro_auc": 0.8386,
+            "seconds": 37.3
           },
           {
             "epoch": 13,
-            "train_loss": 0.4991,
-            "val_macro_auc": 0.8373,
-            "seconds": 33.3
+            "train_loss": 0.4978,
+            "val_macro_auc": 0.8392,
+            "seconds": 38.5
           },
           {
             "epoch": 14,
-            "train_loss": 0.4961,
-            "val_macro_auc": 0.8394,
-            "seconds": 34.2
+            "train_loss": 0.4963,
+            "val_macro_auc": 0.8415,
+            "seconds": 39.2
           },
           {
             "epoch": 15,
-            "train_loss": 0.4941,
-            "val_macro_auc": 0.839,
-            "seconds": 36.6
+            "train_loss": 0.4942,
+            "val_macro_auc": 0.8417,
+            "seconds": 37.4
           },
           {
             "epoch": 16,
-            "train_loss": 0.4911,
-            "val_macro_auc": 0.8405,
-            "seconds": 40.6
+            "train_loss": 0.4914,
+            "val_macro_auc": 0.842,
+            "seconds": 34.7
           },
           {
             "epoch": 17,
-            "train_loss": 0.4888,
-            "val_macro_auc": 0.8417,
-            "seconds": 43.8
+            "train_loss": 0.4894,
+            "val_macro_auc": 0.8455,
+            "seconds": 36.9
           },
           {
             "epoch": 18,
-            "train_loss": 0.4857,
-            "val_macro_auc": 0.8428,
-            "seconds": 35.7
+            "train_loss": 0.486,
+            "val_macro_auc": 0.8453,
+            "seconds": 39.1
           },
           {
             "epoch": 19,
-            "train_loss": 0.4839,
-            "val_macro_auc": 0.8441,
-            "seconds": 33.1
+            "train_loss": 0.4842,
+            "val_macro_auc": 0.8468,
+            "seconds": 36.6
           },
           {
             "epoch": 20,
-            "train_loss": 0.4818,
-            "val_macro_auc": 0.8425,
-            "seconds": 33.2
+            "train_loss": 0.4816,
+            "val_macro_auc": 0.8479,
+            "seconds": 36.2
           },
           {
             "epoch": 21,
-            "train_loss": 0.4791,
-            "val_macro_auc": 0.8445,
-            "seconds": 31.5
+            "train_loss": 0.4792,
+            "val_macro_auc": 0.85,
+            "seconds": 38.0
           },
           {
             "epoch": 22,
-            "train_loss": 0.4763,
-            "val_macro_auc": 0.8459,
-            "seconds": 33.7
+            "train_loss": 0.4771,
+            "val_macro_auc": 0.8473,
+            "seconds": 38.0
           },
           {
             "epoch": 23,
-            "train_loss": 0.4744,
-            "val_macro_auc": 0.848,
-            "seconds": 33.7
+            "train_loss": 0.4752,
+            "val_macro_auc": 0.8505,
+            "seconds": 38.5
           },
           {
             "epoch": 24,
-            "train_loss": 0.4715,
-            "val_macro_auc": 0.8465,
-            "seconds": 33.8
+            "train_loss": 0.4722,
+            "val_macro_auc": 0.8512,
+            "seconds": 36.5
           },
           {
             "epoch": 25,
-            "train_loss": 0.4684,
-            "val_macro_auc": 0.8435,
-            "seconds": 32.2
+            "train_loss": 0.4696,
+            "val_macro_auc": 0.8505,
+            "seconds": 35.8
           },
           {
             "epoch": 26,
-            "train_loss": 0.4661,
-            "val_macro_auc": 0.8483,
-            "seconds": 34.2
+            "train_loss": 0.4674,
+            "val_macro_auc": 0.8515,
+            "seconds": 37.1
           },
           {
             "epoch": 27,
-            "train_loss": 0.4636,
-            "val_macro_auc": 0.8494,
-            "seconds": 33.3
+            "train_loss": 0.4645,
+            "val_macro_auc": 0.8523,
+            "seconds": 37.0
           },
           {
             "epoch": 28,
-            "train_loss": 0.4616,
-            "val_macro_auc": 0.8491,
-            "seconds": 32.0
+            "train_loss": 0.4614,
+            "val_macro_auc": 0.8531,
+            "seconds": 38.9
           },
           {
             "epoch": 29,
-            "train_loss": 0.4585,
-            "val_macro_auc": 0.8511,
-            "seconds": 34.2
+            "train_loss": 0.4598,
+            "val_macro_auc": 0.8537,
+            "seconds": 38.9
           },
           {
             "epoch": 30,
-            "train_loss": 0.4563,
-            "val_macro_auc": 0.8478,
-            "seconds": 30.9
+            "train_loss": 0.4572,
+            "val_macro_auc": 0.855,
+            "seconds": 38.6
           }
         ],
-        "best_epoch": 29,
-        "best_val_macro_auc": 0.8511,
+        "best_epoch": 30,
+        "best_val_macro_auc": 0.855,
         "parameters": 1826508
       },
       "test": {
-        "atoms": 51828,
+        "atoms": 57386,
         "types_present": 9,
-        "types_in_macro": 7,
+        "types_in_macro": 8,
         "min_support_for_macro": 50,
         "types_below_support": {
-          "XBDonor": 42,
           "MetalDonor": 12
         },
         "per_type": {
           "Hydrophobic": {
-            "support": 2634,
-            "base_rate": 0.05082,
-            "auc": 0.7884,
-            "average_precision": 0.1513,
-            "precision": 0.1268,
-            "recall": 0.6188,
-            "f1": 0.2104,
-            "predicted_positive": 12859
+            "support": 2850,
+            "base_rate": 0.04966,
+            "auc": 0.7908,
+            "average_precision": 0.1552,
+            "precision": 0.1255,
+            "recall": 0.5839,
+            "f1": 0.2066,
+            "predicted_positive": 13260
           },
           "HBDonor": {
-            "support": 2160,
-            "base_rate": 0.04168,
-            "auc": 0.7619,
-            "average_precision": 0.1674,
-            "precision": 0.0753,
-            "recall": 0.7861,
-            "f1": 0.1374,
-            "predicted_positive": 22561
+            "support": 2351,
+            "base_rate": 0.04097,
+            "auc": 0.7727,
+            "average_precision": 0.163,
+            "precision": 0.0793,
+            "recall": 0.7678,
+            "f1": 0.1437,
+            "predicted_positive": 22774
           },
           "HBAcceptor": {
-            "support": 4605,
-            "base_rate": 0.08885,
-            "auc": 0.727,
-            "average_precision": 0.2183,
-            "precision": 0.1301,
-            "recall": 0.838,
-            "f1": 0.2253,
-            "predicted_positive": 29658
+            "support": 4945,
+            "base_rate": 0.08617,
+            "auc": 0.7347,
+            "average_precision": 0.2126,
+            "precision": 0.1214,
+            "recall": 0.8896,
+            "f1": 0.2136,
+            "predicted_positive": 36250
           },
           "Cationic": {
-            "support": 306,
-            "base_rate": 0.0059,
-            "auc": 0.9478,
-            "average_precision": 0.1689,
-            "precision": 0.0574,
-            "recall": 0.7418,
-            "f1": 0.1066,
-            "predicted_positive": 3954
+            "support": 355,
+            "base_rate": 0.00619,
+            "auc": 0.9411,
+            "average_precision": 0.1642,
+            "precision": 0.0537,
+            "recall": 0.7042,
+            "f1": 0.0998,
+            "predicted_positive": 4655
           },
           "Anionic": {
-            "support": 1552,
-            "base_rate": 0.02995,
-            "auc": 0.8643,
-            "average_precision": 0.2047,
-            "precision": 0.0749,
-            "recall": 0.886,
-            "f1": 0.1381,
-            "predicted_positive": 18358
+            "support": 1680,
+            "base_rate": 0.02928,
+            "auc": 0.8764,
+            "average_precision": 0.2018,
+            "precision": 0.0703,
+            "recall": 0.9196,
+            "f1": 0.1307,
+            "predicted_positive": 21968
           },
           "PiStacking": {
-            "support": 6603,
-            "base_rate": 0.1274,
-            "auc": 0.7788,
-            "average_precision": 0.3269,
-            "precision": 0.2664,
-            "recall": 0.6361,
-            "f1": 0.3756,
-            "predicted_positive": 15764
+            "support": 7191,
+            "base_rate": 0.12531,
+            "auc": 0.7905,
+            "average_precision": 0.3309,
+            "precision": 0.27,
+            "recall": 0.6322,
+            "f1": 0.3783,
+            "predicted_positive": 16840
           },
           "PiCation": {
-            "support": 284,
-            "base_rate": 0.00548,
-            "auc": 0.9417,
-            "average_precision": 0.1493,
-            "precision": 0.0537,
-            "recall": 0.6831,
-            "f1": 0.0996,
-            "predicted_positive": 3610
+            "support": 345,
+            "base_rate": 0.00601,
+            "auc": 0.9408,
+            "average_precision": 0.1684,
+            "precision": 0.0564,
+            "recall": 0.7072,
+            "f1": 0.1044,
+            "predicted_positive": 4328
           },
           "CationPi": {
             "support": 0,
@@ -1532,14 +1523,14 @@
             "predicted_positive": 0
           },
           "XBDonor": {
-            "support": 42,
-            "base_rate": 0.00081,
-            "auc": 0.9801,
-            "average_precision": 0.0387,
-            "precision": 0.0222,
-            "recall": 0.7143,
-            "f1": 0.043,
-            "predicted_positive": 1354
+            "support": 82,
+            "base_rate": 0.00143,
+            "auc": 0.9795,
+            "average_precision": 0.0697,
+            "precision": 0.0484,
+            "recall": 0.5732,
+            "f1": 0.0893,
+            "predicted_positive": 971
           },
           "XBAcceptor": {
             "support": 0,
@@ -1553,13 +1544,13 @@
           },
           "MetalDonor": {
             "support": 12,
-            "base_rate": 0.00023,
-            "auc": 0.9978,
-            "average_precision": 0.212,
-            "precision": 0.3636,
-            "recall": 0.3333,
-            "f1": 0.3478,
-            "predicted_positive": 11
+            "base_rate": 0.00021,
+            "auc": 0.9599,
+            "average_precision": 0.2442,
+            "precision": 0.0328,
+            "recall": 0.5,
+            "f1": 0.0615,
+            "predicted_positive": 183
           },
           "MetalAcceptor": {
             "support": 0,
@@ -1572,116 +1563,116 @@
             "predicted_positive": 0
           }
         },
-        "macro_auc": 0.83,
-        "macro_average_precision": 0.1981,
-        "macro_f1": 0.1847,
-        "macro_auc_all_types": 0.8653,
+        "macro_auc": 0.8533,
+        "macro_average_precision": 0.1832,
+        "macro_f1": 0.1708,
+        "macro_auc_all_types": 0.8652,
         "any_interaction": {
-          "base_rate": 0.3017,
-          "auc": 0.6012,
-          "average_precision": 0.3873
+          "base_rate": 0.2945,
+          "auc": 0.5971,
+          "average_precision": 0.371
         }
       }
     },
     "_ablation": {
       "metric": "macro_auc",
-      "with_pocket": 0.8236,
-      "without_pocket": 0.83,
-      "delta": -0.0064,
+      "with_pocket": 0.8481,
+      "without_pocket": 0.8533,
+      "delta": -0.0052,
       "verdict": "ignores_the_pocket",
-      "reason": "removing the pocket costs only -0.0064, below the 0.02 margin: the model is predicting from the ligand alone"
+      "reason": "removing the pocket costs only -0.0052, below the 0.02 margin: the model is predicting from the ligand alone"
     },
     "_shuffle_check": {
       "metric": "macro_auc",
-      "with_pocket": 0.8236,
-      "without_pocket": 0.7909,
-      "delta": 0.0327,
+      "with_pocket": 0.8481,
+      "without_pocket": 0.8141,
+      "delta": 0.034,
       "verdict": "uses_the_pocket",
-      "reason": "removing the pocket costs 0.0327, at or above the 0.02 margin"
+      "reason": "removing the pocket costs 0.0340, at or above the 0.02 margin"
     },
     "multi_protein_ligands": {
-      "atoms": 32066,
-      "complexes": 1392,
-      "share_of_test_atoms": 0.6187,
+      "atoms": 35393,
+      "complexes": 1568,
+      "share_of_test_atoms": 0.6168,
       "with_pocket": {
-        "atoms": 32066,
+        "atoms": 35393,
         "types_present": 9,
         "types_in_macro": 7,
         "min_support_for_macro": 50,
         "types_below_support": {
-          "XBDonor": 16,
-          "MetalDonor": 6
+          "XBDonor": 40,
+          "MetalDonor": 5
         },
         "per_type": {
           "Hydrophobic": {
-            "support": 1288,
-            "base_rate": 0.04017,
-            "auc": 0.8356,
-            "average_precision": 0.1631,
-            "precision": 0.1221,
-            "recall": 0.677,
-            "f1": 0.2069,
-            "predicted_positive": 7143
+            "support": 1366,
+            "base_rate": 0.0386,
+            "auc": 0.833,
+            "average_precision": 0.1553,
+            "precision": 0.1242,
+            "recall": 0.6413,
+            "f1": 0.2081,
+            "predicted_positive": 7054
           },
           "HBDonor": {
-            "support": 1469,
-            "base_rate": 0.04581,
-            "auc": 0.7654,
-            "average_precision": 0.181,
-            "precision": 0.0755,
-            "recall": 0.853,
-            "f1": 0.1387,
-            "predicted_positive": 16597
+            "support": 1662,
+            "base_rate": 0.04696,
+            "auc": 0.7625,
+            "average_precision": 0.1804,
+            "precision": 0.0799,
+            "recall": 0.8285,
+            "f1": 0.1458,
+            "predicted_positive": 17233
           },
           "HBAcceptor": {
-            "support": 3357,
-            "base_rate": 0.10469,
-            "auc": 0.7051,
-            "average_precision": 0.2133,
-            "precision": 0.1318,
-            "recall": 0.9234,
-            "f1": 0.2307,
-            "predicted_positive": 23513
+            "support": 3544,
+            "base_rate": 0.10013,
+            "auc": 0.7174,
+            "average_precision": 0.214,
+            "precision": 0.1345,
+            "recall": 0.9072,
+            "f1": 0.2342,
+            "predicted_positive": 23908
           },
           "Cationic": {
-            "support": 170,
-            "base_rate": 0.0053,
-            "auc": 0.9727,
-            "average_precision": 0.2791,
-            "precision": 0.0726,
-            "recall": 0.8235,
-            "f1": 0.1335,
-            "predicted_positive": 1928
+            "support": 221,
+            "base_rate": 0.00624,
+            "auc": 0.9593,
+            "average_precision": 0.208,
+            "precision": 0.0703,
+            "recall": 0.8009,
+            "f1": 0.1293,
+            "predicted_positive": 2516
           },
           "Anionic": {
-            "support": 1199,
-            "base_rate": 0.03739,
-            "auc": 0.8419,
-            "average_precision": 0.1789,
-            "precision": 0.0723,
-            "recall": 0.9399,
-            "f1": 0.1342,
-            "predicted_positive": 15596
+            "support": 1274,
+            "base_rate": 0.036,
+            "auc": 0.8691,
+            "average_precision": 0.2004,
+            "precision": 0.0803,
+            "recall": 0.9223,
+            "f1": 0.1477,
+            "predicted_positive": 14639
           },
           "PiStacking": {
-            "support": 3863,
-            "base_rate": 0.12047,
-            "auc": 0.8146,
-            "average_precision": 0.3669,
-            "precision": 0.2776,
-            "recall": 0.708,
-            "f1": 0.3988,
-            "predicted_positive": 9852
+            "support": 4311,
+            "base_rate": 0.1218,
+            "auc": 0.833,
+            "average_precision": 0.3947,
+            "precision": 0.2889,
+            "recall": 0.7404,
+            "f1": 0.4157,
+            "predicted_positive": 11047
           },
           "PiCation": {
-            "support": 164,
-            "base_rate": 0.00511,
-            "auc": 0.9712,
-            "average_precision": 0.2176,
-            "precision": 0.0773,
-            "recall": 0.8171,
-            "f1": 0.1412,
-            "predicted_positive": 1734
+            "support": 237,
+            "base_rate": 0.0067,
+            "auc": 0.9585,
+            "average_precision": 0.1882,
+            "precision": 0.075,
+            "recall": 0.7806,
+            "f1": 0.1368,
+            "predicted_positive": 2467
           },
           "CationPi": {
             "support": 0,
@@ -1694,14 +1685,14 @@
             "predicted_positive": 0
           },
           "XBDonor": {
-            "support": 16,
-            "base_rate": 0.0005,
-            "auc": 0.9926,
-            "average_precision": 0.1212,
-            "precision": 0.0304,
-            "recall": 0.875,
-            "f1": 0.0588,
-            "predicted_positive": 460
+            "support": 40,
+            "base_rate": 0.00113,
+            "auc": 0.9911,
+            "average_precision": 0.0854,
+            "precision": 0.0681,
+            "recall": 0.65,
+            "f1": 0.1232,
+            "predicted_positive": 382
           },
           "XBAcceptor": {
             "support": 0,
@@ -1714,14 +1705,14 @@
             "predicted_positive": 0
           },
           "MetalDonor": {
-            "support": 6,
-            "base_rate": 0.00019,
-            "auc": 0.9972,
-            "average_precision": 0.0486,
-            "precision": 0.025,
-            "recall": 0.1667,
-            "f1": 0.0435,
-            "predicted_positive": 40
+            "support": 5,
+            "base_rate": 0.00014,
+            "auc": 0.9872,
+            "average_precision": 0.0642,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "predicted_positive": 0
           },
           "MetalAcceptor": {
             "support": 0,
@@ -1734,95 +1725,95 @@
             "predicted_positive": 0
           }
         },
-        "macro_auc": 0.8438,
-        "macro_average_precision": 0.2286,
-        "macro_f1": 0.1977,
-        "macro_auc_all_types": 0.8774,
+        "macro_auc": 0.8475,
+        "macro_average_precision": 0.2201,
+        "macro_f1": 0.2025,
+        "macro_auc_all_types": 0.879,
         "any_interaction": {
-          "base_rate": 0.3075,
-          "auc": 0.6238,
-          "average_precision": 0.4089
+          "base_rate": 0.3024,
+          "auc": 0.6192,
+          "average_precision": 0.3934
         }
       },
       "no_pocket": {
-        "atoms": 32066,
+        "atoms": 35393,
         "types_present": 9,
         "types_in_macro": 7,
         "min_support_for_macro": 50,
         "types_below_support": {
-          "XBDonor": 16,
-          "MetalDonor": 6
+          "XBDonor": 40,
+          "MetalDonor": 5
         },
         "per_type": {
           "Hydrophobic": {
-            "support": 1288,
-            "base_rate": 0.04017,
-            "auc": 0.8443,
-            "average_precision": 0.1784,
-            "precision": 0.1382,
-            "recall": 0.6366,
-            "f1": 0.2271,
-            "predicted_positive": 5933
+            "support": 1366,
+            "base_rate": 0.0386,
+            "auc": 0.8495,
+            "average_precision": 0.1866,
+            "precision": 0.1381,
+            "recall": 0.5908,
+            "f1": 0.2239,
+            "predicted_positive": 5842
           },
           "HBDonor": {
-            "support": 1469,
-            "base_rate": 0.04581,
-            "auc": 0.7964,
-            "average_precision": 0.211,
-            "precision": 0.0865,
-            "recall": 0.853,
-            "f1": 0.1571,
-            "predicted_positive": 14480
+            "support": 1662,
+            "base_rate": 0.04696,
+            "auc": 0.7953,
+            "average_precision": 0.2047,
+            "precision": 0.0896,
+            "recall": 0.8345,
+            "f1": 0.1618,
+            "predicted_positive": 15487
           },
           "HBAcceptor": {
-            "support": 3357,
-            "base_rate": 0.10469,
-            "auc": 0.737,
-            "average_precision": 0.2517,
-            "precision": 0.1449,
-            "recall": 0.8963,
-            "f1": 0.2495,
-            "predicted_positive": 20759
+            "support": 3544,
+            "base_rate": 0.10013,
+            "auc": 0.7421,
+            "average_precision": 0.2407,
+            "precision": 0.1338,
+            "recall": 0.9328,
+            "f1": 0.234,
+            "predicted_positive": 24717
           },
           "Cationic": {
-            "support": 170,
-            "base_rate": 0.0053,
-            "auc": 0.975,
-            "average_precision": 0.2805,
-            "precision": 0.0757,
-            "recall": 0.8706,
-            "f1": 0.1392,
-            "predicted_positive": 1956
+            "support": 221,
+            "base_rate": 0.00624,
+            "auc": 0.9591,
+            "average_precision": 0.2361,
+            "precision": 0.0672,
+            "recall": 0.8145,
+            "f1": 0.1241,
+            "predicted_positive": 2679
           },
           "Anionic": {
-            "support": 1199,
-            "base_rate": 0.03739,
-            "auc": 0.8679,
-            "average_precision": 0.2361,
-            "precision": 0.0847,
-            "recall": 0.9283,
-            "f1": 0.1553,
-            "predicted_positive": 13134
+            "support": 1274,
+            "base_rate": 0.036,
+            "auc": 0.8902,
+            "average_precision": 0.2406,
+            "precision": 0.0818,
+            "recall": 0.9592,
+            "f1": 0.1508,
+            "predicted_positive": 14930
           },
           "PiStacking": {
-            "support": 3863,
-            "base_rate": 0.12047,
-            "auc": 0.8072,
-            "average_precision": 0.3541,
-            "precision": 0.2813,
-            "recall": 0.6485,
-            "f1": 0.3924,
-            "predicted_positive": 8904
+            "support": 4311,
+            "base_rate": 0.1218,
+            "auc": 0.8236,
+            "average_precision": 0.3673,
+            "precision": 0.2922,
+            "recall": 0.6683,
+            "f1": 0.4067,
+            "predicted_positive": 9858
           },
           "PiCation": {
-            "support": 164,
-            "base_rate": 0.00511,
-            "auc": 0.9769,
-            "average_precision": 0.2656,
-            "precision": 0.0782,
-            "recall": 0.8659,
-            "f1": 0.1435,
-            "predicted_positive": 1815
+            "support": 237,
+            "base_rate": 0.0067,
+            "auc": 0.9624,
+            "average_precision": 0.2465,
+            "precision": 0.0745,
+            "recall": 0.827,
+            "f1": 0.1366,
+            "predicted_positive": 2632
           },
           "CationPi": {
             "support": 0,
@@ -1835,14 +1826,14 @@
             "predicted_positive": 0
           },
           "XBDonor": {
-            "support": 16,
-            "base_rate": 0.0005,
-            "auc": 0.9945,
-            "average_precision": 0.0632,
-            "precision": 0.0268,
-            "recall": 1.0,
-            "f1": 0.0521,
-            "predicted_positive": 598
+            "support": 40,
+            "base_rate": 0.00113,
+            "auc": 0.9921,
+            "average_precision": 0.1046,
+            "precision": 0.0672,
+            "recall": 0.775,
+            "f1": 0.1238,
+            "predicted_positive": 461
           },
           "XBAcceptor": {
             "support": 0,
@@ -1855,14 +1846,14 @@
             "predicted_positive": 0
           },
           "MetalDonor": {
-            "support": 6,
-            "base_rate": 0.00019,
-            "auc": 0.9966,
-            "average_precision": 0.0326,
-            "precision": 0.0,
-            "recall": 0.0,
-            "f1": 0.0,
-            "predicted_positive": 0
+            "support": 5,
+            "base_rate": 0.00014,
+            "auc": 0.9965,
+            "average_precision": 0.1437,
+            "precision": 0.0192,
+            "recall": 0.6,
+            "f1": 0.0373,
+            "predicted_positive": 156
           },
           "MetalAcceptor": {
             "support": 0,
@@ -1875,95 +1866,95 @@
             "predicted_positive": 0
           }
         },
-        "macro_auc": 0.8578,
-        "macro_average_precision": 0.2539,
-        "macro_f1": 0.2092,
-        "macro_auc_all_types": 0.8884,
+        "macro_auc": 0.8603,
+        "macro_average_precision": 0.2461,
+        "macro_f1": 0.2054,
+        "macro_auc_all_types": 0.8901,
         "any_interaction": {
-          "base_rate": 0.3075,
-          "auc": 0.6249,
-          "average_precision": 0.4175
+          "base_rate": 0.3024,
+          "auc": 0.6141,
+          "average_precision": 0.3957
         }
       },
       "shuffled_pocket": {
-        "atoms": 32066,
+        "atoms": 35393,
         "types_present": 9,
         "types_in_macro": 7,
         "min_support_for_macro": 50,
         "types_below_support": {
-          "XBDonor": 16,
-          "MetalDonor": 6
+          "XBDonor": 40,
+          "MetalDonor": 5
         },
         "per_type": {
           "Hydrophobic": {
-            "support": 1288,
-            "base_rate": 0.04017,
-            "auc": 0.8237,
-            "average_precision": 0.1511,
-            "precision": 0.1215,
-            "recall": 0.6196,
-            "f1": 0.2032,
-            "predicted_positive": 6566
+            "support": 1366,
+            "base_rate": 0.0386,
+            "auc": 0.822,
+            "average_precision": 0.1428,
+            "precision": 0.1218,
+            "recall": 0.5695,
+            "f1": 0.2007,
+            "predicted_positive": 6388
           },
           "HBDonor": {
-            "support": 1469,
-            "base_rate": 0.04581,
-            "auc": 0.7369,
-            "average_precision": 0.1611,
-            "precision": 0.074,
-            "recall": 0.8039,
-            "f1": 0.1356,
-            "predicted_positive": 15956
+            "support": 1662,
+            "base_rate": 0.04696,
+            "auc": 0.7323,
+            "average_precision": 0.1616,
+            "precision": 0.0771,
+            "recall": 0.7539,
+            "f1": 0.1399,
+            "predicted_positive": 16246
           },
           "HBAcceptor": {
-            "support": 3357,
-            "base_rate": 0.10469,
-            "auc": 0.686,
-            "average_precision": 0.1947,
-            "precision": 0.1312,
-            "recall": 0.9029,
-            "f1": 0.2292,
-            "predicted_positive": 23096
+            "support": 3544,
+            "base_rate": 0.10013,
+            "auc": 0.6888,
+            "average_precision": 0.1904,
+            "precision": 0.1336,
+            "recall": 0.8657,
+            "f1": 0.2314,
+            "predicted_positive": 22970
           },
           "Cationic": {
-            "support": 170,
-            "base_rate": 0.0053,
-            "auc": 0.946,
-            "average_precision": 0.1768,
-            "precision": 0.0665,
-            "recall": 0.6529,
-            "f1": 0.1207,
-            "predicted_positive": 1669
+            "support": 221,
+            "base_rate": 0.00624,
+            "auc": 0.9324,
+            "average_precision": 0.1619,
+            "precision": 0.0572,
+            "recall": 0.6516,
+            "f1": 0.1052,
+            "predicted_positive": 2516
           },
           "Anionic": {
-            "support": 1199,
-            "base_rate": 0.03739,
-            "auc": 0.7883,
-            "average_precision": 0.1409,
-            "precision": 0.0701,
-            "recall": 0.8324,
-            "f1": 0.1294,
-            "predicted_positive": 14227
+            "support": 1274,
+            "base_rate": 0.036,
+            "auc": 0.8316,
+            "average_precision": 0.1638,
+            "precision": 0.0785,
+            "recall": 0.8509,
+            "f1": 0.1437,
+            "predicted_positive": 13813
           },
           "PiStacking": {
-            "support": 3863,
-            "base_rate": 0.12047,
-            "auc": 0.7356,
-            "average_precision": 0.2706,
-            "precision": 0.2138,
-            "recall": 0.614,
-            "f1": 0.3172,
-            "predicted_positive": 11095
+            "support": 4311,
+            "base_rate": 0.1218,
+            "auc": 0.7396,
+            "average_precision": 0.2845,
+            "precision": 0.2246,
+            "recall": 0.643,
+            "f1": 0.3329,
+            "predicted_positive": 12343
           },
           "PiCation": {
-            "support": 164,
-            "base_rate": 0.00511,
-            "auc": 0.9499,
-            "average_precision": 0.1563,
-            "precision": 0.0638,
-            "recall": 0.6768,
-            "f1": 0.1166,
-            "predicted_positive": 1740
+            "support": 237,
+            "base_rate": 0.0067,
+            "auc": 0.9346,
+            "average_precision": 0.1428,
+            "precision": 0.0671,
+            "recall": 0.5949,
+            "f1": 0.1206,
+            "predicted_positive": 2101
           },
           "CationPi": {
             "support": 0,
@@ -1976,14 +1967,14 @@
             "predicted_positive": 0
           },
           "XBDonor": {
-            "support": 16,
-            "base_rate": 0.0005,
-            "auc": 0.9932,
-            "average_precision": 0.0438,
-            "precision": 0.0346,
-            "recall": 1.0,
-            "f1": 0.0669,
-            "predicted_positive": 462
+            "support": 40,
+            "base_rate": 0.00113,
+            "auc": 0.9889,
+            "average_precision": 0.0616,
+            "precision": 0.0627,
+            "recall": 0.65,
+            "f1": 0.1143,
+            "predicted_positive": 415
           },
           "XBAcceptor": {
             "support": 0,
@@ -1996,14 +1987,14 @@
             "predicted_positive": 0
           },
           "MetalDonor": {
-            "support": 6,
-            "base_rate": 0.00019,
-            "auc": 0.9943,
-            "average_precision": 0.0178,
+            "support": 5,
+            "base_rate": 0.00014,
+            "auc": 0.9862,
+            "average_precision": 0.0083,
             "precision": 0.0,
             "recall": 0.0,
             "f1": 0.0,
-            "predicted_positive": 96
+            "predicted_positive": 60
           },
           "MetalAcceptor": {
             "support": 0,
@@ -2016,23 +2007,23 @@
             "predicted_positive": 0
           }
         },
-        "macro_auc": 0.8095,
-        "macro_average_precision": 0.1788,
-        "macro_f1": 0.1788,
-        "macro_auc_all_types": 0.8504,
+        "macro_auc": 0.8116,
+        "macro_average_precision": 0.1783,
+        "macro_f1": 0.1821,
+        "macro_auc_all_types": 0.8507,
         "any_interaction": {
-          "base_rate": 0.3075,
-          "auc": 0.6097,
-          "average_precision": 0.3985
+          "base_rate": 0.3024,
+          "auc": 0.6006,
+          "average_precision": 0.3802
         }
       },
       "_ablation": {
         "metric": "macro_auc",
-        "with_pocket": 0.8438,
-        "without_pocket": 0.8578,
-        "delta": -0.014,
+        "with_pocket": 0.8475,
+        "without_pocket": 0.8603,
+        "delta": -0.0128,
         "verdict": "ignores_the_pocket",
-        "reason": "removing the pocket costs only -0.0140, below the 0.02 margin: the model is predicting from the ligand alone"
+        "reason": "removing the pocket costs only -0.0128, below the 0.02 margin: the model is predicting from the ligand alone"
       }
     }
   },
@@ -2040,57 +2031,57 @@
     "regime": "both_unseen",
     "device": "mps",
     "counts": {
-      "train": 13076,
-      "validation": 100,
-      "test": 109
+      "train": 14553,
+      "validation": 99,
+      "test": 106
     },
     "label_statistics": {
-      "atoms": 313091,
-      "complexes": 13076,
-      "any_interaction_rate": 0.3083,
+      "atoms": 348856,
+      "complexes": 14553,
+      "any_interaction_rate": 0.3089,
       "per_type": {
         "Hydrophobic": {
-          "positives": 24141,
-          "rate": 0.07711
+          "positives": 27066,
+          "rate": 0.07759
         },
         "HBDonor": {
-          "positives": 11305,
-          "rate": 0.03611
+          "positives": 12437,
+          "rate": 0.03565
         },
         "HBAcceptor": {
-          "positives": 18464,
-          "rate": 0.05897
+          "positives": 20461,
+          "rate": 0.05865
         },
         "Cationic": {
-          "positives": 2067,
-          "rate": 0.0066
+          "positives": 2238,
+          "rate": 0.00642
         },
         "Anionic": {
-          "positives": 4820,
-          "rate": 0.01539
+          "positives": 5303,
+          "rate": 0.0152
         },
         "PiStacking": {
-          "positives": 48231,
-          "rate": 0.15405
+          "positives": 54141,
+          "rate": 0.1552
         },
         "PiCation": {
-          "positives": 1664,
-          "rate": 0.00531
+          "positives": 1826,
+          "rate": 0.00523
         },
         "CationPi": {
           "positives": 0,
           "rate": 0.0
         },
         "XBDonor": {
-          "positives": 910,
-          "rate": 0.00291
+          "positives": 1020,
+          "rate": 0.00292
         },
         "XBAcceptor": {
           "positives": 0,
           "rate": 0.0
         },
         "MetalDonor": {
-          "positives": 12,
+          "positives": 13,
           "rate": 4e-05
         },
         "MetalAcceptor": {
@@ -2104,156 +2095,186 @@
         "history": [
           {
             "epoch": 1,
-            "train_loss": 0.6003,
-            "val_macro_auc": 0.695,
-            "seconds": 26.3
+            "train_loss": 0.5902,
+            "val_macro_auc": 0.6777,
+            "seconds": 31.4
           },
           {
             "epoch": 2,
-            "train_loss": 0.539,
-            "val_macro_auc": 0.691,
-            "seconds": 26.0
+            "train_loss": 0.5356,
+            "val_macro_auc": 0.6896,
+            "seconds": 29.9
           },
           {
             "epoch": 3,
-            "train_loss": 0.526,
-            "val_macro_auc": 0.6876,
-            "seconds": 26.5
+            "train_loss": 0.5243,
+            "val_macro_auc": 0.6893,
+            "seconds": 29.2
           },
           {
             "epoch": 4,
-            "train_loss": 0.5184,
-            "val_macro_auc": 0.6902,
-            "seconds": 27.1
+            "train_loss": 0.5168,
+            "val_macro_auc": 0.7012,
+            "seconds": 29.5
           },
           {
             "epoch": 5,
-            "train_loss": 0.513,
-            "val_macro_auc": 0.6912,
-            "seconds": 25.6
+            "train_loss": 0.5114,
+            "val_macro_auc": 0.7024,
+            "seconds": 29.5
           },
           {
             "epoch": 6,
             "train_loss": 0.5078,
-            "val_macro_auc": 0.7026,
-            "seconds": 26.9
+            "val_macro_auc": 0.7031,
+            "seconds": 26.3
           },
           {
             "epoch": 7,
-            "train_loss": 0.5049,
-            "val_macro_auc": 0.6918,
-            "seconds": 27.3
+            "train_loss": 0.5043,
+            "val_macro_auc": 0.7068,
+            "seconds": 30.0
           },
           {
             "epoch": 8,
-            "train_loss": 0.5019,
-            "val_macro_auc": 0.6964,
-            "seconds": 24.9
+            "train_loss": 0.4997,
+            "val_macro_auc": 0.6972,
+            "seconds": 32.0
           },
           {
             "epoch": 9,
-            "train_loss": 0.4975,
-            "val_macro_auc": 0.7002,
-            "seconds": 25.0
+            "train_loss": 0.4967,
+            "val_macro_auc": 0.7054,
+            "seconds": 34.0
           },
           {
             "epoch": 10,
-            "train_loss": 0.4954,
-            "val_macro_auc": 0.7027,
-            "seconds": 24.8
+            "train_loss": 0.4938,
+            "val_macro_auc": 0.7105,
+            "seconds": 30.3
           },
           {
             "epoch": 11,
-            "train_loss": 0.4909,
-            "val_macro_auc": 0.6986,
-            "seconds": 26.9
+            "train_loss": 0.4907,
+            "val_macro_auc": 0.7109,
+            "seconds": 29.3
+          },
+          {
+            "epoch": 12,
+            "train_loss": 0.4874,
+            "val_macro_auc": 0.7087,
+            "seconds": 30.3
+          },
+          {
+            "epoch": 13,
+            "train_loss": 0.484,
+            "val_macro_auc": 0.7091,
+            "seconds": 28.0
+          },
+          {
+            "epoch": 14,
+            "train_loss": 0.4815,
+            "val_macro_auc": 0.7092,
+            "seconds": 29.2
+          },
+          {
+            "epoch": 15,
+            "train_loss": 0.4781,
+            "val_macro_auc": 0.7072,
+            "seconds": 28.0
+          },
+          {
+            "epoch": 16,
+            "train_loss": 0.4741,
+            "val_macro_auc": 0.703,
+            "seconds": 29.1
           }
         ],
-        "best_epoch": 6,
-        "best_val_macro_auc": 0.7026,
+        "best_epoch": 11,
+        "best_val_macro_auc": 0.7109,
         "parameters": 1826508
       },
       "test": {
-        "atoms": 3338,
+        "atoms": 3134,
         "types_present": 8,
         "types_in_macro": 4,
         "min_support_for_macro": 50,
         "types_below_support": {
-          "Cationic": 27,
-          "Anionic": 26,
-          "PiCation": 26,
+          "Cationic": 19,
+          "Anionic": 36,
+          "PiCation": 17,
           "XBDonor": 4
         },
         "per_type": {
           "Hydrophobic": {
-            "support": 252,
-            "base_rate": 0.07549,
-            "auc": 0.6633,
-            "average_precision": 0.1316,
-            "precision": 0.1063,
-            "recall": 0.7778,
-            "f1": 0.187,
-            "predicted_positive": 1844
+            "support": 212,
+            "base_rate": 0.06765,
+            "auc": 0.6835,
+            "average_precision": 0.1262,
+            "precision": 0.1024,
+            "recall": 0.8113,
+            "f1": 0.1818,
+            "predicted_positive": 1680
           },
           "HBDonor": {
-            "support": 104,
-            "base_rate": 0.03116,
-            "auc": 0.631,
-            "average_precision": 0.0442,
-            "precision": 0.0459,
-            "recall": 0.7308,
-            "f1": 0.0863,
-            "predicted_positive": 1657
+            "support": 81,
+            "base_rate": 0.02585,
+            "auc": 0.7354,
+            "average_precision": 0.0757,
+            "precision": 0.0478,
+            "recall": 0.642,
+            "f1": 0.0889,
+            "predicted_positive": 1089
           },
           "HBAcceptor": {
-            "support": 138,
-            "base_rate": 0.04134,
-            "auc": 0.6443,
-            "average_precision": 0.0672,
-            "precision": 0.0653,
-            "recall": 0.4855,
-            "f1": 0.1151,
-            "predicted_positive": 1026
+            "support": 150,
+            "base_rate": 0.04786,
+            "auc": 0.6867,
+            "average_precision": 0.0999,
+            "precision": 0.0959,
+            "recall": 0.4467,
+            "f1": 0.1578,
+            "predicted_positive": 699
           },
           "Cationic": {
-            "support": 27,
-            "base_rate": 0.00809,
-            "auc": 0.8652,
-            "average_precision": 0.0511,
-            "precision": 0.0289,
-            "recall": 0.5556,
-            "f1": 0.0549,
-            "predicted_positive": 519
+            "support": 19,
+            "base_rate": 0.00606,
+            "auc": 0.9148,
+            "average_precision": 0.0759,
+            "precision": 0.0323,
+            "recall": 0.7895,
+            "f1": 0.062,
+            "predicted_positive": 465
           },
           "Anionic": {
-            "support": 26,
-            "base_rate": 0.00779,
-            "auc": 0.8672,
-            "average_precision": 0.0425,
-            "precision": 0.0297,
-            "recall": 0.6538,
-            "f1": 0.0568,
-            "predicted_positive": 573
+            "support": 36,
+            "base_rate": 0.01149,
+            "auc": 0.8613,
+            "average_precision": 0.0582,
+            "precision": 0.0395,
+            "recall": 0.6944,
+            "f1": 0.0747,
+            "predicted_positive": 633
           },
           "PiStacking": {
-            "support": 478,
-            "base_rate": 0.1432,
-            "auc": 0.7617,
-            "average_precision": 0.3433,
-            "precision": 0.2404,
-            "recall": 0.7636,
-            "f1": 0.3657,
-            "predicted_positive": 1518
+            "support": 526,
+            "base_rate": 0.16784,
+            "auc": 0.7413,
+            "average_precision": 0.3464,
+            "precision": 0.2657,
+            "recall": 0.7338,
+            "f1": 0.3901,
+            "predicted_positive": 1453
           },
           "PiCation": {
-            "support": 26,
-            "base_rate": 0.00779,
-            "auc": 0.8561,
-            "average_precision": 0.0472,
-            "precision": 0.0327,
-            "recall": 0.5385,
-            "f1": 0.0617,
-            "predicted_positive": 428
+            "support": 17,
+            "base_rate": 0.00542,
+            "auc": 0.8847,
+            "average_precision": 0.032,
+            "precision": 0.0255,
+            "recall": 0.7647,
+            "f1": 0.0494,
+            "predicted_positive": 509
           },
           "CationPi": {
             "support": 0,
@@ -2267,13 +2288,13 @@
           },
           "XBDonor": {
             "support": 4,
-            "base_rate": 0.0012,
-            "auc": 0.9646,
-            "average_precision": 0.0211,
-            "precision": 0.0175,
-            "recall": 0.25,
-            "f1": 0.0328,
-            "predicted_positive": 57
+            "base_rate": 0.00128,
+            "auc": 0.9513,
+            "average_precision": 0.0922,
+            "precision": 0.0667,
+            "recall": 0.5,
+            "f1": 0.1176,
+            "predicted_positive": 30
           },
           "XBAcceptor": {
             "support": 0,
@@ -2306,99 +2327,99 @@
             "predicted_positive": 0
           }
         },
-        "macro_auc": 0.6751,
-        "macro_average_precision": 0.1466,
-        "macro_f1": 0.1885,
-        "macro_auc_all_types": 0.7817,
+        "macro_auc": 0.7117,
+        "macro_average_precision": 0.162,
+        "macro_f1": 0.2046,
+        "macro_auc_all_types": 0.8074,
         "any_interaction": {
-          "base_rate": 0.2756,
-          "auc": 0.602,
-          "average_precision": 0.3495
+          "base_rate": 0.2894,
+          "auc": 0.6145,
+          "average_precision": 0.3788
         }
       }
     },
     "shuffled_pocket": {
       "test": {
-        "atoms": 3338,
+        "atoms": 3134,
         "types_present": 8,
         "types_in_macro": 4,
         "min_support_for_macro": 50,
         "types_below_support": {
-          "Cationic": 27,
-          "Anionic": 26,
-          "PiCation": 26,
+          "Cationic": 19,
+          "Anionic": 36,
+          "PiCation": 17,
           "XBDonor": 4
         },
         "per_type": {
           "Hydrophobic": {
-            "support": 252,
-            "base_rate": 0.07549,
-            "auc": 0.6659,
-            "average_precision": 0.1315,
-            "precision": 0.1065,
-            "recall": 0.7976,
-            "f1": 0.1879,
-            "predicted_positive": 1887
+            "support": 212,
+            "base_rate": 0.06765,
+            "auc": 0.6801,
+            "average_precision": 0.1213,
+            "precision": 0.0995,
+            "recall": 0.7877,
+            "f1": 0.1766,
+            "predicted_positive": 1679
           },
           "HBDonor": {
-            "support": 104,
-            "base_rate": 0.03116,
-            "auc": 0.6162,
-            "average_precision": 0.0434,
-            "precision": 0.0408,
-            "recall": 0.6635,
-            "f1": 0.0769,
-            "predicted_positive": 1691
+            "support": 81,
+            "base_rate": 0.02585,
+            "auc": 0.71,
+            "average_precision": 0.0594,
+            "precision": 0.0462,
+            "recall": 0.6543,
+            "f1": 0.0864,
+            "predicted_positive": 1146
           },
           "HBAcceptor": {
-            "support": 138,
-            "base_rate": 0.04134,
-            "auc": 0.6474,
-            "average_precision": 0.0671,
-            "precision": 0.0677,
-            "recall": 0.4783,
-            "f1": 0.1186,
-            "predicted_positive": 975
+            "support": 150,
+            "base_rate": 0.04786,
+            "auc": 0.6548,
+            "average_precision": 0.0789,
+            "precision": 0.083,
+            "recall": 0.38,
+            "f1": 0.1362,
+            "predicted_positive": 687
           },
           "Cationic": {
-            "support": 27,
-            "base_rate": 0.00809,
-            "auc": 0.8603,
-            "average_precision": 0.0628,
-            "precision": 0.039,
-            "recall": 0.6667,
-            "f1": 0.0736,
-            "predicted_positive": 462
+            "support": 19,
+            "base_rate": 0.00606,
+            "auc": 0.876,
+            "average_precision": 0.0786,
+            "precision": 0.0241,
+            "recall": 0.6316,
+            "f1": 0.0464,
+            "predicted_positive": 498
           },
           "Anionic": {
-            "support": 26,
-            "base_rate": 0.00779,
-            "auc": 0.8394,
-            "average_precision": 0.028,
-            "precision": 0.0283,
-            "recall": 0.6154,
-            "f1": 0.0541,
-            "predicted_positive": 566
+            "support": 36,
+            "base_rate": 0.01149,
+            "auc": 0.8516,
+            "average_precision": 0.055,
+            "precision": 0.0386,
+            "recall": 0.6111,
+            "f1": 0.0726,
+            "predicted_positive": 570
           },
           "PiStacking": {
-            "support": 478,
-            "base_rate": 0.1432,
-            "auc": 0.6078,
-            "average_precision": 0.2107,
-            "precision": 0.1826,
+            "support": 526,
+            "base_rate": 0.16784,
+            "auc": 0.6364,
+            "average_precision": 0.242,
+            "precision": 0.2286,
             "recall": 0.6046,
-            "f1": 0.2804,
-            "predicted_positive": 1583
+            "f1": 0.3318,
+            "predicted_positive": 1391
           },
           "PiCation": {
-            "support": 26,
-            "base_rate": 0.00779,
-            "auc": 0.7987,
-            "average_precision": 0.0379,
-            "precision": 0.0264,
-            "recall": 0.3846,
-            "f1": 0.0494,
-            "predicted_positive": 379
+            "support": 17,
+            "base_rate": 0.00542,
+            "auc": 0.8278,
+            "average_precision": 0.0201,
+            "precision": 0.0157,
+            "recall": 0.5294,
+            "f1": 0.0304,
+            "predicted_positive": 575
           },
           "CationPi": {
             "support": 0,
@@ -2412,13 +2433,13 @@
           },
           "XBDonor": {
             "support": 4,
-            "base_rate": 0.0012,
-            "auc": 0.9757,
-            "average_precision": 0.035,
-            "precision": 0.0308,
+            "base_rate": 0.00128,
+            "auc": 0.949,
+            "average_precision": 0.0193,
+            "precision": 0.0256,
             "recall": 0.5,
-            "f1": 0.058,
-            "predicted_positive": 65
+            "f1": 0.0488,
+            "predicted_positive": 78
           },
           "XBAcceptor": {
             "support": 0,
@@ -2451,14 +2472,14 @@
             "predicted_positive": 0
           }
         },
-        "macro_auc": 0.6343,
-        "macro_average_precision": 0.1132,
-        "macro_f1": 0.1659,
-        "macro_auc_all_types": 0.7514,
+        "macro_auc": 0.6703,
+        "macro_average_precision": 0.1254,
+        "macro_f1": 0.1827,
+        "macro_auc_all_types": 0.7732,
         "any_interaction": {
-          "base_rate": 0.2756,
-          "auc": 0.5626,
-          "average_precision": 0.3187
+          "base_rate": 0.2894,
+          "auc": 0.5796,
+          "average_precision": 0.3348
         }
       }
     },
@@ -2467,138 +2488,192 @@
         "history": [
           {
             "epoch": 1,
-            "train_loss": 0.5996,
-            "val_macro_auc": 0.6768,
-            "seconds": 25.0
+            "train_loss": 0.5908,
+            "val_macro_auc": 0.6585,
+            "seconds": 29.1
           },
           {
             "epoch": 2,
-            "train_loss": 0.5451,
-            "val_macro_auc": 0.6814,
-            "seconds": 27.1
+            "train_loss": 0.5416,
+            "val_macro_auc": 0.6702,
+            "seconds": 29.5
           },
           {
             "epoch": 3,
-            "train_loss": 0.5334,
-            "val_macro_auc": 0.6835,
-            "seconds": 24.8
+            "train_loss": 0.5308,
+            "val_macro_auc": 0.6686,
+            "seconds": 29.9
           },
           {
             "epoch": 4,
-            "train_loss": 0.526,
-            "val_macro_auc": 0.6835,
-            "seconds": 24.2
+            "train_loss": 0.5245,
+            "val_macro_auc": 0.6695,
+            "seconds": 29.6
           },
           {
             "epoch": 5,
-            "train_loss": 0.5224,
-            "val_macro_auc": 0.6786,
-            "seconds": 24.5
+            "train_loss": 0.5207,
+            "val_macro_auc": 0.6815,
+            "seconds": 34.8
           },
           {
             "epoch": 6,
-            "train_loss": 0.5183,
-            "val_macro_auc": 0.6806,
-            "seconds": 25.6
+            "train_loss": 0.5172,
+            "val_macro_auc": 0.6744,
+            "seconds": 28.6
           },
           {
             "epoch": 7,
-            "train_loss": 0.5156,
-            "val_macro_auc": 0.6782,
-            "seconds": 24.6
+            "train_loss": 0.514,
+            "val_macro_auc": 0.6781,
+            "seconds": 29.1
           },
           {
             "epoch": 8,
-            "train_loss": 0.5125,
+            "train_loss": 0.5103,
+            "val_macro_auc": 0.6744,
+            "seconds": 29.0
+          },
+          {
+            "epoch": 9,
+            "train_loss": 0.5081,
+            "val_macro_auc": 0.6846,
+            "seconds": 27.9
+          },
+          {
+            "epoch": 10,
+            "train_loss": 0.505,
+            "val_macro_auc": 0.6838,
+            "seconds": 28.6
+          },
+          {
+            "epoch": 11,
+            "train_loss": 0.503,
+            "val_macro_auc": 0.6801,
+            "seconds": 28.8
+          },
+          {
+            "epoch": 12,
+            "train_loss": 0.5004,
+            "val_macro_auc": 0.6849,
+            "seconds": 31.1
+          },
+          {
+            "epoch": 13,
+            "train_loss": 0.4967,
+            "val_macro_auc": 0.6763,
+            "seconds": 27.9
+          },
+          {
+            "epoch": 14,
+            "train_loss": 0.4944,
+            "val_macro_auc": 0.6755,
+            "seconds": 27.5
+          },
+          {
+            "epoch": 15,
+            "train_loss": 0.4927,
+            "val_macro_auc": 0.6809,
+            "seconds": 28.8
+          },
+          {
+            "epoch": 16,
+            "train_loss": 0.4895,
             "val_macro_auc": 0.6732,
-            "seconds": 26.0
+            "seconds": 28.8
+          },
+          {
+            "epoch": 17,
+            "train_loss": 0.4867,
+            "val_macro_auc": 0.6825,
+            "seconds": 30.8
           }
         ],
-        "best_epoch": 3,
-        "best_val_macro_auc": 0.6835,
+        "best_epoch": 12,
+        "best_val_macro_auc": 0.6849,
         "parameters": 1826508
       },
       "test": {
-        "atoms": 3338,
+        "atoms": 3134,
         "types_present": 8,
         "types_in_macro": 4,
         "min_support_for_macro": 50,
         "types_below_support": {
-          "Cationic": 27,
-          "Anionic": 26,
-          "PiCation": 26,
+          "Cationic": 19,
+          "Anionic": 36,
+          "PiCation": 17,
           "XBDonor": 4
         },
         "per_type": {
           "Hydrophobic": {
-            "support": 252,
-            "base_rate": 0.07549,
-            "auc": 0.6626,
-            "average_precision": 0.1225,
-            "precision": 0.1142,
-            "recall": 0.6151,
-            "f1": 0.1927,
-            "predicted_positive": 1357
+            "support": 212,
+            "base_rate": 0.06765,
+            "auc": 0.6794,
+            "average_precision": 0.1379,
+            "precision": 0.099,
+            "recall": 0.7689,
+            "f1": 0.1754,
+            "predicted_positive": 1647
           },
           "HBDonor": {
-            "support": 104,
-            "base_rate": 0.03116,
-            "auc": 0.6165,
-            "average_precision": 0.0462,
-            "precision": 0.0362,
-            "recall": 0.7885,
-            "f1": 0.0692,
-            "predicted_positive": 2267
+            "support": 81,
+            "base_rate": 0.02585,
+            "auc": 0.7373,
+            "average_precision": 0.0582,
+            "precision": 0.0473,
+            "recall": 0.7407,
+            "f1": 0.0889,
+            "predicted_positive": 1269
           },
           "HBAcceptor": {
-            "support": 138,
-            "base_rate": 0.04134,
-            "auc": 0.6319,
-            "average_precision": 0.0686,
-            "precision": 0.0626,
-            "recall": 0.5,
-            "f1": 0.1113,
-            "predicted_positive": 1102
+            "support": 150,
+            "base_rate": 0.04786,
+            "auc": 0.6645,
+            "average_precision": 0.0899,
+            "precision": 0.0869,
+            "recall": 0.4467,
+            "f1": 0.1455,
+            "predicted_positive": 771
           },
           "Cationic": {
-            "support": 27,
-            "base_rate": 0.00809,
-            "auc": 0.8623,
-            "average_precision": 0.068,
-            "precision": 0.0288,
-            "recall": 0.5556,
-            "f1": 0.0547,
-            "predicted_positive": 521
+            "support": 19,
+            "base_rate": 0.00606,
+            "auc": 0.894,
+            "average_precision": 0.0551,
+            "precision": 0.0319,
+            "recall": 0.6842,
+            "f1": 0.0609,
+            "predicted_positive": 408
           },
           "Anionic": {
-            "support": 26,
-            "base_rate": 0.00779,
-            "auc": 0.8775,
-            "average_precision": 0.0448,
-            "precision": 0.0351,
-            "recall": 0.5385,
-            "f1": 0.0659,
-            "predicted_positive": 399
+            "support": 36,
+            "base_rate": 0.01149,
+            "auc": 0.845,
+            "average_precision": 0.045,
+            "precision": 0.0349,
+            "recall": 0.6111,
+            "f1": 0.0661,
+            "predicted_positive": 630
           },
           "PiStacking": {
-            "support": 478,
-            "base_rate": 0.1432,
-            "auc": 0.6766,
-            "average_precision": 0.2589,
-            "precision": 0.2002,
-            "recall": 0.7866,
-            "f1": 0.3192,
-            "predicted_positive": 1878
+            "support": 526,
+            "base_rate": 0.16784,
+            "auc": 0.6738,
+            "average_precision": 0.2997,
+            "precision": 0.2425,
+            "recall": 0.6331,
+            "f1": 0.3507,
+            "predicted_positive": 1373
           },
           "PiCation": {
-            "support": 26,
-            "base_rate": 0.00779,
-            "auc": 0.8555,
-            "average_precision": 0.0383,
-            "precision": 0.0361,
-            "recall": 0.3846,
-            "f1": 0.066,
-            "predicted_positive": 277
+            "support": 17,
+            "base_rate": 0.00542,
+            "auc": 0.823,
+            "average_precision": 0.0194,
+            "precision": 0.0222,
+            "recall": 0.4706,
+            "f1": 0.0424,
+            "predicted_positive": 360
           },
           "CationPi": {
             "support": 0,
@@ -2612,13 +2687,13 @@
           },
           "XBDonor": {
             "support": 4,
-            "base_rate": 0.0012,
-            "auc": 0.985,
-            "average_precision": 0.0554,
-            "precision": 0.0429,
-            "recall": 0.75,
-            "f1": 0.0811,
-            "predicted_positive": 70
+            "base_rate": 0.00128,
+            "auc": 0.9504,
+            "average_precision": 0.0226,
+            "precision": 0.0241,
+            "recall": 0.5,
+            "f1": 0.046,
+            "predicted_positive": 83
           },
           "XBAcceptor": {
             "support": 0,
@@ -2651,32 +2726,32 @@
             "predicted_positive": 0
           }
         },
-        "macro_auc": 0.6469,
-        "macro_average_precision": 0.124,
-        "macro_f1": 0.1731,
-        "macro_auc_all_types": 0.771,
+        "macro_auc": 0.6887,
+        "macro_average_precision": 0.1464,
+        "macro_f1": 0.1901,
+        "macro_auc_all_types": 0.7834,
         "any_interaction": {
-          "base_rate": 0.2756,
-          "auc": 0.5704,
-          "average_precision": 0.3231
+          "base_rate": 0.2894,
+          "auc": 0.5804,
+          "average_precision": 0.3494
         }
       }
     },
     "_ablation": {
       "metric": "macro_auc",
-      "with_pocket": 0.6751,
-      "without_pocket": 0.6469,
-      "delta": 0.0282,
+      "with_pocket": 0.7117,
+      "without_pocket": 0.6887,
+      "delta": 0.023,
       "verdict": "uses_the_pocket",
-      "reason": "removing the pocket costs 0.0282, at or above the 0.02 margin"
+      "reason": "removing the pocket costs 0.0230, at or above the 0.02 margin"
     },
     "_shuffle_check": {
       "metric": "macro_auc",
-      "with_pocket": 0.6751,
-      "without_pocket": 0.6343,
-      "delta": 0.0408,
+      "with_pocket": 0.7117,
+      "without_pocket": 0.6703,
+      "delta": 0.0414,
       "verdict": "uses_the_pocket",
-      "reason": "removing the pocket costs 0.0408, at or above the 0.02 margin"
+      "reason": "removing the pocket costs 0.0414, at or above the 0.02 margin"
     }
   }
 }
