@@ -70,6 +70,98 @@ class PocketConditionedAtomModel(nn.Module):
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
 
 
+class GeometricPocketAtomModel(nn.Module):
+    """Atoms attend to their own 3D pocket neighbourhoods.
+
+    The earlier model projected a six-number pocket descriptor and added it to
+    every atom alike. Measured across three independent cycles, that cost
+    -0.013 to +0.003 macro AUC against having no pocket at all, while a random
+    forest on the same features gained +0.040 — the information was there and
+    the conditioning was throwing it away. A vector added identically to every
+    atom can say "this pocket is 11% anionic"; it cannot say "*this* atom has a
+    carboxylate oxygen 2.9 A away", which is the fact that decides the label.
+
+    Here each atom cross-attends over its own nearest pocket atoms, described
+    by distance and chemistry. Two properties are deliberate:
+
+    **The ablation is still one flag.** `use_pocket=False` masks the
+    neighbourhood instead of changing the architecture, so the control has the
+    same parameters, the same depth and the same training schedule. That is
+    what made the earlier comparison trustworthy and it would have been easy to
+    lose here.
+
+    **Only distances enter, never coordinates.** The representation is
+    invariant to rotation and translation by construction, so nothing is spent
+    learning that a PDB file's reference frame is arbitrary.
+    """
+
+    def __init__(self, atom_dim, neighbour_dim, hidden=192, layers=4, heads=6,
+                 dropout=0.1, n_types=len(INTERACTIONS), use_pocket=True):
+        super().__init__()
+        self.use_pocket = use_pocket
+        self.hidden = hidden
+        self.atom_in = nn.Sequential(
+            nn.Linear(atom_dim, hidden), nn.GELU(), nn.LayerNorm(hidden))
+        self.neighbour_in = nn.Sequential(
+            nn.Linear(neighbour_dim, hidden), nn.GELU(), nn.LayerNorm(hidden))
+        self.pocket_attention = nn.MultiheadAttention(
+            hidden, heads, dropout=dropout, batch_first=True)
+        self.pocket_norm = nn.LayerNorm(hidden)
+        encoder_layer = nn.TransformerEncoderLayer(
+            d_model=hidden, nhead=heads, dim_feedforward=hidden * 4,
+            dropout=dropout, batch_first=True, norm_first=True, activation='gelu')
+        self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=layers)
+        self.head = nn.Sequential(
+            nn.LayerNorm(hidden), nn.Linear(hidden, hidden), nn.GELU(),
+            nn.Dropout(dropout), nn.Linear(hidden, n_types))
+
+    def forward(self, atoms, neighbours, neighbour_mask, mask):
+        """atoms (B, A, atom_dim), neighbours (B, A, K, nd), masks (B, A, K) and (B, A)."""
+        h = self.atom_in(atoms)
+        if self.use_pocket:
+            batch, n_atoms, k, _ = neighbours.shape
+            queries = h.reshape(batch * n_atoms, 1, self.hidden)
+            keys = self.neighbour_in(neighbours).reshape(batch * n_atoms, k, self.hidden)
+            padding = ~neighbour_mask.reshape(batch * n_atoms, k)
+            # A padded ligand slot has no neighbours at all, and attention over
+            # an entirely masked row softmaxes to NaN and poisons the batch.
+            # Those rows are given a dummy key and their output discarded.
+            empty = padding.all(dim=1)
+            padding = padding.clone()
+            padding[empty, 0] = False
+            context, _weights = self.pocket_attention(
+                queries, keys, keys, key_padding_mask=padding, need_weights=False)
+            context = context.reshape(batch, n_atoms, self.hidden)
+            context = context * (~empty).reshape(batch, n_atoms, 1)
+            h = self.pocket_norm(h + context)
+        h = self.encoder(h, src_key_padding_mask=~mask)
+        return self.head(h)
+
+    def parameter_count(self):
+        return sum(p.numel() for p in self.parameters() if p.requires_grad)
+
+
+def collate_geometric(batch, atom_dim, neighbour_dim, k):
+    """Pad a batch for the geometric model: atoms, neighbourhoods and two masks."""
+    width = max(e['n_heavy'] for e in batch)
+    atoms = torch.zeros(len(batch), width, atom_dim)
+    neighbours = torch.zeros(len(batch), width, k, neighbour_dim)
+    neighbour_mask = torch.zeros(len(batch), width, k, dtype=torch.bool)
+    labels = torch.zeros(len(batch), width, len(INTERACTIONS))
+    mask = torch.zeros(len(batch), width, dtype=torch.bool)
+    for i, example in enumerate(batch):
+        n = example['n_heavy']
+        atoms[i, :n] = torch.from_numpy(example['atom_features'][:n])
+        labels[i, :n] = torch.from_numpy(example['labels'][:n].astype('float32'))
+        mask[i, :n] = True
+        nf, nm = example.get('neighbour_features'), example.get('neighbour_mask')
+        if nf is not None:
+            rows = min(n, nf.shape[0])
+            neighbours[i, :rows] = torch.from_numpy(nf[:rows])
+            neighbour_mask[i, :rows] = torch.from_numpy(nm[:rows])
+    return atoms, neighbours, neighbour_mask, mask, labels
+
+
 def collate(batch, atom_dim, pocket_dim):
     """Pad a batch of variable-length molecules; mask marks the real atoms."""
     width = max(e['n_heavy'] for e in batch)

@@ -132,7 +132,7 @@ def record_to_example(record):
         mol = Chem.RemoveHs(mol)
         n_heavy = mol.GetNumAtoms()
     atoms = np.array([atom_features(mol, i) for i in range(n_heavy)], dtype=np.float32)
-    return {
+    example = {
         'key': (record['pdb_id'], record['comp_id']),
         'smiles': record['smiles'],
         'uniprot': record['uniprot'],
@@ -142,10 +142,33 @@ def record_to_example(record):
         'labels': label_matrix(record, n_heavy),
         'n_heavy': n_heavy,
     }
+    features, mask = neighbour_features(record)
+    if features is not None and features.shape[0] == n_heavy:
+        # A mismatch means the stored coordinates belong to a different atom
+        # ordering than the SMILES this example is built from, which would pair
+        # every atom with someone else's neighbourhood. Dropping the geometry
+        # is the safe answer; a silent misalignment is not.
+        example['neighbour_features'] = features
+        example['neighbour_mask'] = mask
+    return example
 
 
-def load_examples(release, split_map=None, subset=None):
-    """Examples from the corpus, optionally restricted to one split subset."""
+def load_examples(release, split_map=None, subset=None, geometry=True):
+    """Examples from the corpus, optionally restricted to one split subset.
+
+    Geometry lives in two places and is merged here. Complexes built after the
+    corpus started storing coordinates carry them in the record; earlier ones
+    are filled from the backfill sidecar, which is written separately because
+    the build appends to the record shards continuously and rewriting a file
+    another process is appending to is how corpora get silently corrupted.
+    """
+    sidecar = {}
+    if geometry:
+        try:
+            from pharmacophore.backfill_geometry import load_sidecar, key_of
+            sidecar = load_sidecar(release)
+        except Exception:
+            sidecar = {}
     out = []
     for record in iter_records(release):
         if record.get('rejected'):
@@ -155,10 +178,118 @@ def load_examples(release, split_map=None, subset=None):
             where = split_map.get(key)
             if where is None or (subset and where != subset):
                 continue
+        if sidecar and not record.get('pocket_atoms'):
+            extra = sidecar.get(key_of(record))
+            if extra:
+                record = dict(record, ligand_xyz=extra['ligand_xyz'],
+                              pocket_atoms=extra['pocket_atoms'])
         example = record_to_example(record)
         if example is not None:
             out.append(example)
     return out
+
+
+def geometry_coverage(examples):
+    """How many examples actually carry a neighbourhood.
+
+    Reported rather than assumed: training the geometric arm on a corpus that
+    is only half backfilled would quietly compare a pocket-aware model on half
+    the data against a ligand-only model on all of it.
+    """
+    with_geometry = sum(1 for e in examples if e.get('neighbour_features') is not None)
+    return {'examples': len(examples), 'with_geometry': with_geometry,
+            'fraction': round(with_geometry / max(len(examples), 1), 4)}
+
+
+# --------------------------------------------------------------------------
+# Geometric pocket neighbourhoods
+# --------------------------------------------------------------------------
+
+# Neighbours kept per ligand atom. Sixteen covers the first shell comfortably --
+# a buried atom has roughly 10-14 protein atoms within 5 A -- without padding
+# most rows with far-away atoms that carry no signal.
+N_NEIGHBOURS = 16
+
+# Gaussian centres for the distance expansion, in Angstroms. A raw distance is a
+# poor input: the difference between 2.8 and 3.2 A decides whether something is
+# a hydrogen bond, while 7 and 8 A are equally irrelevant. Expanding onto
+# overlapping Gaussians lets the model weight those regimes separately.
+RBF_CENTRES = np.array([2.0, 2.75, 3.5, 4.25, 5.0, 5.75, 6.5, 8.0], dtype=np.float32)
+RBF_WIDTH = 0.75
+
+NEIGHBOUR_ELEMENTS = ['C', 'N', 'O', 'S']
+
+HYDROPHOBIC_RES = {'ALA', 'VAL', 'LEU', 'ILE', 'MET', 'PRO', 'PHE', 'TRP'}
+AROMATIC_RES = {'PHE', 'TYR', 'TRP', 'HIS'}
+CATIONIC_RES = {'LYS', 'ARG', 'HIS'}
+ANIONIC_RES = {'ASP', 'GLU'}
+POLAR_RES = {'SER', 'THR', 'ASN', 'GLN', 'CYS', 'TYR'}
+BACKBONE_ATOMS = {'N', 'CA', 'C', 'O', 'OXT'}
+
+# distance RBFs + element one-hot (+other) + 5 residue classes + backbone flag
+NEIGHBOUR_DIM = len(RBF_CENTRES) + len(NEIGHBOUR_ELEMENTS) + 1 + 5 + 1
+
+
+def neighbour_features(record, k=N_NEIGHBOURS):
+    """(n_heavy, k, NEIGHBOUR_DIM) and a (n_heavy, k) mask of real neighbours.
+
+    For each ligand heavy atom, its `k` nearest pocket atoms described by how
+    far away they are and what they are. This is what the composition fractions
+    could never express: a fraction says the pocket is 11% anionic, this says
+    *this* atom has a carboxylate oxygen 2.8 A away.
+
+    Only distances are used, never raw coordinates, so the representation is
+    invariant to rotation and translation by construction rather than by
+    augmentation — there is nothing for the model to learn about the arbitrary
+    frame a PDB file happens to be deposited in.
+
+    Returns `None` when the record has no stored geometry, which is how a
+    corpus that is only partly backfilled stays usable.
+    """
+    ligand_xyz = record.get('ligand_xyz')
+    pocket_atoms = record.get('pocket_atoms')
+    if not ligand_xyz or not pocket_atoms:
+        return None, None
+
+    lig = np.asarray(ligand_xyz, dtype=np.float32)
+    coords = np.asarray([[a[3], a[4], a[5]] for a in pocket_atoms], dtype=np.float32)
+    n_heavy = lig.shape[0]
+    features = np.zeros((n_heavy, k, NEIGHBOUR_DIM), dtype=np.float32)
+    mask = np.zeros((n_heavy, k), dtype=bool)
+    if not coords.size:
+        return features, mask
+
+    # Describe each pocket atom once; the same atom is a neighbour of many
+    # ligand atoms and rebuilding this inside the loop is what made an early
+    # version unusably slow.
+    identity = np.zeros((len(pocket_atoms), NEIGHBOUR_DIM - len(RBF_CENTRES)),
+                        dtype=np.float32)
+    for i, atom in enumerate(pocket_atoms):
+        element, resname, atom_name = atom[0], atom[1], atom[2]
+        offset = 0
+        if element in NEIGHBOUR_ELEMENTS:
+            identity[i, NEIGHBOUR_ELEMENTS.index(element)] = 1.0
+        else:
+            identity[i, len(NEIGHBOUR_ELEMENTS)] = 1.0
+        offset = len(NEIGHBOUR_ELEMENTS) + 1
+        for j, group in enumerate((HYDROPHOBIC_RES, AROMATIC_RES, CATIONIC_RES,
+                                   ANIONIC_RES, POLAR_RES)):
+            if resname in group:
+                identity[i, offset + j] = 1.0
+        if atom_name in BACKBONE_ATOMS:
+            identity[i, offset + 5] = 1.0
+
+    distances = np.linalg.norm(lig[:, None, :] - coords[None, :, :], axis=2)
+    take = min(k, coords.shape[0])
+    nearest = np.argpartition(distances, take - 1, axis=1)[:, :take]
+    for atom_index in range(n_heavy):
+        order = nearest[atom_index][np.argsort(distances[atom_index][nearest[atom_index]])]
+        d = distances[atom_index][order]
+        rbf = np.exp(-((d[:, None] - RBF_CENTRES[None, :]) ** 2) / (2 * RBF_WIDTH ** 2))
+        features[atom_index, :take, :len(RBF_CENTRES)] = rbf
+        features[atom_index, :take, len(RBF_CENTRES):] = identity[order]
+        mask[atom_index, :take] = True
+    return features, mask
 
 
 def promiscuous_ligands(release):

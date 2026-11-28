@@ -259,6 +259,75 @@ class PocketFeatureIndependenceTests(unittest.TestCase):
         self.assertNotEqual(charged, greasy)
 
 
+class GeometricPocketTests(unittest.TestCase):
+    """The 3D conditioning must be invariant, aligned, and a fair control."""
+
+    @staticmethod
+    def _record():
+        return {
+            'ligand_xyz': [[0.0, 0.0, 0.0], [1.5, 0.0, 0.0]],
+            'pocket_atoms': [
+                ['O', 'ASP', 'OD1', 2.8, 0.0, 0.0],
+                ['C', 'LEU', 'CD1', 0.0, 4.0, 0.0],
+                ['N', 'LYS', 'NZ', 6.0, 0.0, 0.0],
+            ],
+        }
+
+    def test_features_are_rotation_and_translation_invariant(self):
+        import numpy as np
+        from pharmacophore import dataset as D
+        record = self._record()
+        before, _ = D.neighbour_features(record)
+        angle = 0.9
+        rotation = np.array([[np.cos(angle), -np.sin(angle), 0],
+                             [np.sin(angle), np.cos(angle), 0], [0, 0, 1]])
+        shift = np.array([11.0, -4.0, 23.0])
+        moved = {
+            'ligand_xyz': (np.asarray(record['ligand_xyz']) @ rotation.T + shift).tolist(),
+            'pocket_atoms': [a[:3] + list(np.asarray(a[3:6]) @ rotation.T + shift)
+                             for a in record['pocket_atoms']],
+        }
+        after, _ = D.neighbour_features(moved)
+        self.assertLess(float(np.abs(before - after).max()), 1e-4)
+
+    def test_nearest_neighbour_is_actually_nearest(self):
+        from pharmacophore import dataset as D
+        features, mask = D.neighbour_features(self._record())
+        # Ligand atom 0 sits 2.8 A from the aspartate oxygen, its closest
+        # neighbour, so that neighbour's slot must carry the anionic flag.
+        offset = len(D.RBF_CENTRES) + len(D.NEIGHBOUR_ELEMENTS) + 1
+        anionic = offset + 3
+        self.assertEqual(features[0][0][anionic], 1.0)
+        self.assertTrue(mask[0][0])
+
+    def test_missing_geometry_is_reported_not_faked(self):
+        from pharmacophore import dataset as D
+        features, mask = D.neighbour_features({'ligand_xyz': None, 'pocket_atoms': None})
+        self.assertIsNone(features)
+        self.assertIsNone(mask)
+
+    def test_the_ablation_is_the_same_model(self):
+        from pharmacophore import dataset as D
+        from pharmacophore import model as Model
+        on = Model.GeometricPocketAtomModel(26, D.NEIGHBOUR_DIM, use_pocket=True)
+        off = Model.GeometricPocketAtomModel(26, D.NEIGHBOUR_DIM, use_pocket=False)
+        # Same parameters either way: a difference between the arms is the
+        # conditioning, not capacity.
+        self.assertEqual(on.parameter_count(), off.parameter_count())
+
+    def test_an_atom_with_no_neighbours_does_not_produce_nan(self):
+        import torch
+        from pharmacophore import dataset as D
+        from pharmacophore import model as Model
+        net = Model.GeometricPocketAtomModel(26, D.NEIGHBOUR_DIM)
+        atoms = torch.randn(2, 4, 26)
+        neighbours = torch.randn(2, 4, D.N_NEIGHBOURS, D.NEIGHBOUR_DIM)
+        nmask = torch.ones(2, 4, D.N_NEIGHBOURS, dtype=torch.bool)
+        nmask[0, 1, :] = False
+        mask = torch.ones(2, 4, dtype=torch.bool)
+        self.assertTrue(bool(torch.isfinite(net(atoms, neighbours, nmask, mask)).all()))
+
+
 class MacroSupportFloorTests(unittest.TestCase):
     """A type with a handful of positives must not swing the headline number."""
 
