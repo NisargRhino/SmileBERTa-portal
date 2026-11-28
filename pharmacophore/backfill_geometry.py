@@ -126,9 +126,12 @@ def run(release, limit=None, shard=0, of=1, log=print):
             handle.flush()
             if index % 200 == 0:
                 rate = index / max(time.time() - started, 1) * 60
-                left = (len(ids) - index) / max(rate, 1e-6)
-                log('  %d/%d entries  %.0f/min  %d written  %d failed  ~%.1f h left'
-                    % (index, len(ids), rate, written, failed, left))
+                # Minutes, because `rate` is per minute. Dividing by a
+                # per-minute rate and printing "h" turned a 49-minute job into
+                # a reported 49 hours.
+                left_minutes = (len(ids) - index) / max(rate, 1e-6)
+                log('  %d/%d entries  %.0f/min  %d written  %d failed  ~%.0f min left'
+                    % (index, len(ids), rate, written, failed, left_minutes))
     log('done: %d complexes written, %d failed' % (written, failed))
     return written
 
