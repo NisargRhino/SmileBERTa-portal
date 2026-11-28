@@ -126,7 +126,23 @@ Restricted to ligands observed bound to more than one protein — the only compl
 
 *The geometric transformer had not finished when this draft was generated; its column is blank rather than filled with a guess.*
 
-### 3.4 Reverse direction: a pocket in, fragments out
+### 3.4 How much of the geometric score is the label definition?
+
+Interactions in this corpus are defined geometrically: a salt bridge is a charged ligand atom within 5.0 Å of an oppositely charged protein atom, a hydrophobic contact is two apolar atoms within about 4.5 Å. The geometric model receives, per atom, the distances to its nearest pocket atoms with their element and residue class — most of what those definitions consume. A high absolute score could therefore reflect the model recovering the rule that generated its own labels rather than learning chemistry.
+
+To bound this we wrote those definitions out as hand-coded rules over the model's own input features, fitting no parameters, and scored them identically:
+
+| Regime | Rule baseline (no parameters) | Test atoms |
+| --- | --- | --- |
+| unseen ligand | 0.7722 | 108,620 |
+| unseen protein | 0.7615 | 90,594 |
+| both unseen | 0.8155 | 5,208 |
+
+These rules, with nothing fitted, outperform the descriptor transformer. The learned geometric model should therefore be read as improving on this baseline rather than on chance, and the conclusion to draw is that **predicting interactions given a pose is largely determined by geometry**. What remains genuinely open is prediction without a pose.
+
+This also bounds the practical value of the forward model: if a pose is already available, much of the answer follows from it. The ablation comparison in §3.3 is unaffected, since it compares a model with its own matched control rather than with chance.
+
+### 3.5 Reverse direction: a pocket in, fragments out
 
 *Pending: the reverse-direction run had not completed when this draft was generated.*
 

@@ -52,6 +52,7 @@ def build(release, out_path, log=print):
     model = _load(release, 'model.json')
     geometric = _load(release, 'model_geometric.json')
     reverse = _load(release, 'reverse.json')
+    rules = _load(release, 'rule_baseline.json')
     splits = None
     split_path = os.path.join(release, 'splits', 'README.json')
     if os.path.exists(split_path):
@@ -329,7 +330,51 @@ def build(release, out_path, log=print):
           'generated; its column is blank rather than filled with a guess.*')
         w('')
 
-    w('### 3.4 Reverse direction: a pocket in, fragments out')
+    w('### 3.4 How much of the geometric score is the label definition?')
+    w('')
+    w('Interactions in this corpus are defined geometrically: a salt bridge is '
+      'a charged ligand atom within 5.0 Å of an oppositely charged protein '
+      'atom, a hydrophobic contact is two apolar atoms within about 4.5 Å. The '
+      'geometric model receives, per atom, the distances to its nearest pocket '
+      'atoms with their element and residue class — most of what those '
+      'definitions consume. A high absolute score could therefore reflect the '
+      'model recovering the rule that generated its own labels rather than '
+      'learning chemistry.')
+    w('')
+    if rules:
+        w('To bound this we wrote those definitions out as hand-coded rules '
+          'over the model\'s own input features, fitting no parameters, and '
+          'scored them identically:')
+        w('')
+        w('| Regime | Rule baseline (no parameters) | Test atoms |')
+        w('| --- | --- | --- |')
+        for regime in REGIMES:
+            entry = (rules or {}).get(regime) or {}
+            test = entry.get('test') or {}
+            if not test:
+                continue
+            w('| %s | %s | %s |'
+              % (REGIME_NAMES[regime], _p(test.get('macro_auc')),
+                 f"{test.get('atoms', 0):,}"))
+        w('')
+        w('These rules, with nothing fitted, outperform the descriptor '
+          'transformer. The learned geometric model should therefore be read '
+          'as improving on this baseline rather than on chance, and the '
+          'conclusion to draw is that **predicting interactions given a pose '
+          'is largely determined by geometry**. What remains genuinely open is '
+          'prediction without a pose.')
+        w('')
+        w('This also bounds the practical value of the forward model: if a '
+          'pose is already available, much of the answer follows from it. The '
+          'ablation comparison in §3.3 is unaffected, since it compares a '
+          'model with its own matched control rather than with chance.')
+        w('')
+    else:
+        w('*Pending: the rule baseline had not completed when this draft was '
+          'generated.*')
+        w('')
+
+    w('### 3.5 Reverse direction: a pocket in, fragments out')
     w('')
     if reverse:
         w('The per-atom model cannot screen candidate fragments against a '
