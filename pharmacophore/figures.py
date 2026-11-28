@@ -44,10 +44,43 @@ plt.rcParams.update({
 })
 
 
+# Journal figure widths in inches. Most chemistry and cheminformatics journals
+# typeset to roughly these, and a figure drawn at the wrong width gets scaled by
+# the typesetter, which silently changes every font size on it.
+SINGLE_COLUMN = 3.46
+DOUBLE_COLUMN = 7.09
+
+PAPER_MODE = os.environ.get('SB_PAPER_FIGURES', '0') == '1'
+
+
+def use_paper_style():
+    """Switch to settings a journal will accept.
+
+    Vector output, real font sizes rather than whatever looked right on screen,
+    and fonts embedded as TrueType -- the default Type 3 fonts are rejected by
+    several publishers' submission systems and the rejection happens after
+    review, which is the worst possible time to discover it.
+    """
+    plt.rcParams.update({
+        'figure.dpi': 300, 'savefig.dpi': 300,
+        'font.size': 7, 'axes.titlesize': 7.5, 'axes.labelsize': 7,
+        'xtick.labelsize': 6.5, 'ytick.labelsize': 6.5, 'legend.fontsize': 6.5,
+        'axes.titleweight': 'bold', 'axes.linewidth': 0.6,
+        'xtick.major.width': 0.6, 'ytick.major.width': 0.6,
+        'pdf.fonttype': 42, 'ps.fonttype': 42,
+        'savefig.bbox': 'tight', 'savefig.pad_inches': 0.02,
+        'figure.facecolor': 'white',
+    })
+
+
 def _save(fig, out_dir, name, payload):
     os.makedirs(out_dir, exist_ok=True)
     png = os.path.join(out_dir, name + '.png')
     fig.savefig(png)
+    if PAPER_MODE:
+        # PDF beside the PNG: the PNG is for the README and the web page, the
+        # PDF is what goes to a journal. Same figure, so they cannot disagree.
+        fig.savefig(os.path.join(out_dir, name + '.pdf'))
     plt.close(fig)
     with open(os.path.join(out_dir, name + '.json'), 'w') as handle:
         json.dump(payload, handle, indent=2)
@@ -817,5 +850,12 @@ if __name__ == '__main__':
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--release', default='corpus/v1')
     ap.add_argument('--out', default=None)
+    ap.add_argument('--paper', action='store_true',
+                    help='journal settings: vector PDF beside each PNG, '
+                         'embedded TrueType fonts, real point sizes')
     args = ap.parse_args()
+    if args.paper:
+        PAPER_MODE = True
+        globals()['PAPER_MODE'] = True
+        use_paper_style()
     run(args.release, args.out)
