@@ -1,7 +1,7 @@
 /* Landing page interactions. */
 (function () {
   const { icon, TOOLS, LEARN, $, $$ } = SB;
-  const TAGS = { 'fragmentation': ['AI model', 'blue'], 'drug_class': ['AI model', 'blue'], 'combine': ['Chemistry', 'violet'], 'builder': ['Force field', 'cyan'], 'docking': ['Physics', 'green'], 'studio': ['Visualization', 'amber'], 'models': ['Notebooks', 'violet'], 'admet': ['Pharmacokinetics', 'green'] };
+  const TAGS = { 'fragmentation': ['AI model', 'blue'], 'drug_class': ['AI model', 'blue'], 'combine': ['Chemistry', 'violet'], 'builder': ['Force field', 'cyan'], 'docking': ['Physics', 'green'], 'studio': ['Visualization', 'amber'], 'models': ['Notebooks', 'violet'], 'admet': ['Pharmacokinetics', 'green'], 'pharmacophore': ['Crystal-trained', 'violet'] };
   const LONG = {
     'fragmentation': 'Give it a drug-like molecule and SmileBERTa predicts the fragment most relevant to binding. You get Rule-of-Three checks, a 3D conformer and a side-by-side property comparison.',
     'drug_class': 'Predict the therapeutic class of any compound (anti-infective, antineoplastic, CNS, cardiovascular and more), shown with ranked alternatives and a drug-likeness profile.',
@@ -10,6 +10,7 @@
     'docking': 'Load any PDB target, define a search box around the pocket, and dock ligands with AutoDock Vina. Inspect poses, affinities and H-bonds.',
     'studio': 'A Chimera-style viewer. Isolate chains, show backbones and surfaces, colour by secondary structure or B-factor, and measure distances and angles.',
     'admet': 'Profile absorption, water solubility, blood–brain barrier crossing, seven drug-likeness filters and PAINS/Brenk structural alerts. Every number cites the paper it comes from, and screens up to 200 compounds at once.',
+    'pharmacophore': 'For every heavy atom of a molecule, which protein interactions it is predicted to make \u2014 hydrogen bonds, salt bridges, \u03c0-stacking, hydrophobic contact. Trained on contacts measured in crystal structures rather than docking scores, and it labels atoms of your own molecule, so the answer is always a real substructure of what you gave it.',
     'models': 'Browse drug-discovery models on Hugging Face and generate a Colab-ready notebook wired to your own CSV, with SMILES validation, batching and export already written.',
   };
 

@@ -104,6 +104,7 @@
     { href: 'docking', icon: 'target', title: 'Docking', desc: 'Protein–ligand docking with AutoDock Vina' },
     { href: 'studio', icon: 'helix', title: 'Structure Studio', desc: 'Explore chains, backbones, surfaces' },
     { href: 'admet', icon: 'gauge', title: 'ADMET Profiler', desc: 'Absorption, solubility, drug-likeness, alerts' },
+    { href: 'pharmacophore', icon: 'target', title: 'Pharmacophore Predictor', desc: 'Per-atom interactions, trained on crystal contacts' },
     { href: 'models', icon: 'atom', title: 'Model Hub', desc: 'Hugging Face models → runnable notebooks' },
   ];
   const LEARN = [

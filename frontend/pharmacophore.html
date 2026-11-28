@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pharmacophore Predictor — SmileBERTa</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    .ex-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 9px; }
+
+    /* Per-atom rows. The bar is the score; the chips are the typed contacts. */
+    .atom { padding: 9px 0; border-bottom: 1px solid var(--border); }
+    .atom:last-child { border-bottom: 0; }
+    .atom-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+    .atom-id { font-family: var(--mono); font-size: .8rem; color: var(--text-2); }
+    .atom-score { font-family: var(--mono); font-size: .8rem; }
+    .bar { height: 5px; border-radius: 99px; background: var(--border); margin-top: 6px; overflow: hidden; }
+    .bar > i { display: block; height: 100%; background: var(--green); }
+    .types { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 7px; }
+    .type { font-size: .7rem; padding: 2px 7px; border-radius: 99px; border: 1px solid var(--border); color: var(--text-2); }
+
+    /* The claim banner. This is not decoration: the pose-free answer is a
+       weaker claim than the site-specific one and the page has to say which
+       one the user is looking at. */
+    .claim { border-left: 3px solid var(--amber); background: var(--bg-2); padding: 11px 13px; border-radius: 6px; font-size: .82rem; line-height: 1.55; margin-bottom: 16px; }
+    .claim.specific { border-left-color: var(--green); }
+    .claim b { display: block; margin-bottom: 3px; }
+    .metrics { font-size: .76rem; color: var(--muted); line-height: 1.6; }
+    .metrics code { font-size: .74rem; }
+    .unavailable { text-align: center; padding: 34px 18px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div id="site-nav"></div>
+  <main class="container">
+    <div class="page-head">
+      <div class="crumbs"><a href="./">Home</a><span>/</span><a href="./#tools">Tools</a><span>/</span><span>Pharmacophore Predictor</span></div>
+      <div class="eyebrow">Per-atom interactions · Crystal-trained</div>
+      <h1>Pharmacophore Predictor</h1>
+      <p class="lead">For every heavy atom of a molecule, which protein interactions it is predicted to make — hydrogen bonds, salt bridges, π-stacking, hydrophobic contact. Trained on interactions measured in crystal structures, not on docking scores. The prediction labels atoms of the molecule you give it, so the answer is always a real substructure of your input.</p>
+    </div>
+
+    <div id="unavailable" class="panel" hidden><div class="panel-body unavailable">
+      <div id="unavailable-msg">Checking for a trained model…</div>
+    </div></div>
+
+    <div id="tool" hidden>
+      <div class="panel" style="margin-bottom:18px"><div class="panel-body">
+        <label class="field">
+          <span>SMILES</span>
+          <div class="row" style="gap:8px;flex-wrap:wrap">
+            <input class="input mono" id="smi" placeholder="CC(=O)Oc1ccccc1C(=O)O" spellcheck="false" style="flex:1;min-width:220px">
+            <button class="btn btn-primary" id="run">Predict</button>
+          </div>
+        </label>
+        <label class="field" style="margin-top:12px">
+          <span>PDB entry (optional) — for a site-specific answer</span>
+          <input class="input mono" id="pdb" placeholder="3PTB" spellcheck="false" maxlength="4" style="max-width:150px">
+        </label>
+        <p class="metrics" style="margin-top:8px">
+          Without a PDB entry the model answers which atoms of this molecule
+          tend to interact in general. To ask which atoms bind a
+          <em>particular</em> protein it needs the crystallised pose, so give an
+          entry in which this molecule is bound.
+        </p>
+        <div class="ex-row" id="examples"></div>
+      </div></div>
+
+      <div id="out" hidden>
+        <div id="claim" class="claim"></div>
+        <div class="tool-grid">
+          <aside class="stack">
+            <div class="panel"><div class="panel-body">
+              <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:10px">
+                <b>Structure</b>
+                <div class="row" style="gap:6px">
+                  <button class="btn btn-sm" id="save">Save</button>
+                  <button class="btn btn-sm" id="csv">CSV</button>
+                </div>
+              </div>
+              <div id="depict" style="display:flex;justify-content:center;min-height:170px"></div>
+              <div class="kv" id="summary" style="margin-top:12px"></div>
+            </div></div>
+
+            <div class="panel"><div class="panel-body">
+              <b style="display:block;margin-bottom:8px">How it was measured</b>
+              <div class="metrics" id="provenance"></div>
+            </div></div>
+          </aside>
+
+          <section class="stack">
+            <div class="panel"><div class="panel-body">
+              <div class="row" style="justify-content:space-between;align-items:baseline;margin-bottom:4px">
+                <b>Predicted pharmacophore</b>
+                <span class="metrics" id="count"></span>
+              </div>
+              <p class="metrics" style="margin-bottom:10px">Atoms ranked by the strongest interaction predicted for them. Indices match the canonical SMILES shown on the left.</p>
+              <div id="atoms"></div>
+            </div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="assets/js/core.js"></script>
+  <script src="assets/js/pharmacophore.js"></script>
+</body>
+</html>
