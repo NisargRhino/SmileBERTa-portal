@@ -326,5 +326,47 @@ def select(pdb_id):
     return out
 
 
+# Pocket atoms this far from any ligand heavy atom cannot take part in any
+# interaction this project types: the widest cutoff in interactions.py is
+# PI_CENTROID_CUTOFF at 5.5 A and ProLIF's own top out near 6. Eight leaves
+# headroom and keeps the stored geometry to a few kilobytes per complex.
+GEOMETRY_RADIUS = 8.0
+
+
+def pocket_geometry(pocket, ligand_mol, radius=GEOMETRY_RADIUS):
+    """Coordinates for the geometric model: ligand atoms and nearby pocket atoms.
+
+    The corpus originally stored only residue *names* for the pocket, which is
+    enough for composition fractions but throws away where anything is. A model
+    given only fractions cannot know which ligand atom faces which residue, and
+    that is exactly why the pocket-conditioned network ignored the pocket while
+    a random forest on the same features did not.
+
+    Ligand coordinates are taken from `ligand_mol`'s conformer so their order
+    matches the heavy-atom indices used by `per_atom` labels. Getting that wrong
+    would silently pair every atom with the wrong neighbourhood.
+
+    Coordinates are rounded to 0.01 A. Crystallographic coordinates are not
+    meaningful past two decimals and the rounding roughly halves the stored
+    size.
+    """
+    conf = ligand_mol.GetConformer()
+    ligand_xyz = []
+    for i in range(ligand_mol.GetNumAtoms()):
+        p = conf.GetAtomPosition(i)
+        ligand_xyz.append([round(p.x, 2), round(p.y, 2), round(p.z, 2)])
+    lig = np.array(ligand_xyz) if ligand_xyz else np.zeros((0, 3))
+
+    atoms = []
+    for (resname, chain, resi), residue_atoms in pocket.items():
+        for atom in residue_atoms:
+            xyz = np.array(atom['xyz'])
+            if lig.size and float(np.linalg.norm(lig - xyz, axis=1).min()) > radius:
+                continue
+            atoms.append([atom['el'], resname, atom['name'],
+                          round(xyz[0], 2), round(xyz[1], 2), round(xyz[2], 2)])
+    return ligand_xyz, atoms
+
+
 def summarise_rejections(records):
     return dict(Counter(r['rejected'] for r in records if r.get('rejected')))

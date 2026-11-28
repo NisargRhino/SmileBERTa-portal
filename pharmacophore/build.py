@@ -109,6 +109,13 @@ def _process(pdb_id):
             out.append({'pdb_id': pdb_id, 'comp_id': rec['comp_id'],
                         'rejected': 'no_interactions_detected', 'detail': ''})
             continue
+        try:
+            ligand_xyz, pocket_atoms = C.pocket_geometry(rec['pocket'], rec['ligand_mol'])
+        except Exception:
+            # Geometry is an addition, not a precondition. A record without it
+            # still trains the composition-only model, and the backfill can
+            # supply it later.
+            ligand_xyz, pocket_atoms = None, None
         out.append({
             'pdb_id': pdb_id,
             'resolution': rec['resolution'],
@@ -126,6 +133,8 @@ def _process(pdb_id):
             'by_type': ifp['by_type'],
             'pocket_profile': I.pocket_feature_profile(ifp),
             'n_interactions': len(ifp['contacts']),
+            'ligand_xyz': ligand_xyz,
+            'pocket_atoms': pocket_atoms,
             'rejected': None,
         })
     return out
