@@ -1,0 +1,150 @@
+{
+  "both_unseen": {
+    "regime": "both_unseen",
+    "test": {
+      "atoms": 5208,
+      "types_present": 9,
+      "types_in_macro": 5,
+      "min_support_for_macro": 50,
+      "types_below_support": {
+        "Cationic": 31,
+        "PiCation": 29,
+        "XBDonor": 12,
+        "MetalDonor": 1
+      },
+      "per_type": {
+        "Hydrophobic": {
+          "support": 360,
+          "base_rate": 0.06912,
+          "auc": 0.5987,
+          "average_precision": 0.089,
+          "precision": 0.3333,
+          "recall": 0.0028,
+          "f1": 0.0055,
+          "predicted_positive": 3
+        },
+        "HBDonor": {
+          "support": 151,
+          "base_rate": 0.02899,
+          "auc": 0.8795,
+          "average_precision": 0.1834,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "predicted_positive": 0
+        },
+        "HBAcceptor": {
+          "support": 303,
+          "base_rate": 0.05818,
+          "auc": 0.8945,
+          "average_precision": 0.3751,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "predicted_positive": 0
+        },
+        "Cationic": {
+          "support": 31,
+          "base_rate": 0.00595,
+          "auc": 0.8264,
+          "average_precision": 0.0404,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "predicted_positive": 3
+        },
+        "Anionic": {
+          "support": 65,
+          "base_rate": 0.01248,
+          "auc": 0.9141,
+          "average_precision": 0.1582,
+          "precision": 0.6667,
+          "recall": 0.0308,
+          "f1": 0.0588,
+          "predicted_positive": 3
+        },
+        "PiStacking": {
+          "support": 728,
+          "base_rate": 0.13978,
+          "auc": 0.7905,
+          "average_precision": 0.2957,
+          "precision": 0.1231,
+          "recall": 0.022,
+          "f1": 0.0373,
+          "predicted_positive": 130
+        },
+        "PiCation": {
+          "support": 29,
+          "base_rate": 0.00557,
+          "auc": 0.7382,
+          "average_precision": 0.0189,
+          "precision": 0.0308,
+          "recall": 0.1379,
+          "f1": 0.0503,
+          "predicted_positive": 130
+        },
+        "CationPi": {
+          "support": 0,
+          "base_rate": 0.0,
+          "auc": null,
+          "average_precision": null,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "predicted_positive": 0
+        },
+        "XBDonor": {
+          "support": 12,
+          "base_rate": 0.0023,
+          "auc": 0.7352,
+          "average_precision": 0.007,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "predicted_positive": 0
+        },
+        "XBAcceptor": {
+          "support": 0,
+          "base_rate": 0.0,
+          "auc": null,
+          "average_precision": null,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "predicted_positive": 0
+        },
+        "MetalDonor": {
+          "support": 1,
+          "base_rate": 0.00019,
+          "auc": 0.2619,
+          "average_precision": 0.0002,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "predicted_positive": 0
+        },
+        "MetalAcceptor": {
+          "support": 0,
+          "base_rate": 0.0,
+          "auc": null,
+          "average_precision": null,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "predicted_positive": 0
+        }
+      },
+      "macro_auc": 0.8155,
+      "macro_average_precision": 0.2203,
+      "macro_f1": 0.0203,
+      "macro_auc_all_types": 0.7377,
+      "any_interaction": {
+        "base_rate": 0.2836,
+        "auc": 0.7274,
+        "average_precision": 0.4847
+      }
+    },
+    "complexes": 170,
+    "note": "no parameters fitted; these are the label definitions applied to the model's own input features"
+  }
+}
