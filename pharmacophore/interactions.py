@@ -84,6 +84,58 @@ def assign_protein_charges(mol):
 TRIM_MARGIN = 12.0
 
 
+def trim_pdb_text(pdb_text, near, margin=TRIM_MARGIN):
+    """Drop protein residues that are too far from any ligand to matter.
+
+    Done on the text, before protonation, because protonation is the expensive
+    step: Open Babel was adding hydrogens to every atom of a 30,000-atom
+    structure and 80% of them were discarded immediately afterwards. Whole
+    residues are kept or dropped so no residue is left half-protonated.
+    """
+    import numpy as np
+
+    points = []
+    for coords in near or []:
+        coords = np.asarray(coords, dtype=float)
+        if coords.size:
+            points.append(coords)
+    if not points:
+        return pdb_text
+    points = np.vstack(points)
+
+    lines = pdb_text.splitlines()
+    residue_lines, order, keep = {}, [], set()
+    for line in lines:
+        if not line.startswith('ATOM'):
+            continue
+        key = (line[21:22], line[22:27])
+        if key not in residue_lines:
+            residue_lines[key] = []
+            order.append(key)
+        residue_lines[key].append(line)
+
+    for key in order:
+        for line in residue_lines[key]:
+            try:
+                xyz = np.array([float(line[30:38]), float(line[38:46]), float(line[46:54])])
+            except ValueError:
+                continue
+            if float(np.linalg.norm(points - xyz, axis=1).min()) <= margin:
+                keep.add(key)
+                break
+    if not keep:
+        return pdb_text              # never hand back an empty receptor
+
+    out = []
+    for line in lines:
+        if line.startswith('ATOM'):
+            if (line[21:22], line[22:27]) in keep:
+                out.append(line)
+        elif not line.startswith(('ANISOU', 'HETATM')):
+            out.append(line)
+    return '\n'.join(out) + '\n'
+
+
 def protein_molecule(pdb_text, protonate=True, near=None, margin=TRIM_MARGIN):
     """A ProLIF Molecule for the protein, protonated and charged.
 
@@ -107,7 +159,10 @@ def protein_molecule(pdb_text, protonate=True, near=None, margin=TRIM_MARGIN):
     import numpy as np
     import prolif as plf
 
-    text, _added = P.protonated_pdb(pdb_text) if protonate else (pdb_text, 0)
+    # Trim before protonating, not after: adding hydrogens is the expensive
+    # step and there is no point doing it to atoms that are about to be dropped.
+    source = trim_pdb_text(pdb_text, near, margin) if near is not None else pdb_text
+    text, _added = P.protonated_pdb(source) if protonate else (source, 0)
     with tempfile.TemporaryDirectory() as d:
         path = os.path.join(d, 'protein.pdb')
         with open(path, 'w') as f:
