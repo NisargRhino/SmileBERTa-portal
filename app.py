@@ -899,6 +899,104 @@ def admin_feedback(user):
 
 # ── ADMET ────────────────────────────────────────────────────────────────────
 
+@app.route('/pharmacophore/status')
+def pharmacophore_status():
+    """Whether the model is available, and what it actually measured.
+
+    The metrics come with the model rather than from this file, so a redeploy
+    with a different checkpoint cannot leave a stale claim on the page.
+    """
+    try:
+        from pharmacophore import serve as ph_serve
+    except Exception as e:
+        return jsonify({'available': False, 'reason': f'not installed: {e}'})
+    if not ph_serve.available():
+        return jsonify({'available': False,
+                        'reason': 'no trained checkpoint on this host'})
+    try:
+        _net, blob = ph_serve._model()
+        meta = blob.get('metadata') or {}
+        return jsonify({
+            'available': True,
+            'kind': blob.get('kind'),
+            'interactions': blob.get('interactions'),
+            'trained_on_complexes': meta.get('complexes'),
+            'test_macro_auc': meta.get('test_macro_auc'),
+            'ablation_delta': meta.get('ablation_delta'),
+            'ablation_verdict': meta.get('ablation_verdict'),
+            # Shown so the page cannot present pose-free output as
+            # protein-specific; see /learn-pharmacophore.
+            'needs_pose_for_protein_specific': True,
+        })
+    except Exception as e:
+        return jsonify({'available': False, 'reason': str(e)[:160]})
+
+
+@app.route('/pharmacophore', methods=['POST'])
+def pharmacophore_route():
+    """Per-atom pharmacophore prediction for one molecule.
+
+    With `pdb_id`, the co-crystallised pose in that entry is used and the
+    answer is specific to that site. Without it the pocket is masked and the
+    answer is ligand-only — a weaker and different claim, which the payload
+    states rather than leaving to the caller.
+    """
+    try:
+        from pharmacophore import serve as ph_serve
+    except Exception as e:
+        return err(f'pharmacophore model not installed: {e}', 503)
+    if not ph_serve.available():
+        return err('No trained pharmacophore model on this host', 503)
+
+    data = body()
+    smiles = (data.get('smiles') or '').strip()
+    if not smiles:
+        return err('smiles is required')
+    if len(smiles) > 600:
+        return err('SMILES too long')
+
+    pocket_record = None
+    pdb_id = (data.get('pdb_id') or '').strip().upper()
+    if pdb_id:
+        if not (len(pdb_id) == 4 and pdb_id.isalnum()):
+            return err('pdb_id must be a 4-character PDB code')
+        try:
+            from pharmacophore import complexes as C
+            found = [r for r in C.select(pdb_id) if not r.get('rejected')]
+            if not found:
+                return err(f'No usable ligand found in {pdb_id}', 404)
+            # Match the requested molecule to a ligand in the entry; without a
+            # match the stored pose belongs to a different molecule and the
+            # neighbourhoods would describe the wrong atoms.
+            target = Chem.MolFromSmiles(smiles)
+            key = Chem.MolToInchiKey(target) if target else None
+            chosen = next((r for r in found if r.get('inchikey') == key), None)
+            if chosen is None:
+                names = ', '.join(sorted({r['comp_id'] for r in found})[:8])
+                return err(f'{pdb_id} does not contain that molecule. '
+                           f'Ligands present: {names}', 404)
+            pocket_record = ph_serve.pocket_from_pdb(chosen['pdb_text'],
+                                                     chosen['ligand_mol'])
+            smiles = chosen['smiles']
+        except Exception as e:
+            return err(f'Could not build a pocket from {pdb_id}: {e}', 502)
+
+    try:
+        out = ph_serve.predict(smiles, pocket_record=pocket_record,
+                               threshold=float(data.get('threshold', 0.5)))
+    except ValueError as e:
+        return err(str(e))
+    except Exception as e:
+        return err(f'Prediction failed: {e}', 500)
+
+    if data.get('svg', True):
+        try:
+            out['svg'] = depict_svg(Chem.MolFromSmiles(out['smiles']))
+        except Exception:
+            out['svg'] = None
+    return jsonify(out)
+
+
 @app.route('/admet', methods=['POST'])
 def admet_route():
     """Full ADMET profile for one molecule."""
